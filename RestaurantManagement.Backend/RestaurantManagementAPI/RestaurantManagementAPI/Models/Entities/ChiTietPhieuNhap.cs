@@ -13,5 +13,9 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("SoLuong")]
         public int SoLuong { get; set; }
+
+        
+        public PhieuNhapKho? PhieuNhapKho { get; set; }
+        public Kho? Kho { get; set; }
     }
 }

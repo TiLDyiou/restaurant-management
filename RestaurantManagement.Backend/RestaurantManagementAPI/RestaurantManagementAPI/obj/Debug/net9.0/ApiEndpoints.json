@@ -1,6 +1,54 @@
 [
   {
     "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "AdminUpdate",
+    "RelativePath": "api/Auth/admin-update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "RestaurentManagementAPI.DTOs.AdminUpdateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "ChangePassword",
+    "RelativePath": "api/Auth/change-password",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "RestaurentManagementAPI.DTOs.ChangePasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/Auth/DeleteUser",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "RestaurentManagementAPI.DTOs.DeleteUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "api/Auth/login",
     "HttpMethod": "POST",
@@ -42,33 +90,35 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.TestController",
-    "Method": "AdminOnly",
-    "RelativePath": "api/Test/admin-only",
-    "HttpMethod": "GET",
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Auth/reset-password",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "RestaurentManagementAPI.DTOs.ResetPasswordDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.TestController",
-    "Method": "CheckDb",
-    "RelativePath": "api/Test/check-db",
-    "HttpMethod": "GET",
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "Update",
+    "RelativePath": "api/Auth/update",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "RestaurentManagementAPI.Controllers.TestController",
-    "Method": "Staff",
-    "RelativePath": "api/Test/staff",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "RestaurentManagementAPI.DTOs.UpdateUserDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   }
 ]

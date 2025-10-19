@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RestaurentManagementAPI.Models.Entities
@@ -19,5 +20,8 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("SoLuongTon")]
         public int SoLuongTon { get; set; }
+
+        
+        public ICollection<ChiTietPhieuNhap>? ChiTietPhieuNhaps { get; set; } // 1-n
     }
 }

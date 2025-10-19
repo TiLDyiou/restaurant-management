@@ -12,6 +12,7 @@ namespace RestaurentManagementAPI.Models.Entities
         public string MaMA { get; set; } = string.Empty;
 
         [Column("TenMA")]
+        [Required]
         public string TenMA { get; set; } = string.Empty;
 
         [Column("DonGia")]
@@ -19,5 +20,8 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("Loai")]
         public string? Loai { get; set; }
+
+        
+        public ICollection<ChiTietHoaDon>? ChiTietHoaDons { get; set; } // 1-n
     }
 }

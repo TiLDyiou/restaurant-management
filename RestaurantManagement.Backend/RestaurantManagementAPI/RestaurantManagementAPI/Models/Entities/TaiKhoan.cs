@@ -11,7 +11,6 @@ namespace RestaurentManagementAPI.Models.Entities
         [StringLength(30)]
         public string TenDangNhap { get; set; } = string.Empty;
 
-        // Lưu hashed password hoặc plain (nếu DB cũ). Controller sẽ xử lý.
         [Column("MatKhau")]
         public string MatKhau { get; set; } = string.Empty;
 
@@ -21,5 +20,8 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("Quyen")]
         public string? Quyen { get; set; } = "NhanVien";
+
+        
+        public NhanVien NhanVien { get; set; } = null!;
     }
 }

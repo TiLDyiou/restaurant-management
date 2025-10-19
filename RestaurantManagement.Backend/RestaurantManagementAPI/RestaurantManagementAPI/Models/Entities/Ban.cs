@@ -16,5 +16,8 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("TrangThai")]
         public string? TrangThai { get; set; }
+
+      
+        public ICollection<HoaDon>? HoaDons { get; set; } // 1-n
     }
 }

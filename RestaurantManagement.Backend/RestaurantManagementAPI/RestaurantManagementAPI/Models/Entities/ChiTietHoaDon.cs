@@ -21,6 +21,10 @@ namespace RestaurentManagementAPI.Models.Entities
         public decimal DonGia { get; set; }
 
         [Column("ThanhTien")]
-        public decimal ThanhTien { get; set; } // Computed column
+        public decimal ThanhTien { get; set; }
+
+        
+        public HoaDon? HoaDon { get; set; }
+        public MonAn? MonAn { get; set; }
     }
 }
