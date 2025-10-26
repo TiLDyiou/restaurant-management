@@ -233,6 +233,191 @@
           }
         }
       }
+    },
+    "/api/get-dishes": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonAnDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonAnDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonAnDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get-dishes-info": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "parameters": [
+          {
+            "name": "maMA",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/add-dishes": {
+      "post": {
+        "tags": [
+          "Dishes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMonAnDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMonAnDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMonAnDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/update-dishes": {
+      "put": {
+        "tags": [
+          "Dishes"
+        ],
+        "parameters": [
+          {
+            "name": "maMA",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMonAnDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMonAnDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMonAnDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/delete-dishes": {
+      "delete": {
+        "tags": [
+          "Dishes"
+        ],
+        "parameters": [
+          {
+            "name": "maMA",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -281,6 +466,33 @@
         },
         "additionalProperties": false
       },
+      "CreateMonAnDto": {
+        "required": [
+          "loai",
+          "tenMA"
+        ],
+        "type": "object",
+        "properties": {
+          "tenMA": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "donGia": {
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "loai": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hinhAnh": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DeleteUserDto": {
         "type": "object",
         "properties": {
@@ -303,6 +515,32 @@
             "nullable": true
           },
           "matKhau": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MonAnDto": {
+        "type": "object",
+        "properties": {
+          "maMA": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenMA": {
+            "type": "string",
+            "nullable": true
+          },
+          "donGia": {
+            "type": "number",
+            "format": "double"
+          },
+          "loai": {
+            "type": "string",
+            "nullable": true
+          },
+          "hinhAnh": {
             "type": "string",
             "nullable": true
           }
@@ -357,6 +595,32 @@
         },
         "additionalProperties": false
       },
+      "UpdateMonAnDto": {
+        "required": [
+          "tenMA"
+        ],
+        "type": "object",
+        "properties": {
+          "tenMA": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "donGia": {
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "loai": {
+            "type": "string",
+            "nullable": true
+          },
+          "hinhAnh": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateUserDto": {
         "type": "object",
         "properties": {
@@ -371,6 +635,19 @@
         },
         "additionalProperties": false
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"12345abcdef\"",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
 }

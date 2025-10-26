@@ -1,5 +1,31 @@
 [
   {
+    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "Method": "PostDish",
+    "RelativePath": "api/add-dishes",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createDto",
+        "Type": "RestaurentManagementAPI.DTOs.CreateMonAnDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
     "Method": "AdminUpdate",
     "RelativePath": "api/Auth/admin-update",
@@ -116,6 +142,89 @@
       {
         "Name": "dto",
         "Type": "RestaurentManagementAPI.DTOs.UpdateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "Method": "DeleteDish",
+    "RelativePath": "api/delete-dishes",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maMA",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "Method": "GetDishes",
+    "RelativePath": "api/get-dishes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[RestaurentManagementAPI.DTOs.MonAnDto, RestaurantManagementAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "Method": "GetDish",
+    "RelativePath": "api/get-dishes-info",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maMA",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "Method": "PutDish",
+    "RelativePath": "api/update-dishes",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maMA",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateDto",
+        "Type": "RestaurentManagementAPI.DTOs.UpdateMonAnDto",
         "IsRequired": true
       }
     ],

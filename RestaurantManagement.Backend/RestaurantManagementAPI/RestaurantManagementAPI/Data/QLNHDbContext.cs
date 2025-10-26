@@ -66,8 +66,8 @@ namespace RestaurentManagementAPI.Data
             modelBuilder.Entity<MonAn>()
                 .HasMany(m => m.ChiTietHoaDons)
                 .WithOne(c => c.MonAn)
-                .HasForeignKey(c => c.MaMA)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(c => c.MaMA);
+                //.OnDelete(DeleteBehavior.Restrict); Cho phép tính năng "xoá mềm" hoạt động
 
             // ---------------- HoaDon ----------------
             modelBuilder.Entity<HoaDon>()

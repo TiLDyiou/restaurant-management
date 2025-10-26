@@ -11,7 +11,7 @@ namespace RestaurentManagementAPI.Models.Entities
         public string MaHD { get; set; } = string.Empty;
 
         [Column("MaMA")]
-        [StringLength(5)]
+        [StringLength(20)]
         public string MaMA { get; set; } = string.Empty;
 
         [Column("SoLuong")]
