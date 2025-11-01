@@ -34,19 +34,29 @@ namespace RestaurentManagementAPI.Controllers
             if (await _context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == dto.TenDangNhap))
                 return Conflict("Tên đăng nhập đã tồn tại.");
 
-            // Tự sinh mã nhân viên (ví dụ NV001, NV002,...)
-            var lastNV = await _context.NHANVIEN
-                .OrderByDescending(nv => nv.MaNV)
-                .FirstOrDefaultAsync();
+            var allMaNVs = await _context.NHANVIEN
+    .Where(nv => nv.MaNV.StartsWith("NV"))
+    .Select(nv => nv.MaNV)
+    .ToListAsync();
 
-            string newMaNV;
-            if (lastNV == null || string.IsNullOrEmpty(lastNV.MaNV))
-                newMaNV = "NV001";
-            else
+            // Lọc trong bộ nhớ (LINQ to Objects) để tìm số lớn nhất
+            int lastNumber = 0;
+
+            // Tìm các mã NV hợp lệ (VD: "NV001", "NV123")
+            var validMaNVs = allMaNVs
+                .Where(maNV => maNV.Length == 5 && int.TryParse(maNV.Substring(2), out _))
+                .ToList();
+
+            if (validMaNVs.Any())
             {
-                int lastNumber = int.Parse(lastNV.MaNV.Substring(2)); // Bỏ "NV"
-                newMaNV = $"NV{(lastNumber + 1).ToString("D3")}"; // D3 -> luôn có 3 chữ số
+                // Nếu có mã hợp lệ, tìm số lớn nhất
+                lastNumber = validMaNVs
+                    .Select(maNV => int.Parse(maNV.Substring(2)))
+                    .Max();
             }
+
+            // Dòng 47 (logic) giờ đã được thay thế bằng logic an toàn ở trên
+            string newMaNV = $"NV{(lastNumber + 1).ToString("D3")}";
 
             // Tạo mới nhân viên
             var nv = new NhanVien
