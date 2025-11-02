@@ -104,7 +104,8 @@ namespace RestaurentManagementAPI.Controllers
                 token,
                 username = user.TenDangNhap,
                 role = user.Quyen,
-                maNV = user.MaNV
+                maNV = user.MaNV,
+                chucVu = user.NhanVien?.ChucVu
             });
         }
 

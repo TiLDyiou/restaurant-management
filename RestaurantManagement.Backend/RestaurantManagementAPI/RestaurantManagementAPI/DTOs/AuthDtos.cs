@@ -6,7 +6,7 @@
         public string MatKhau { get; set; } = string.Empty;
         public string MaNV { get; set; } = string.Empty;
         public string HoTen { get; set; } = string.Empty;
-        public string ChucVu { get; set; } = "NhanVien";
+        public string ChucVu { get; set; } = "Nhân viên";
         public string SDT { get; set; } = string.Empty;
         public string Quyen { get; set; } = "NhanVien";
     }

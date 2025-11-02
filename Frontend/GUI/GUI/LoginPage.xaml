@@ -76,71 +76,34 @@
 
                         <!-- Ô nhập mật khẩu + icon mắt -->
                         <Border Stroke="{StaticResource PrimaryBrandColor}"
-        StrokeThickness="2"
-        StrokeShape="RoundRectangle 30"
-        HeightRequest="50"
-        Padding="0">
-
-                            <Grid ColumnDefinitions="*,Auto"
-          Padding="20,0,10,0">
-
-                                <!-- Entry mật khẩu -->
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 30"
+                                HeightRequest="50"
+                                Padding="0">
+                            <Grid ColumnDefinitions="*,Auto" Padding="20,0,10,0">
                                 <Entry x:Name="PasswordEntry"
-               Grid.Column="0"
-               Placeholder="Mật khẩu"
-               PlaceholderColor="{StaticResource PrimaryBrandColor}"
-               TextColor="{StaticResource PrimaryBrandColor}"
-               IsPassword="True"
-               VerticalTextAlignment="Center"
-               FontFamily="RobotoMono"
-               BackgroundColor="Transparent" />
-
-                                <!-- Nút hiện/ẩn mật khẩu -->
+                                       Grid.Column="0"
+                                       Placeholder="Mật khẩu"
+                                       PlaceholderColor="{StaticResource PrimaryBrandColor}"
+                                       TextColor="{StaticResource PrimaryBrandColor}"
+                                       IsPassword="True"
+                                       VerticalTextAlignment="Center"
+                                       FontFamily="RobotoMono"
+                                       BackgroundColor="Transparent" />
                                 <Image x:Name="PasswordToggleIcon"
-               Grid.Column="1"
-               Source="eye_hide.png"
-               WidthRequest="24"
-               HeightRequest="24"
-               Aspect="AspectFit"
-               HorizontalOptions="Center"
-               VerticalOptions="Center">
+                                       Grid.Column="1"
+                                       Source="eye_hide.png"
+                                       WidthRequest="24"
+                                       HeightRequest="24"
+                                       Aspect="AspectFit"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnPasswordToggleTapped" />
                                     </Image.GestureRecognizers>
                                 </Image>
-
                             </Grid>
                         </Border>
-
-
-                        <!-- Nhớ mật khẩu + Quên mật khẩu -->
-                        <Grid ColumnDefinitions="Auto,*,Auto"
-                              HorizontalOptions="FillAndExpand">
-
-                            <StackLayout Grid.Column="0"
-                                         Orientation="Horizontal"
-                                         Spacing="5"
-                                         VerticalOptions="Center">
-                                <CheckBox x:Name="RememberCheck"
-                                          VerticalOptions="Center"
-                                          Color="{StaticResource ButtonBackground}" />
-                                <Label Text="Nhớ mật khẩu"
-                                       TextColor="{StaticResource PrimaryBrandColor}"
-                                       FontFamily="RobotoMono"
-                                       VerticalOptions="Center" />
-                            </StackLayout>
-
-                            <Button Grid.Column="2"
-                                    Text="Quên mật khẩu?"
-                                    FontFamily="RobotoMono"
-                                    FontSize="13"
-                                    TextColor="{StaticResource SecondaryTextColor}"
-                                    BackgroundColor="Transparent"
-                                    Clicked="OnForgotPasswordClicked"
-                                    Padding="0"
-                                    Margin="5,0,0,0"
-                                    HorizontalOptions="End" />
-                        </Grid>
 
                         <!-- Nút đăng nhập -->
                         <Button x:Name="LoginButton"
@@ -153,6 +116,18 @@
                                 CornerRadius="25"
                                 Clicked="OnLoginClicked"
                                 Margin="0,10,0,0" />
+
+                        <!-- Nút quên mật khẩu -->
+                        <Button Text="Quên mật khẩu?"
+                                FontFamily="RobotoMono"
+                                FontSize="13"
+                                TextColor="{StaticResource SecondaryTextColor}"
+                                BackgroundColor="Transparent"
+                                Clicked="OnForgotPasswordClicked"
+                                Padding="0"
+                                Margin="0,-10,0,0"
+                                HorizontalOptions="Center" />
+
                     </VerticalStackLayout>
                 </Border>
             </Grid>

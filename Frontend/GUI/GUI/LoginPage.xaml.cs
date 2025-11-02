@@ -64,53 +64,52 @@ namespace RestaurantManagementGUI
 
             try
             {
-                // 1. Tạo đối tượng request
+                // Tạo đối tượng request
                 var loginRequest = new LoginRequestModel
                 {
                     TenDangNhap = user,
                     MatKhau = pass
                 };
 
-                // 2. Chuyển sang JSON
+                // Chuyển sang JSON
                 string jsonPayload = JsonSerializer.Serialize(loginRequest);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                // 3. Lấy URL đúng (localhost hoặc 10.0.2.2)
+                // Lấy URL đúng (localhost hoặc 10.0.2.2)
                 string apiUrl = GetApiUrl();
 
-                // 4. Gửi yêu cầu POST đến API
+                //  Gửi yêu cầu POST đến API
                 HttpResponseMessage response = await _httpClient.PostAsync(apiUrl, content);
 
-                // 5. Xử lý kết quả
+                // Xử lý kết quả
                 if (response.IsSuccessStatusCode)
                 {
                     // Đọc nội dung JSON trả về
                     string responseBody = await response.Content.ReadAsStringAsync();
                     var loginResponse = JsonSerializer.Deserialize<LoginResponseModel>(responseBody);
 
-                    // 6. LƯU TOKEN BẢO MẬT
-                    if (!string.IsNullOrWhiteSpace(loginResponse?.Token))
+                    // Lưu token bảo mật
+                    if (loginResponse != null && !string.IsNullOrWhiteSpace(loginResponse.Token))
                     {
-                        // SecureStorage là cách an toàn để lưu token
                         await SecureStorage.Default.SetAsync("auth_token", loginResponse.Token);
-
-                        // Bạn cũng có thể lưu các thông tin khác
+                        await SecureStorage.Default.SetAsync("user_username", loginResponse.Username ?? loginResponse.MaNV);
                         await SecureStorage.Default.SetAsync("user_manv", loginResponse.MaNV);
                         await SecureStorage.Default.SetAsync("user_role", loginResponse.Role);
+                        await SecureStorage.Default.SetAsync("user_chucvu", loginResponse.ChucVu ?? "");
 
-                        // Chuyển hướng đến trang chính
-                        Application.Current.MainPage = new AppShell();
+
+                        // Chuyển hướng Dashboard theo chức vụ
+                        string chucVu = loginResponse.ChucVu?.Trim().ToLower() ?? "";
+
+                        if (chucVu == "đầu bếp" || chucVu == "dau bep")
+                        {
+                            Application.Current.MainPage = new NavigationPage(new ChefDashboardPage());
+                        }
+                        else
+                        {
+                            Application.Current.MainPage = new NavigationPage(new DashboardPage());
+                        }
                     }
-                    else
-                    {
-                        await DisplayAlert("Lỗi", "Đăng nhập thành công nhưng không nhận được Token.", "OK");
-                    }
-                }
-                else
-                {
-                    // API trả về lỗi (Ví dụ: 401 - Sai mật khẩu, 404 - Không tìm thấy)
-                    string errorMsg = await response.Content.ReadAsStringAsync();
-                    await DisplayAlert("Đăng nhập thất bại", $"Lỗi: {response.StatusCode}\n{errorMsg}", "OK");
                 }
             }
             catch (Exception ex)

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.DashboardPage"
+             BackgroundColor="White"
+             Shell.NavBarIsVisible="False">
+
+    <Grid ColumnDefinitions="250,*" RowDefinitions="*" BackgroundColor="White">
+
+        <!-- Bên trái -->
+        <StackLayout BackgroundColor="#FFBD59"
+                     Padding="20"
+                     VerticalOptions="FillAndExpand"
+                     Spacing="25">
+
+            <Label Text="NHÓM II"
+                   TextColor="#263238"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Restaurant Management System"
+                   TextColor="#263238"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   HorizontalOptions="FillAndExpand" />
+
+            <BoxView HeightRequest="2" BackgroundColor="#263238" Opacity="0.2" Margin="0,10,0,10" />
+
+            <Label x:Name="WelcomeLabel"
+                   Text="Welcome, User"
+                   FontSize="16"
+                   TextColor="#263238"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0" />
+        </StackLayout>
+		
+		<!-- Logout -->
+		<Button Text="Đăng xuất"
+                    x:Name="LogoutButton"
+                    TextColor="White"
+                    BackgroundColor="#263238"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    HeightRequest="40"
+                    HorizontalOptions="Center"
+                    Clicked="OnLogoutClicked"/>
+
+        <!-- Bên phải (nút chức năng) -->
+        <ScrollView Grid.Column="1" Padding="30">
+            <Grid ColumnDefinitions="*,*,*,*"
+                  RowDefinitions="Auto,Auto"
+                  ColumnSpacing="20"
+                  RowSpacing="20">
+
+                <!-- Roles -->
+                <Border Grid.Row="0" Grid.Column="0"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="roles.png" HeightRequest="40" />
+                        <Button x:Name="RolesButton" Text="Roles"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnRolesClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Users -->
+                <Border Grid.Row="0" Grid.Column="1"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="users.png" HeightRequest="40" />
+                        <Button x:Name="UsersButton" Text="Users"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnUsersClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Food Categories -->
+                <Border Grid.Row="0" Grid.Column="2"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="categories.png" HeightRequest="40" />
+                        <Button x:Name="FoodCategoriesButton" Text="Food Categories"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnFoodCategoriesClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Food Menu -->
+                <Border Grid.Row="0" Grid.Column="3"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="menu.png" HeightRequest="40" />
+                        <Button x:Name="FoodMenuButton" Text="Food Menu"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnFoodMenuClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Orders -->
+                <Border Grid.Row="1" Grid.Column="0"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="orders.png" HeightRequest="40" />
+                        <Button x:Name="OrdersButton" Text="Orders"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnOrdersClicked" />
+                    </VerticalStackLayout>
+                </Border>
+				
+				
+                <!-- Tables -->
+                <Border Grid.Row="1" Grid.Column="1"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="tables.png" HeightRequest="40" />
+                        <Button x:Name="TablesButton" Text="Tables"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnTablesClicked" />
+                    </VerticalStackLayout>
+                </Border>
+				
+				
+
+
+                <!-- Bill Generation -->
+                <Border Grid.Row="1" Grid.Column="2"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="bill.png" HeightRequest="40" />
+                        <Button x:Name="BillGenerationButton" Text="Bill Generation"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnBillGenerationClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Order Modifications -->
+                <Border Grid.Row="1" Grid.Column="3"
+                        Stroke="#E0E0E0" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 15"
+                        BackgroundColor="White" HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="modify.png" HeightRequest="40" />
+                        <Button x:Name="OrderModificationsButton" Text="Order Modifications"
+                                TextColor="#263238"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnOrderModificationsClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </Grid>
+        </ScrollView>
+    </Grid>
+</ContentPage>
