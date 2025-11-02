@@ -30,13 +30,10 @@ namespace RestaurentManagementAPI.DTOs
     // DTO để cập nhật (PUT)
     public class UpdateMonAnDto
     {
-        [Required]
-        public string TenMA { get; set; }
-
-        [Range(0, double.MaxValue)]
-        public decimal DonGia { get; set; }
-
+        public string? TenMA { get; set; }
+        public decimal? DonGia { get; set; }
         public string? Loai { get; set; }
         public string? HinhAnh { get; set; }
+        public bool? TrangThai { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using BCrypt.Net; 
+﻿using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +25,8 @@ namespace RestaurentManagementAPI.Controllers
             _config = config;
         }
 
+        #region ===================== Public APIs =====================
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
@@ -34,31 +36,10 @@ namespace RestaurentManagementAPI.Controllers
             if (await _context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == dto.TenDangNhap))
                 return Conflict("Tên đăng nhập đã tồn tại.");
 
-            var allMaNVs = await _context.NHANVIEN
-    .Where(nv => nv.MaNV.StartsWith("NV"))
-    .Select(nv => nv.MaNV)
-    .ToListAsync();
+            // Sinh MaNV tự động
+            var newMaNV = await GenerateNewMaNV();
 
-            // Lọc trong bộ nhớ (LINQ to Objects) để tìm số lớn nhất
-            int lastNumber = 0;
-
-            // Tìm các mã NV hợp lệ (VD: "NV001", "NV123")
-            var validMaNVs = allMaNVs
-                .Where(maNV => maNV.Length == 5 && int.TryParse(maNV.Substring(2), out _))
-                .ToList();
-
-            if (validMaNVs.Any())
-            {
-                // Nếu có mã hợp lệ, tìm số lớn nhất
-                lastNumber = validMaNVs
-                    .Select(maNV => int.Parse(maNV.Substring(2)))
-                    .Max();
-            }
-
-            // Dòng 47 (logic) giờ đã được thay thế bằng logic an toàn ở trên
-            string newMaNV = $"NV{(lastNumber + 1).ToString("D3")}";
-
-            // Tạo mới nhân viên
+            // Tạo nhân viên
             var nv = new NhanVien
             {
                 MaNV = newMaNV,
@@ -70,17 +51,18 @@ namespace RestaurentManagementAPI.Controllers
             };
             _context.NHANVIEN.Add(nv);
 
-            // Tạo tài khoản kèm theo
+            // Tạo tài khoản
             var tk = new TaiKhoan
             {
                 TenDangNhap = dto.TenDangNhap,
                 MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau),
-                MaNV = newMaNV, // dùng mã mới sinh
+                MaNV = newMaNV,
                 Quyen = string.IsNullOrWhiteSpace(dto.Quyen) ? "NhanVien" : dto.Quyen
             };
             _context.TAIKHOAN.Add(tk);
 
             await _context.SaveChangesAsync();
+
             return Ok(new { message = "Đăng ký thành công", maNV = newMaNV });
         }
 
@@ -92,7 +74,9 @@ namespace RestaurentManagementAPI.Controllers
 
             var user = await _context.TAIKHOAN.Include(t => t.NhanVien)
                 .FirstOrDefaultAsync(t => t.TenDangNhap == dto.TenDangNhap);
-            if (user == null) return Unauthorized("Sai tài khoản hoặc mật khẩu.");
+
+            if (user == null)
+                return Unauthorized("Sai tài khoản hoặc mật khẩu.");
 
             bool matched = false;
             try
@@ -101,6 +85,7 @@ namespace RestaurentManagementAPI.Controllers
             }
             catch { matched = false; }
 
+            // Trường hợp mật khẩu chưa hash
             if (!matched && dto.MatKhau == user.MatKhau)
             {
                 matched = true;
@@ -123,6 +108,10 @@ namespace RestaurentManagementAPI.Controllers
             });
         }
 
+        #endregion
+
+        #region ===================== User APIs (Authenticated) =====================
+
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> Me()
@@ -132,6 +121,7 @@ namespace RestaurentManagementAPI.Controllers
 
             var user = await _context.TAIKHOAN.Include(t => t.NhanVien)
                 .FirstOrDefaultAsync(t => t.TenDangNhap == username);
+
             if (user == null) return NotFound();
 
             return Ok(new
@@ -146,63 +136,98 @@ namespace RestaurentManagementAPI.Controllers
         }
 
         [Authorize]
-        [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody] UpdateUserDto dto)
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
         {
             var username = User.Identity?.Name;
             if (username == null) return Unauthorized();
 
-            var user = await _context.TAIKHOAN
-                .Include(t => t.NhanVien)
+            var user = await _context.TAIKHOAN.Include(t => t.NhanVien)
                 .FirstOrDefaultAsync(t => t.TenDangNhap == username);
-            if (user == null) return NotFound();
-            if (!string.IsNullOrWhiteSpace(dto.TenDangNhap))
-                user.TenDangNhap = dto.TenDangNhap;
 
+            if (user == null) return NotFound();
+
+            // Đổi SDT
             if (!string.IsNullOrWhiteSpace(dto.SDT))
+            {
                 user.NhanVien.SDT = dto.SDT;
+            }
+
+            // Đổi mật khẩu
+            if (!string.IsNullOrWhiteSpace(dto.NewPassword))
+            {
+                if (string.IsNullOrWhiteSpace(dto.CurrentPassword))
+                    return BadRequest("Cần cung cấp mật khẩu hiện tại để đổi mật khẩu.");
+
+                if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.MatKhau))
+                    return BadRequest("Mật khẩu hiện tại không đúng.");
+
+                user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            }
 
             _context.TAIKHOAN.Update(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Cập nhật thông tin cá nhân thành công" });
+            return Ok(new
+            {
+                message = "Cập nhật thông tin thành công",
+                username = user.TenDangNhap,
+                sdt = user.NhanVien.SDT
+            });
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPut("admin-update")]
-        public async Task<IActionResult> AdminUpdate([FromBody] AdminUpdateUserDto dto)
-        {
-            var user = await _context.TAIKHOAN.Include(t => t.NhanVien)
-                .FirstOrDefaultAsync(t => t.TenDangNhap == dto.TenDangNhap);
-            if (user == null) return NotFound();
-            if (!string.IsNullOrWhiteSpace(dto.MatKhau))
-                user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
-            if (!string.IsNullOrWhiteSpace(dto.Quyen))
-                user.Quyen = dto.Quyen;
-            if (!string.IsNullOrWhiteSpace(dto.HoTen))
-                user.NhanVien.HoTen = dto.HoTen;
-            if (!string.IsNullOrWhiteSpace(dto.ChucVu))
-                user.NhanVien.ChucVu = dto.ChucVu;
-            if (!string.IsNullOrWhiteSpace(dto.SDT))
-                user.NhanVien.SDT = dto.SDT;
+        #endregion
 
-            _context.TAIKHOAN.Update(user);
+        #region ===================== Admin APIs =====================
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("admin-update/{maNV}")]
+        public async Task<IActionResult> AdminUpdate(string maNV, [FromBody] AdminUpdateUserDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(maNV))
+                return BadRequest("MaNV không được để trống.");
+
+            // Tìm nhân viên theo MaNV
+            var user = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+
+            if (user == null || user.TaiKhoan == null)
+                return NotFound("Nhân viên không tồn tại.");
+
+            // Cập nhật thông tin tài khoản
+            if (!string.IsNullOrWhiteSpace(dto.MatKhau))
+                user.TaiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+            if (!string.IsNullOrWhiteSpace(dto.Quyen))
+                user.TaiKhoan.Quyen = dto.Quyen;
+
+            // Cập nhật thông tin nhân viên
+            if (!string.IsNullOrWhiteSpace(dto.HoTen))
+                user.HoTen = dto.HoTen;
+            if (!string.IsNullOrWhiteSpace(dto.ChucVu))
+                user.ChucVu = dto.ChucVu;
+            if (!string.IsNullOrWhiteSpace(dto.SDT))
+                user.SDT = dto.SDT;
+
+            _context.NHANVIEN.Update(user);
+            _context.TAIKHOAN.Update(user.TaiKhoan);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Cập nhật thành công" });
         }
 
-        [HttpPost("DeleteUser")]
-        public async Task<IActionResult> DeleteUser([FromBody] DeleteUserDto request)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{maNV}")]
+        public async Task<IActionResult> DeleteUser(string maNV)
         {
             var employee = await _context.NHANVIEN
                 .Include(e => e.TaiKhoan)
                 .Include(e => e.HoaDons)
                 .Include(e => e.PhieuNhapKhos)
-                .FirstOrDefaultAsync(e => e.MaNV == request.MaNV && e.HoTen == request.HoTen);
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
 
             if (employee == null)
-                return NotFound(new { success = false, message = "Nhân viên không tồn tại hoặc họ tên không khớp" });
+                return NotFound(new { success = false, message = "Nhân viên không tồn tại" });
 
             _context.NHANVIEN.Remove(employee);
             await _context.SaveChangesAsync();
@@ -210,42 +235,26 @@ namespace RestaurentManagementAPI.Controllers
             return Ok(new { success = true, message = "Xóa user thành công" });
         }
 
+        #endregion
 
-        [Authorize]
-        [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        #region ===================== Helper Methods =====================
+
+        private async Task<string> GenerateNewMaNV()
         {
-            var username = User.Identity?.Name;
-            if (username == null) return Unauthorized();
+            var allMaNVs = await _context.NHANVIEN
+                .Where(nv => nv.MaNV.StartsWith("NV"))
+                .Select(nv => nv.MaNV)
+                .ToListAsync();
 
-            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(t => t.TenDangNhap == username);
-            if (user == null) return NotFound();
+            int lastNumber = allMaNVs
+                .Where(maNV => maNV.Length == 5 && int.TryParse(maNV.Substring(2), out _))
+                .Select(maNV => int.Parse(maNV.Substring(2)))
+                .DefaultIfEmpty(0)
+                .Max();
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.MatKhau))
-                return BadRequest("Mật khẩu hiện tại không đúng.");
-
-            user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            _context.TAIKHOAN.Update(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Đổi mật khẩu thành công" });
+            return $"NV{(lastNumber + 1):D3}";
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
-        {
-            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(t => t.TenDangNhap == dto.TenDangNhap);
-            if (user == null) return NotFound();
-
-            user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            _context.TAIKHOAN.Update(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Reset mật khẩu thành công" });
-        }
-
-        
         private string GenerateJwtToken(TaiKhoan user)
         {
             var jwt = _config.GetSection("Jwt");
@@ -274,5 +283,6 @@ namespace RestaurentManagementAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        #endregion
     }
 }

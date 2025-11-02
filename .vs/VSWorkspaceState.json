@@ -1,12 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\Frontend",
+    "\\Frontend\\GUI",
     "\\RestaurantManagement.Backend",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers",
-    "\\RestaurantManagement.Frontend"
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers"
   ],
-  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\AuthController.cs",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Program.cs",
   "PreviewInSolutionExplorer": false
 }

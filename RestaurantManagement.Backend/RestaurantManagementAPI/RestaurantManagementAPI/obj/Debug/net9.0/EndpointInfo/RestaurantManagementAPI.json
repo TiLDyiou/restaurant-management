@@ -79,7 +79,7 @@
         }
       }
     },
-    "/api/Auth/update": {
+    "/api/Auth/update-profile": {
       "put": {
         "tags": [
           "Auth"
@@ -88,17 +88,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UpdateProfileDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UpdateProfileDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UpdateProfileDto"
               }
             }
           }
@@ -110,10 +110,20 @@
         }
       }
     },
-    "/api/Auth/admin-update": {
+    "/api/Auth/admin-update/{maNV}": {
       "put": {
         "tags": [
           "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "maNV",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
           "content": {
@@ -141,30 +151,21 @@
         }
       }
     },
-    "/api/Auth/DeleteUser": {
-      "post": {
+    "/api/Auth/{maNV}": {
+      "delete": {
         "tags": [
           "Auth"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteUserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteUserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteUserDto"
-              }
+        "parameters": [
+          {
+            "name": "maNV",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -172,26 +173,48 @@
         }
       }
     },
-    "/api/Auth/change-password": {
+    "/api/Ban": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Ban/{maBan}/trangthai": {
       "put": {
         "tags": [
-          "Auth"
+          "Ban"
+        ],
+        "parameters": [
+          {
+            "name": "maBan",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordDto"
+                "type": "string"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordDto"
+                "type": "string"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordDto"
+                "type": "string"
               }
             }
           }
@@ -203,38 +226,7 @@
         }
       }
     },
-    "/api/Auth/reset-password": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/get-dishes": {
+    "/api/dishes": {
       "get": {
         "tags": [
           "Dishes"
@@ -270,47 +262,7 @@
             }
           }
         }
-      }
-    },
-    "/api/get-dishes-info": {
-      "get": {
-        "tags": [
-          "Dishes"
-        ],
-        "parameters": [
-          {
-            "name": "maMA",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonAnDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonAnDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonAnDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/add-dishes": {
+      },
       "post": {
         "tags": [
           "Dishes"
@@ -358,7 +310,44 @@
         }
       }
     },
-    "/api/update-dishes": {
+    "/api/dishes/{maMA}": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "parameters": [
+          {
+            "name": "maMA",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Dishes"
@@ -366,7 +355,8 @@
         "parameters": [
           {
             "name": "maMA",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -396,9 +386,7 @@
             "description": "OK"
           }
         }
-      }
-    },
-    "/api/delete-dishes": {
+      },
       "delete": {
         "tags": [
           "Dishes"
@@ -406,7 +394,8 @@
         "parameters": [
           {
             "name": "maMA",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -425,10 +414,6 @@
       "AdminUpdateUserDto": {
         "type": "object",
         "properties": {
-          "tenDangNhap": {
-            "type": "string",
-            "nullable": true
-          },
           "matKhau": {
             "type": "string",
             "nullable": true
@@ -446,20 +431,6 @@
             "nullable": true
           },
           "sdt": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ChangePasswordDto": {
-        "type": "object",
-        "properties": {
-          "currentPassword": {
-            "type": "string",
-            "nullable": true
-          },
-          "newPassword": {
             "type": "string",
             "nullable": true
           }
@@ -487,20 +458,6 @@
             "type": "string"
           },
           "hinhAnh": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteUserDto": {
-        "type": "object",
-        "properties": {
-          "maNV": {
-            "type": "string",
-            "nullable": true
-          },
-          "hoTen": {
             "type": "string",
             "nullable": true
           }
@@ -581,34 +538,17 @@
         },
         "additionalProperties": false
       },
-      "ResetPasswordDto": {
-        "type": "object",
-        "properties": {
-          "tenDangNhap": {
-            "type": "string",
-            "nullable": true
-          },
-          "newPassword": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "UpdateMonAnDto": {
-        "required": [
-          "tenMA"
-        ],
         "type": "object",
         "properties": {
           "tenMA": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "donGia": {
-            "minimum": 0,
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           },
           "loai": {
             "type": "string",
@@ -617,18 +557,26 @@
           "hinhAnh": {
             "type": "string",
             "nullable": true
+          },
+          "trangThai": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "UpdateUserDto": {
+      "UpdateProfileDto": {
         "type": "object",
         "properties": {
-          "tenDangNhap": {
+          "sdt": {
             "type": "string",
             "nullable": true
           },
-          "sdt": {
+          "currentPassword": {
+            "type": "string",
+            "nullable": true
+          },
+          "newPassword": {
             "type": "string",
             "nullable": true
           }
@@ -639,7 +587,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"12345abcdef\"",
+        "description": "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"Bearer 12345abcdef\"",
         "scheme": "Bearer",
         "bearerFormat": "JWT"
       }

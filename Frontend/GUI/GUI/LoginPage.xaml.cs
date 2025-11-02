@@ -7,13 +7,14 @@ namespace RestaurantManagementGUI
 {
     public partial class LoginPage : ContentPage
     {
+
         private readonly HttpClient _httpClient;
 
         public LoginPage()
         {
             InitializeComponent();
 
-            // --- GIẢI QUYẾT VẤN ĐỀ SSL VÀ LOCALHOST ---
+            // GIẢI QUYẾT VẤN ĐỀ SSL VÀ LOCALHOST
 #if DEBUG
             // Chỉ trong chế độ DEBUG, chúng ta mới bỏ qua lỗi chứng chỉ
             // ĐỪNG BAO GIỜ dùng code này trong sản phẩm thật (production)
@@ -146,6 +147,11 @@ namespace RestaurantManagementGUI
                 return sslPolicyErrors == System.Net.Security.SslPolicyErrors.None;
             };
             return handler;
+        }
+        private void OnPasswordToggleTapped(object sender, TappedEventArgs e)
+        {
+            PasswordEntry.IsPassword = !PasswordEntry.IsPassword;
+            PasswordToggleIcon.Source = PasswordEntry.IsPassword ? "eye_hide.png" : "eye_show.png";
         }
     }
 }

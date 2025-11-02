@@ -1,73 +1,36 @@
 [
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
-    "Method": "PostDish",
-    "RelativePath": "api/add-dishes",
-    "HttpMethod": "POST",
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/Auth/{maNV}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "createDto",
-        "Type": "RestaurentManagementAPI.DTOs.CreateMonAnDto",
+        "Name": "maNV",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "RestaurentManagementAPI.DTOs.MonAnDto",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
     "Method": "AdminUpdate",
-    "RelativePath": "api/Auth/admin-update",
+    "RelativePath": "api/Auth/admin-update/{maNV}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
+      {
+        "Name": "maNV",
+        "Type": "System.String",
+        "IsRequired": true
+      },
       {
         "Name": "dto",
         "Type": "RestaurentManagementAPI.DTOs.AdminUpdateUserDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
-    "Method": "ChangePassword",
-    "RelativePath": "api/Auth/change-password",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "RestaurentManagementAPI.DTOs.ChangePasswordDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
-    "Method": "DeleteUser",
-    "RelativePath": "api/Auth/DeleteUser",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "RestaurentManagementAPI.DTOs.DeleteUserDto",
         "IsRequired": true
       }
     ],
@@ -117,56 +80,55 @@
   },
   {
     "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
-    "Method": "ResetPassword",
-    "RelativePath": "api/Auth/reset-password",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "RestaurentManagementAPI.DTOs.ResetPasswordDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
-    "Method": "Update",
-    "RelativePath": "api/Auth/update",
+    "Method": "UpdateProfile",
+    "RelativePath": "api/Auth/update-profile",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "RestaurentManagementAPI.DTOs.UpdateUserDto",
+        "Type": "RestaurentManagementAPI.DTOs.UpdateProfileDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
-    "Method": "DeleteDish",
-    "RelativePath": "api/delete-dishes",
-    "HttpMethod": "DELETE",
+    "ContainingType": "RestaurentManagementAPI.Controllers.BanController",
+    "Method": "GetBan",
+    "RelativePath": "api/Ban",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.BanController",
+    "Method": "CapNhatTrangThaiBan",
+    "RelativePath": "api/Ban/{maBan}/trangthai",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "maMA",
+        "Name": "maBan",
         "Type": "System.String",
-        "IsRequired": false
+        "IsRequired": true
+      },
+      {
+        "Name": "trangThai",
+        "Type": "System.String",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "ContainingType": "DishesController",
     "Method": "GetDishes",
-    "RelativePath": "api/get-dishes",
+    "RelativePath": "api/dishes",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -184,17 +146,17 @@
     ]
   },
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
-    "Method": "GetDish",
-    "RelativePath": "api/get-dishes-info",
-    "HttpMethod": "GET",
+    "ContainingType": "DishesController",
+    "Method": "PostDish",
+    "RelativePath": "api/dishes",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "maMA",
-        "Type": "System.String",
-        "IsRequired": false
+        "Name": "createDto",
+        "Type": "RestaurentManagementAPI.DTOs.CreateMonAnDto",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": [
@@ -210,9 +172,35 @@
     ]
   },
   {
-    "ContainingType": "RestaurentManagementAPI.Controllers.DishesController",
+    "ContainingType": "DishesController",
+    "Method": "GetDish",
+    "RelativePath": "api/dishes/{maMA}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maMA",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "DishesController",
     "Method": "PutDish",
-    "RelativePath": "api/update-dishes",
+    "RelativePath": "api/dishes/{maMA}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -220,11 +208,27 @@
       {
         "Name": "maMA",
         "Type": "System.String",
-        "IsRequired": false
+        "IsRequired": true
       },
       {
         "Name": "updateDto",
         "Type": "RestaurentManagementAPI.DTOs.UpdateMonAnDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DishesController",
+    "Method": "DeleteDish",
+    "RelativePath": "api/dishes/{maMA}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maMA",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],

@@ -20,7 +20,7 @@ namespace RestaurentManagementAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // ---------------- NhanVien ----------------
+            // NhanVien 
             modelBuilder.Entity<NhanVien>()
                 .HasKey(n => n.MaNV);
 
@@ -45,11 +45,11 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey<TaiKhoan>(t => t.MaNV)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ---------------- TaiKhoan ----------------
+            // TaiKhoan 
             modelBuilder.Entity<TaiKhoan>()
                 .HasKey(t => t.TenDangNhap);
 
-            // ---------------- Ban ----------------
+            // Ban
             modelBuilder.Entity<Ban>()
                 .HasKey(b => b.MaBan);
 
@@ -59,7 +59,7 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey(h => h.MaBan)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ---------------- MonAn ----------------
+            // MonAn
             modelBuilder.Entity<MonAn>()
                 .HasKey(m => m.MaMA);
 
@@ -69,7 +69,7 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey(c => c.MaMA);
                 //.OnDelete(DeleteBehavior.Restrict); Cho phép tính năng "xoá mềm" hoạt động
 
-            // ---------------- HoaDon ----------------
+            // HoaDon
             modelBuilder.Entity<HoaDon>()
                 .HasKey(h => h.MaHD);
 
@@ -79,7 +79,7 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey(c => c.MaHD)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ---------------- ChiTietHoaDon ----------------
+            // ChiTietHoaDon
             modelBuilder.Entity<ChiTietHoaDon>()
                 .HasKey(c => new { c.MaHD, c.MaMA });
 
@@ -87,7 +87,7 @@ namespace RestaurentManagementAPI.Data
                 .Property(c => c.ThanhTien)
                 .HasComputedColumnSql("[SoLuong] * [DonGia]", stored: true);
 
-            // ---------------- Kho ----------------
+            // Kho
             modelBuilder.Entity<Kho>()
                 .HasKey(k => k.MaNL);
 
@@ -97,7 +97,7 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey(c => c.MaNL)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ---------------- PhieuNhapKho ----------------
+            // PhieuNhapKho
             modelBuilder.Entity<PhieuNhapKho>()
                 .HasKey(p => p.MaPN);
 
@@ -107,11 +107,11 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey(c => c.MaPN)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ---------------- ChiTietPhieuNhap ----------------
+            // ChiTietPhieuNhap
             modelBuilder.Entity<ChiTietPhieuNhap>()
                 .HasKey(c => new { c.MaPN, c.MaNL });
 
-            // ---------------- DonHangOnline ----------------
+            // DonHangOnline
             modelBuilder.Entity<DonHangOnline>()
                 .HasKey(d => d.MaDH);
         }
