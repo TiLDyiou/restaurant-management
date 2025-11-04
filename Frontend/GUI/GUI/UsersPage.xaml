@@ -1,12 +1,108 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RestaurantManagementGUI.UsersPage"
-             Title="UsersPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             BackgroundColor="#263238"
+             Shell.NavBarIsVisible="False">
+
+    <!-- Bảng màu chủ đạo -->
+    <ContentPage.Resources>
+        <Color x:Key="PrimaryColor">#263238</Color>
+        <!-- Màu nền đen xám -->
+        <Color x:Key="AccentColor">#FFBD59</Color>
+        <!-- Màu vàng nổi bật -->
+        <Color x:Key="LightBackground">#FAFAFA</Color>
+        <Color x:Key="TextPrimary">#FFFFFF</Color>
+        <Color x:Key="TextSecondary">#B0BEC5</Color>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <!-- Nút quay lại -->
+            <Button Text="← Quay lại"
+                    BackgroundColor="{StaticResource AccentColor}"
+                    TextColor="{StaticResource PrimaryColor}"
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    CornerRadius="12"
+                    HeightRequest="48"
+                    WidthRequest="150"
+                    HorizontalOptions="Start"
+                    Clicked="OnBackClicked" />
+
+            <!-- Tiêu đề -->
+            <Label Text="Quản lý nhân viên"
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource AccentColor}" />
+
+            <!-- Nút thêm nhân viên -->
+            <Button Text="➕ Thêm nhân viên"
+                    BackgroundColor="{StaticResource AccentColor}"
+                    TextColor="{StaticResource PrimaryColor}"
+                    CornerRadius="12"
+                    HeightRequest="50"
+                    FontAttributes="Bold"
+                    Clicked="OnAddUserClicked" />
+
+            <!-- Danh sách nhân viên -->
+            <CollectionView x:Name="UsersCollectionView"
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="{StaticResource AccentColor}"
+                               BackgroundColor="{StaticResource LightBackground}"
+                               Padding="15"
+                               CornerRadius="14"
+                               Margin="0,8"
+                               HasShadow="True">
+
+                            <VerticalStackLayout Spacing="6">
+
+                                <Label Text="{Binding HoTen, StringFormat='👤 Họ tên: {0}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="#000000" />
+
+                                <Label Text="{Binding MaNV, StringFormat='🆔 Mã nhân viên: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#333333" />
+
+                                <Label Text="{Binding ChucVu, StringFormat='💼 Chức vụ: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#444444" />
+
+                                <Label Text="{Binding SDT, StringFormat='📞 Số điện thoại: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#444444" />
+
+                                <Label Text="{Binding Quyen, StringFormat='🔒 Quyền: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#757575" />
+
+                                <HorizontalStackLayout Spacing="10" Margin="0,10,0,0">
+                                    <Button Text="✏️ Sửa"
+                                            BackgroundColor="{StaticResource AccentColor}"
+                                            TextColor="{StaticResource PrimaryColor}"
+                                            CornerRadius="8"
+                                            FontAttributes="Bold"
+                                            WidthRequest="90"
+                                            Clicked="OnEditClicked" />
+
+                                    <Button Text="🗑 Xóa"
+                                            BackgroundColor="#E53935"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            FontAttributes="Bold"
+                                            WidthRequest="90"
+                                            Clicked="OnDeleteClicked" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

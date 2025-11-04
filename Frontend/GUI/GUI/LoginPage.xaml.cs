@@ -100,7 +100,6 @@ namespace RestaurantManagementGUI
 
                         // Chuyển hướng Dashboard theo chức vụ
                         string chucVu = loginResponse.ChucVu?.Trim().ToLower() ?? "";
-
                         if (chucVu == "đầu bếp" || chucVu == "dau bep")
                         {
                             Application.Current.MainPage = new NavigationPage(new ChefDashboardPage());

@@ -95,6 +95,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/Auth/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "RestaurentManagementAPI.Controllers.BanController",
     "Method": "GetBan",
     "RelativePath": "api/Ban",

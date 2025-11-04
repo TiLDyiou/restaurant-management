@@ -33,7 +33,7 @@ namespace RestaurantManagementGUI
             }
             catch (Exception ex)
             {
-                await DisplayAlert("L?i", $"??ng xu?t th?t b?i: {ex.Message}", "OK");
+                await DisplayAlert("L?i", $"??ng xu?t th?tt b?i: {ex.Message}", "OK");
             }
         }
 

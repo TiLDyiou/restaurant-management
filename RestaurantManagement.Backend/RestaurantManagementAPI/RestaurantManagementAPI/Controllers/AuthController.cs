@@ -236,6 +236,26 @@ namespace RestaurentManagementAPI.Controllers
             return Ok(new { success = true, message = "Xóa user thành công" });
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _context.NHANVIEN
+                .Include(nv => nv.TaiKhoan)
+                .Select(nv => new
+                {
+                    maNV = nv.MaNV,
+                    hoTen = nv.HoTen,
+                    chucVu = nv.ChucVu,
+                    sdt = nv.SDT,
+                    quyen = nv.TaiKhoan.Quyen,
+                    tenDangNhap = nv.TaiKhoan.TenDangNhap
+                })
+                .ToListAsync();
+
+            return Ok(users);
+        }
+
         #endregion
 
         #region ===================== Helper Methods =====================
