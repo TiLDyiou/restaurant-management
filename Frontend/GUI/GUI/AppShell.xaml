@@ -6,10 +6,6 @@
     xmlns:local="clr-namespace:RestaurantManagementGUI"
     Title="RestaurantManagementGUI">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
     
     
 

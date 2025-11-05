@@ -58,37 +58,29 @@ namespace RestaurantManagementGUI
                 return;
             }
 
-            // Vô hiệu hóa nút để tránh nhấn 2 lần
             LoginButton.IsEnabled = false;
             LoginButton.Text = "Đang xử lý...";
 
             try
             {
-                // Tạo đối tượng request
                 var loginRequest = new LoginRequestModel
                 {
                     TenDangNhap = user,
                     MatKhau = pass
                 };
 
-                // Chuyển sang JSON
                 string jsonPayload = JsonSerializer.Serialize(loginRequest);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                // Lấy URL đúng (localhost hoặc 10.0.2.2)
                 string apiUrl = GetApiUrl();
 
-                //  Gửi yêu cầu POST đến API
                 HttpResponseMessage response = await _httpClient.PostAsync(apiUrl, content);
 
-                // Xử lý kết quả
+                string responseBody = await response.Content.ReadAsStringAsync();
+
                 if (response.IsSuccessStatusCode)
                 {
-                    // Đọc nội dung JSON trả về
-                    string responseBody = await response.Content.ReadAsStringAsync();
                     var loginResponse = JsonSerializer.Deserialize<LoginResponseModel>(responseBody);
-
-                    // Lưu token bảo mật
                     if (loginResponse != null && !string.IsNullOrWhiteSpace(loginResponse.Token))
                     {
                         await SecureStorage.Default.SetAsync("auth_token", loginResponse.Token);
@@ -97,28 +89,29 @@ namespace RestaurantManagementGUI
                         await SecureStorage.Default.SetAsync("user_role", loginResponse.Role);
                         await SecureStorage.Default.SetAsync("user_chucvu", loginResponse.ChucVu ?? "");
 
-
-                        // Chuyển hướng Dashboard theo chức vụ
                         string chucVu = loginResponse.ChucVu?.Trim().ToLower() ?? "";
                         if (chucVu == "đầu bếp" || chucVu == "dau bep")
-                        {
                             Application.Current.MainPage = new NavigationPage(new ChefDashboardPage());
-                        }
                         else
-                        {
                             Application.Current.MainPage = new NavigationPage(new DashboardPage());
-                        }
                     }
+                }
+                else
+                {
+                    if (responseBody.Contains("vô hiệu hóa", StringComparison.OrdinalIgnoreCase))
+                        await DisplayAlert("Tài khoản bị vô hiệu hóa", responseBody, "OK");
+                    else if (responseBody.Contains("tồn tại", StringComparison.OrdinalIgnoreCase))
+                        await DisplayAlert("Lỗi đăng ký", responseBody, "OK");
+                    else
+                        await DisplayAlert("Lỗi đăng nhập", responseBody, "OK");
                 }
             }
             catch (Exception ex)
             {
-                // Lỗi kết nối (Ví dụ: API chưa chạy, mất mạng, lỗi SSL...)
                 await DisplayAlert("Lỗi kết nối", $"Không thể kết nối đến máy chủ: {ex.Message}", "OK");
             }
             finally
             {
-                // Kích hoạt lại nút bấm
                 LoginButton.IsEnabled = true;
                 LoginButton.Text = "Đăng nhập";
             }
@@ -146,6 +139,7 @@ namespace RestaurantManagementGUI
             };
             return handler;
         }
+
         private void OnPasswordToggleTapped(object sender, TappedEventArgs e)
         {
             PasswordEntry.IsPassword = !PasswordEntry.IsPassword;

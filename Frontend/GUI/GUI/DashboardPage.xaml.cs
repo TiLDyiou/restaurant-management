@@ -1,4 +1,4 @@
-namespace RestaurantManagementGUI
+﻿namespace RestaurantManagementGUI
 {
     public partial class DashboardPage : ContentPage
     {
@@ -27,20 +27,17 @@ namespace RestaurantManagementGUI
         {
             try
             {
-                // X�a SecureStorage
+                // Xóa SecureStorage
                 SecureStorage.RemoveAll();
 
-                // Quay l?i trang Login
+                // Quay lại trang Login
                 Application.Current.MainPage = new NavigationPage(new LoginPage());
             }
             catch (Exception ex)
             {
-                await DisplayAlert("L?i", $"??ng xu?t th?t b?i: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi", $"Đăng xuất thất bại: {ex.Message}", "OK");
             }
         }
-
-        private async void OnRolesClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new RolesPage());
 
         private async void OnUsersClicked(object sender, EventArgs e)
             => await Navigation.PushAsync(new UsersPage());

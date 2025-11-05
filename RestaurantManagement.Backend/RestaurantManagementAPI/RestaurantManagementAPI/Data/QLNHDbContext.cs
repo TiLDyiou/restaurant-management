@@ -17,6 +17,7 @@ namespace RestaurentManagementAPI.Data
         public DbSet<PhieuNhapKho> PHIEUNHAPKHO { get; set; }
         public DbSet<ChiTietPhieuNhap> CHITIETPHIEUNHAP { get; set; }
         public DbSet<DonHangOnline> DONHANG_ONLINE { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,7 +68,11 @@ namespace RestaurentManagementAPI.Data
                 .HasMany(m => m.ChiTietHoaDons)
                 .WithOne(c => c.MonAn)
                 .HasForeignKey(c => c.MaMA);
-                //.OnDelete(DeleteBehavior.Restrict); Cho phép tính năng "xoá mềm" hoạt động
+
+            // Fix decimal
+            modelBuilder.Entity<MonAn>()
+                .Property(m => m.DonGia)
+                .HasPrecision(18, 2);
 
             // HoaDon
             modelBuilder.Entity<HoaDon>()
@@ -79,12 +84,21 @@ namespace RestaurentManagementAPI.Data
                 .HasForeignKey(c => c.MaHD)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<HoaDon>()
+                .Property(h => h.TongTien)
+                .HasPrecision(18, 2);
+
             // ChiTietHoaDon
             modelBuilder.Entity<ChiTietHoaDon>()
                 .HasKey(c => new { c.MaHD, c.MaMA });
 
             modelBuilder.Entity<ChiTietHoaDon>()
+                .Property(c => c.DonGia)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ChiTietHoaDon>()
                 .Property(c => c.ThanhTien)
+                .HasPrecision(18, 2)
                 .HasComputedColumnSql("[SoLuong] * [DonGia]", stored: true);
 
             // Kho

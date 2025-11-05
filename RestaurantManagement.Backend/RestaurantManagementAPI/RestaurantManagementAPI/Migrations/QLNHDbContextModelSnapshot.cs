@@ -55,6 +55,7 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnName("MaMA");
 
                     b.Property<decimal>("DonGia")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("DonGia");
 
@@ -64,6 +65,7 @@ namespace RestaurantManagementAPI.Migrations
 
                     b.Property<decimal>("ThanhTien")
                         .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("ThanhTien")
                         .HasComputedColumnSql("[SoLuong] * [DonGia]", true);
@@ -156,6 +158,7 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnName("PaymentMethod");
 
                     b.Property<decimal>("TongTien")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("TongTien");
 
@@ -204,6 +207,7 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnName("MaMA");
 
                     b.Property<decimal>("DonGia")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("DonGia");
 
@@ -297,6 +301,10 @@ namespace RestaurantManagementAPI.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)")
                         .HasColumnName("TenDangNhap");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("HoatDong");
 
                     b.Property<string>("MaNV")
                         .IsRequired()

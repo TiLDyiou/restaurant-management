@@ -21,7 +21,8 @@ namespace RestaurentManagementAPI.Models.Entities
         [Column("Quyen")]
         public string? Quyen { get; set; } = "NhanVien";
 
-        
+        [Column("HoatDong")]
+        public bool IsActive { get; set; } = true;
         public NhanVien NhanVien { get; set; } = null!;
     }
 }

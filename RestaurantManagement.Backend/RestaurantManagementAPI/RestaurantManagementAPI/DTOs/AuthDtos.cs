@@ -8,6 +8,7 @@
         public string HoTen { get; set; } = string.Empty;
         public string ChucVu { get; set; } = "Nhân viên";
         public string SDT { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public string Quyen { get; set; } = "NhanVien";
     }
 
@@ -25,6 +26,7 @@
         public string? HoTen { get; set; }
         public string? ChucVu { get; set; }
         public string? SDT { get; set; }
+        public string? TrangThai { get; set; }
     }
 
     public class UpdateProfileDto
@@ -39,5 +41,4 @@
         public string MaNV { get; set; } = string.Empty;
         public string HoTen { get; set; } = string.Empty;
     }
-
 }

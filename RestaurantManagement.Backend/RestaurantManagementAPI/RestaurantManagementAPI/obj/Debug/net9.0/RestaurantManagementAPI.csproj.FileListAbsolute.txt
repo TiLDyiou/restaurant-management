@@ -168,3 +168,6 @@ D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\Re
 D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\RestaurantManagementAPI\obj\Debug\net9.0\RestaurantManagementAPI.pdb
 D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\RestaurantManagementAPI\obj\Debug\net9.0\RestaurantManagementAPI.genruntimeconfig.cache
 D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\RestaurantManagementAPI\obj\Debug\net9.0\ref\RestaurantManagementAPI.dll
+D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\RestaurantManagementAPI\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
+D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\RestaurantManagementAPI\bin\Debug\net9.0\MailKit.dll
+D:\restaurant-management\RestaurantManagement.Backend\RestaurantManagementAPI\RestaurantManagementAPI\bin\Debug\net9.0\MimeKit.dll

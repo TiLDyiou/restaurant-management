@@ -1,9 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
-    public class UserModel
+    public class UserModel : INotifyPropertyChanged
     {
+        private string _trangThai = "Đang làm";
+
         [JsonPropertyName("maNV")]
         public string MaNV { get; set; }
 
@@ -21,5 +25,26 @@ namespace RestaurantManagementGUI.Models
 
         [JsonPropertyName("tenDangNhap")]
         public string TenDangNhap { get; set; }
+
+        [JsonPropertyName("trangThai")]
+        public string TrangThai
+        {
+            get => _trangThai;
+            set
+            {
+                if (_trangThai != value)
+                {
+                    _trangThai = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

@@ -1,8 +1,8 @@
 [
   {
     "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
-    "Method": "DeleteUser",
-    "RelativePath": "api/Auth/{maNV}",
+    "Method": "HardDelete",
+    "RelativePath": "api/Auth/hard-delete/{maNV}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -10,27 +10,6 @@
       {
         "Name": "maNV",
         "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
-    "Method": "AdminUpdate",
-    "RelativePath": "api/Auth/admin-update/{maNV}",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "maNV",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "dto",
-        "Type": "RestaurentManagementAPI.DTOs.AdminUpdateUserDto",
         "IsRequired": true
       }
     ],
@@ -73,6 +52,22 @@
       {
         "Name": "dto",
         "Type": "RestaurentManagementAPI.DTOs.RegisterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.AuthController",
+    "Method": "ToggleStatus",
+    "RelativePath": "api/Auth/soft-delete/{maNV}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maNV",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],

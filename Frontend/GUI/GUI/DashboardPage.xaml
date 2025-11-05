@@ -5,6 +5,28 @@
              BackgroundColor="White"
              Shell.NavBarIsVisible="False">
 
+    <ContentPage.Resources>
+        <!-- Style cho Border các nút -->
+        <Style x:Key="DashboardButtonStyle" TargetType="Border">
+            <Setter Property="Stroke" Value="#E0E0E0"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="15"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="White"/>
+            <Setter Property="HeightRequest" Value="120"/>
+        </Style>
+
+        <!-- Style cho Button bên trong Border -->
+        <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
+            <Setter Property="TextColor" Value="#263238"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+        </Style>
+    </ContentPage.Resources>
+
     <Grid ColumnDefinitions="250,*" RowDefinitions="*" BackgroundColor="White">
 
         <!-- Bên trái -->
@@ -34,10 +56,8 @@
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
                    Margin="0,10,0,0" />
-        </StackLayout>
-		
-		<!-- Logout -->
-		<Button Text="Đăng xuất"
+
+            <Button Text="Đăng xuất"
                     x:Name="LogoutButton"
                     TextColor="White"
                     BackgroundColor="#263238"
@@ -46,6 +66,7 @@
                     HeightRequest="40"
                     HorizontalOptions="Center"
                     Clicked="OnLogoutClicked"/>
+        </StackLayout>
 
         <!-- Bên phải (nút chức năng) -->
         <ScrollView Grid.Column="1" Padding="30">
@@ -54,130 +75,59 @@
                   ColumnSpacing="20"
                   RowSpacing="20">
 
-                <!-- Roles -->
-                <Border Grid.Row="0" Grid.Column="0"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
+                <!-- Row 0 -->
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardButtonStyle}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="roles.png" HeightRequest="40" />
-                        <Button x:Name="RolesButton" Text="Roles"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnRolesClicked" />
+                        <Image Source="users.png" HeightRequest="40"/>
+                        <Button Text="Users" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUsersClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Users -->
-                <Border Grid.Row="0" Grid.Column="1"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource DashboardButtonStyle}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="users.png" HeightRequest="40" />
-                        <Button x:Name="UsersButton" Text="Users"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnUsersClicked" />
+                        <Image Source="categories.png" HeightRequest="40"/>
+                        <Button Text="Food Categories" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodCategoriesClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Food Categories -->
-                <Border Grid.Row="0" Grid.Column="2"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
+                <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource DashboardButtonStyle}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="categories.png" HeightRequest="40" />
-                        <Button x:Name="FoodCategoriesButton" Text="Food Categories"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnFoodCategoriesClicked" />
+                        <Image Source="menu.png" HeightRequest="40"/>
+                        <Button Text="Food Menu" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Food Menu -->
-                <Border Grid.Row="0" Grid.Column="3"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
+                <Border Grid.Row="0" Grid.Column="3" Style="{StaticResource DashboardButtonStyle}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="menu.png" HeightRequest="40" />
-                        <Button x:Name="FoodMenuButton" Text="Food Menu"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnFoodMenuClicked" />
+                        <Image Source="orders.png" HeightRequest="40"/>
+                        <Button Text="Orders" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Orders -->
-                <Border Grid.Row="1" Grid.Column="0"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
+                <!-- Row 1 -->
+                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource DashboardButtonStyle}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="orders.png" HeightRequest="40" />
-                        <Button x:Name="OrdersButton" Text="Orders"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnOrdersClicked" />
-                    </VerticalStackLayout>
-                </Border>
-				
-				
-                <!-- Tables -->
-                <Border Grid.Row="1" Grid.Column="1"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="tables.png" HeightRequest="40" />
-                        <Button x:Name="TablesButton" Text="Tables"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnTablesClicked" />
-                    </VerticalStackLayout>
-                </Border>
-				
-				
-
-
-                <!-- Bill Generation -->
-                <Border Grid.Row="1" Grid.Column="2"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="bill.png" HeightRequest="40" />
-                        <Button x:Name="BillGenerationButton" Text="Bill Generation"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnBillGenerationClicked" />
+                        <Image Source="tables.png" HeightRequest="40"/>
+                        <Button Text="Tables" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnTablesClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Order Modifications -->
-                <Border Grid.Row="1" Grid.Column="3"
-                        Stroke="#E0E0E0" StrokeThickness="1"
-                        StrokeShape="RoundRectangle 15"
-                        BackgroundColor="White" HeightRequest="120">
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource DashboardButtonStyle}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="modify.png" HeightRequest="40" />
-                        <Button x:Name="OrderModificationsButton" Text="Order Modifications"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                BackgroundColor="Transparent"
-                                Clicked="OnOrderModificationsClicked" />
+                        <Image Source="bill.png" HeightRequest="40"/>
+                        <Button Text="Bill Generation" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnBillGenerationClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
+                <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource DashboardButtonStyle}">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="modify.png" HeightRequest="40"/>
+                        <Button Text="Order Modifications" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrderModificationsClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ô trống để cân đối -->
+                <BoxView Grid.Row="1" Grid.Column="3" BackgroundColor="Transparent"/>
             </Grid>
         </ScrollView>
     </Grid>

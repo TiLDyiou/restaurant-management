@@ -1,41 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:RestaurantManagementGUI.Converters"
              x:Class="RestaurantManagementGUI.UsersPage"
              BackgroundColor="#263238"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="True"
+             Title="Quản lý nhân viên">
 
-    <!-- Bảng màu chủ đạo -->
     <ContentPage.Resources>
         <Color x:Key="PrimaryColor">#263238</Color>
-        <!-- Màu nền đen xám -->
         <Color x:Key="AccentColor">#FFBD59</Color>
-        <!-- Màu vàng nổi bật -->
         <Color x:Key="LightBackground">#FAFAFA</Color>
         <Color x:Key="TextPrimary">#FFFFFF</Color>
         <Color x:Key="TextSecondary">#B0BEC5</Color>
+
+        <conv:StatusColorConverter x:Key="StatusColorConverter"/>
+        <conv:CanEditConverter x:Key="CanEditConverter"/>
+        <conv:StatusButtonTextConverter x:Key="StatusButtonTextConverter"/>
     </ContentPage.Resources>
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <!-- Nút quay lại -->
-            <Button Text="← Quay lại"
-                    BackgroundColor="{StaticResource AccentColor}"
-                    TextColor="{StaticResource PrimaryColor}"
-                    FontAttributes="Bold"
-                    FontSize="14"
-                    CornerRadius="12"
-                    HeightRequest="48"
-                    WidthRequest="150"
-                    HorizontalOptions="Start"
-                    Clicked="OnBackClicked" />
-
-            <!-- Tiêu đề -->
-            <Label Text="Quản lý nhân viên"
-                   FontSize="26"
+            <!-- Tiêu đề nhỏ bên trong -->
+            <Label Text="Danh sách nhân viên"
+                   FontSize="22"
                    FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   TextColor="{StaticResource AccentColor}" />
+                   TextColor="{StaticResource AccentColor}"
+                   HorizontalOptions="Center"/>
 
             <!-- Nút thêm nhân viên -->
             <Button Text="➕ Thêm nhân viên"
@@ -52,12 +44,11 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame BorderColor="{StaticResource AccentColor}"
+                               CornerRadius="14"
                                BackgroundColor="{StaticResource LightBackground}"
                                Padding="15"
-                               CornerRadius="14"
                                Margin="0,8"
                                HasShadow="True">
-
                             <VerticalStackLayout Spacing="6">
 
                                 <Label Text="{Binding HoTen, StringFormat='👤 Họ tên: {0}'}"
@@ -81,23 +72,43 @@
                                        FontSize="14"
                                        TextColor="#757575" />
 
+                                <Label Text="{Binding TrangThai, StringFormat='⚡ Trạng thái: {0}'}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding TrangThai, Converter={StaticResource StatusColorConverter}}" />
+
+                                <!-- Nút hành động -->
                                 <HorizontalStackLayout Spacing="10" Margin="0,10,0,0">
+
+                                    <!-- Nút Sửa -->
                                     <Button Text="✏️ Sửa"
                                             BackgroundColor="{StaticResource AccentColor}"
                                             TextColor="{StaticResource PrimaryColor}"
                                             CornerRadius="8"
                                             FontAttributes="Bold"
-                                            WidthRequest="90"
-                                            Clicked="OnEditClicked" />
+                                            Clicked="OnEditClicked"
+                                            IsEnabled="{Binding TrangThai, Converter={StaticResource CanEditConverter}}"
+                                            Padding="10,0"/>
 
+                                    <!-- Nút Nghỉ việc / Quay lại -->
+                                    <Button Text="{Binding TrangThai, Converter={StaticResource StatusButtonTextConverter}}"
+                                            BackgroundColor="#FFA000"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            FontAttributes="Bold"
+                                            Clicked="OnToggleStatusClicked"
+                                            Padding="10,0"/>
+
+                                    <!-- Nút Xóa -->
                                     <Button Text="🗑 Xóa"
                                             BackgroundColor="#E53935"
                                             TextColor="White"
                                             CornerRadius="8"
                                             FontAttributes="Bold"
-                                            WidthRequest="90"
-                                            Clicked="OnDeleteClicked" />
+                                            Clicked="OnHardDeleteClicked"
+                                            Padding="10,0"/>
                                 </HorizontalStackLayout>
+
                             </VerticalStackLayout>
                         </Frame>
                     </DataTemplate>

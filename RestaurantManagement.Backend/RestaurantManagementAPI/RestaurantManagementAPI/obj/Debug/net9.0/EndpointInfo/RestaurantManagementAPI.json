@@ -110,7 +110,19 @@
         }
       }
     },
-    "/api/Auth/admin-update/{maNV}": {
+    "/api/Auth/users": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Auth/soft-delete/{maNV}": {
       "put": {
         "tags": [
           "Auth"
@@ -125,25 +137,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminUpdateUserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminUpdateUserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminUpdateUserDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -151,7 +144,7 @@
         }
       }
     },
-    "/api/Auth/{maNV}": {
+    "/api/Auth/hard-delete/{maNV}": {
       "delete": {
         "tags": [
           "Auth"
@@ -165,18 +158,6 @@
               "type": "string"
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Auth/users": {
-      "get": {
-        "tags": [
-          "Auth"
         ],
         "responses": {
           "200": {
@@ -423,32 +404,6 @@
   },
   "components": {
     "schemas": {
-      "AdminUpdateUserDto": {
-        "type": "object",
-        "properties": {
-          "matKhau": {
-            "type": "string",
-            "nullable": true
-          },
-          "quyen": {
-            "type": "string",
-            "nullable": true
-          },
-          "hoTen": {
-            "type": "string",
-            "nullable": true
-          },
-          "chucVu": {
-            "type": "string",
-            "nullable": true
-          },
-          "sdt": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "CreateMonAnDto": {
         "required": [
           "loai",
@@ -540,6 +495,10 @@
             "nullable": true
           },
           "sdt": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
             "type": "string",
             "nullable": true
           },

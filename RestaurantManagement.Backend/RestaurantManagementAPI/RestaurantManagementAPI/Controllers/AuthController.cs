@@ -36,10 +36,8 @@ namespace RestaurentManagementAPI.Controllers
             if (await _context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == dto.TenDangNhap))
                 return Conflict("Tên đăng nhập đã tồn tại.");
 
-            // Sinh MaNV tự động
             var newMaNV = await GenerateNewMaNV();
 
-            // Tạo nhân viên
             var nv = new NhanVien
             {
                 MaNV = newMaNV,
@@ -51,13 +49,13 @@ namespace RestaurentManagementAPI.Controllers
             };
             _context.NHANVIEN.Add(nv);
 
-            // Tạo tài khoản
             var tk = new TaiKhoan
             {
                 TenDangNhap = dto.TenDangNhap,
                 MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau),
                 MaNV = newMaNV,
-                Quyen = string.IsNullOrWhiteSpace(dto.Quyen) ? "NhanVien" : dto.Quyen
+                Quyen = string.IsNullOrWhiteSpace(dto.Quyen) ? "NhanVien" : dto.Quyen,
+                IsActive = true
             };
             _context.TAIKHOAN.Add(tk);
 
@@ -77,6 +75,9 @@ namespace RestaurentManagementAPI.Controllers
 
             if (user == null)
                 return Unauthorized("Sai tài khoản hoặc mật khẩu.");
+
+            if (!user.IsActive)
+                return Unauthorized("Tài khoản của bạn đã bị vô hiệu hóa.");
 
             bool matched = false;
             try
@@ -108,7 +109,6 @@ namespace RestaurentManagementAPI.Controllers
                 chucVu = user.NhanVien?.ChucVu
             });
         }
-
         #endregion
 
         #region ===================== User APIs (Authenticated) =====================
@@ -148,13 +148,9 @@ namespace RestaurentManagementAPI.Controllers
 
             if (user == null) return NotFound();
 
-            // Đổi SDT
             if (!string.IsNullOrWhiteSpace(dto.SDT))
-            {
                 user.NhanVien.SDT = dto.SDT;
-            }
 
-            // Đổi mật khẩu
             if (!string.IsNullOrWhiteSpace(dto.NewPassword))
             {
                 if (string.IsNullOrWhiteSpace(dto.CurrentPassword))
@@ -182,61 +178,6 @@ namespace RestaurentManagementAPI.Controllers
         #region ===================== Admin APIs =====================
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("admin-update/{maNV}")]
-        public async Task<IActionResult> AdminUpdate(string maNV, [FromBody] AdminUpdateUserDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(maNV))
-                return BadRequest("MaNV không được để trống.");
-
-            // Tìm nhân viên theo MaNV
-            var user = await _context.NHANVIEN
-                .Include(e => e.TaiKhoan)
-                .FirstOrDefaultAsync(e => e.MaNV == maNV);
-
-            if (user == null || user.TaiKhoan == null)
-                return NotFound("Nhân viên không tồn tại.");
-
-            // Cập nhật thông tin tài khoản
-            if (!string.IsNullOrWhiteSpace(dto.MatKhau))
-                user.TaiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
-            if (!string.IsNullOrWhiteSpace(dto.Quyen))
-                user.TaiKhoan.Quyen = dto.Quyen;
-
-            // Cập nhật thông tin nhân viên
-            if (!string.IsNullOrWhiteSpace(dto.HoTen))
-                user.HoTen = dto.HoTen;
-            if (!string.IsNullOrWhiteSpace(dto.ChucVu))
-                user.ChucVu = dto.ChucVu;
-            if (!string.IsNullOrWhiteSpace(dto.SDT))
-                user.SDT = dto.SDT;
-
-            _context.NHANVIEN.Update(user);
-            _context.TAIKHOAN.Update(user.TaiKhoan);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Cập nhật thành công" });
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("{maNV}")]
-        public async Task<IActionResult> DeleteUser(string maNV)
-        {
-            var employee = await _context.NHANVIEN
-                .Include(e => e.TaiKhoan)
-                .Include(e => e.HoaDons)
-                .Include(e => e.PhieuNhapKhos)
-                .FirstOrDefaultAsync(e => e.MaNV == maNV);
-
-            if (employee == null)
-                return NotFound(new { success = false, message = "Nhân viên không tồn tại" });
-
-            _context.NHANVIEN.Remove(employee);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { success = true, message = "Xóa user thành công" });
-        }
-
-        [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -249,14 +190,69 @@ namespace RestaurentManagementAPI.Controllers
                     chucVu = nv.ChucVu,
                     sdt = nv.SDT,
                     quyen = nv.TaiKhoan.Quyen,
-                    tenDangNhap = nv.TaiKhoan.TenDangNhap
+                    tenDangNhap = nv.TaiKhoan.TenDangNhap,
+                    trangThai = nv.TrangThai,
+                    hoatDong = nv.TaiKhoan.IsActive
                 })
                 .ToListAsync();
 
             return Ok(users);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("soft-delete/{maNV}")]
+        public async Task<IActionResult> ToggleStatus(string maNV)
+        {
+            var employee = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+
+            if (employee == null)
+                return NotFound("Nhân viên không tồn tại.");
+
+            // Toggle trạng thái NHANVIEN
+            employee.TrangThai = employee.TrangThai == "Đang làm" ? "Đã nghỉ" : "Đang làm";
+
+            // Đồng bộ sang TaiKhoan
+            if (employee.TaiKhoan != null)
+                employee.TaiKhoan.IsActive = employee.TrangThai == "Đang làm";
+
+            _context.NHANVIEN.Update(employee);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                maNV = employee.MaNV,
+                TrangThai = employee.TrangThai,
+                HoatDong = employee.TaiKhoan?.IsActive
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("hard-delete/{maNV}")]
+        public async Task<IActionResult> HardDelete(string maNV)
+        {
+            var employee = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .Include(e => e.HoaDons)
+                .Include(e => e.PhieuNhapKhos)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+
+            if (employee == null) return NotFound();
+
+            if (employee.TaiKhoan != null)
+                _context.TAIKHOAN.Remove(employee.TaiKhoan);
+
+            _context.NHANVIEN.Remove(employee);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Nhân viên đã bị xóa vĩnh viễn" });
+        }
+
         #endregion
+
+        
+
 
         #region ===================== Helper Methods =====================
 
