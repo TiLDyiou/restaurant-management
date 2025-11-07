@@ -1,53 +1,27 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Microsoft.Maui.Storage; // Để lưu token (SecureStorage)
-using RestaurantManagementGUI.Models; // Nơi chứa 2 model bạn vừa tạo
+using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Models;
+using RestaurantManagementGUI.Helpers;
 
 namespace RestaurantManagementGUI
 {
     public partial class LoginPage : ContentPage
     {
-
         private readonly HttpClient _httpClient;
 
         public LoginPage()
         {
             InitializeComponent();
 
-            // GIẢI QUYẾT VẤN ĐỀ SSL VÀ LOCALHOST
 #if DEBUG
-            // Chỉ trong chế độ DEBUG, chúng ta mới bỏ qua lỗi chứng chỉ
-            // ĐỪNG BAO GIỜ dùng code này trong sản phẩm thật (production)
-            HttpClientHandler insecureHandler = GetInsecureHandler();
-            _httpClient = new HttpClient(insecureHandler);
+            _httpClient = new HttpClient(GetInsecureHandler());
 #else
-            // Khi build release, dùng HttpClient bình thường
             _httpClient = new HttpClient();
 #endif
         }
 
-        // Hàm này trả về URL đúng cho từng nền tảng
-        private string GetApiUrl()
-        {
-            // Nếu chạy trên Windows, dùng localhost
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-            {
-                return "https://localhost:7004/api/Auth/login";
-            }
-
-            // Nếu chạy trên Android, dùng IP đặc biệt 10.0.2.2
-            if (DeviceInfo.Platform == DevicePlatform.Android)
-            {
-                return "https://10.0.2.2:7004/api/Auth/login";
-            }
-
-            // Các nền tảng khác (iOS, Mac) sẽ cần IP LAN của máy bạn, 
-            // nhưng hiện tại chúng ta chỉ xử lý 2 trường hợp này
-            return "https://localhost:7004/api/Auth/login";
-        }
-
-        // Hàm chính xử lý đăng nhập
-        async void OnLoginClicked(object sender, EventArgs e)
+        private async void OnLoginClicked(object sender, EventArgs e)
         {
             string user = UsernameEntry.Text?.Trim() ?? string.Empty;
             string pass = PasswordEntry.Text ?? string.Empty;
@@ -72,10 +46,7 @@ namespace RestaurantManagementGUI
                 string jsonPayload = JsonSerializer.Serialize(loginRequest);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                string apiUrl = GetApiUrl();
-
-                HttpResponseMessage response = await _httpClient.PostAsync(apiUrl, content);
-
+                var response = await _httpClient.PostAsync(ApiConfig.Login, content);
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -98,12 +69,10 @@ namespace RestaurantManagementGUI
                 }
                 else
                 {
-                    if (responseBody.Contains("vô hiệu hóa", StringComparison.OrdinalIgnoreCase))
-                        await DisplayAlert("Tài khoản bị vô hiệu hóa", responseBody, "OK");
-                    else if (responseBody.Contains("tồn tại", StringComparison.OrdinalIgnoreCase))
-                        await DisplayAlert("Lỗi đăng ký", responseBody, "OK");
-                    else
-                        await DisplayAlert("Lỗi đăng nhập", responseBody, "OK");
+                    string msg = responseBody.Contains("vô hiệu hóa", StringComparison.OrdinalIgnoreCase)
+                        ? "Tài khoản đã bị vô hiệu hóa."
+                        : "Sai tên đăng nhập hoặc mật khẩu.";
+                    await DisplayAlert("Lỗi", msg, "OK");
                 }
             }
             catch (Exception ex)
@@ -117,25 +86,22 @@ namespace RestaurantManagementGUI
             }
         }
 
-        // Hàm xử lý "Quên mật khẩu"
-        async void OnForgotPasswordClicked(object sender, EventArgs e)
+        private async void OnForgotPasswordClicked(object sender, EventArgs e)
         {
-            await DisplayAlert("Quên mật khẩu", "Vui lòng liên hệ quản trị viên.", "OK");
+            await DisplayAlert("Quên mật khẩu", "Vui lòng liên hệ quản trị viên để được hỗ trợ.", "OK");
         }
 
-        // Hàm trợ giúp để bỏ qua lỗi SSL (Chỉ dùng cho DEBUG)
-        public HttpClientHandler GetInsecureHandler()
+        private HttpClientHandler GetInsecureHandler()
         {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) =>
             {
                 if (sender is HttpRequestMessage request)
                 {
-                    // Tự động tin tưởng "localhost" hoặc "10.0.2.2"
                     return request.RequestUri.IsLoopback ||
                            (DeviceInfo.Platform == DevicePlatform.Android && request.RequestUri.Host == "10.0.2.2");
                 }
-                return sslPolicyErrors == System.Net.Security.SslPolicyErrors.None;
+                return errors == System.Net.Security.SslPolicyErrors.None;
             };
             return handler;
         }

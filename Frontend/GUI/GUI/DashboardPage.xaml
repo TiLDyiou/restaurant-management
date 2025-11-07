@@ -16,7 +16,8 @@
                 </Setter.Value>
             </Setter>
             <Setter Property="BackgroundColor" Value="White"/>
-            <Setter Property="HeightRequest" Value="120"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="MinimumHeightRequest" Value="120"/>
         </Style>
 
         <!-- Style cho Button bên trong Border -->
@@ -24,10 +25,12 @@
             <Setter Property="TextColor" Value="#263238"/>
             <Setter Property="FontAttributes" Value="Bold"/>
             <Setter Property="BackgroundColor" Value="Transparent"/>
+            <Setter Property="LineBreakMode" Value="WordWrap"/>
         </Style>
     </ContentPage.Resources>
 
-    <Grid ColumnDefinitions="250,*" RowDefinitions="*" BackgroundColor="White">
+    <!-- Grid chính: cột trái nhỏ để phần phải rộng hơn Android -->
+    <Grid ColumnDefinitions="160,*" RowDefinitions="*" BackgroundColor="White">
 
         <!-- Bên trái -->
         <StackLayout BackgroundColor="#FFBD59"
@@ -68,67 +71,72 @@
                     Clicked="OnLogoutClicked"/>
         </StackLayout>
 
-        <!-- Bên phải (nút chức năng) -->
+        <!-- Bên phải -->
         <ScrollView Grid.Column="1" Padding="30">
-            <Grid ColumnDefinitions="*,*,*,*"
-                  RowDefinitions="Auto,Auto"
-                  ColumnSpacing="20"
-                  RowSpacing="20">
+            <FlexLayout x:Name="ButtonsLayout"
+                        Direction="Row"
+                        Wrap="Wrap"
+                        JustifyContent="Start"
+                        AlignItems="Start"
+                        AlignContent="Start">
 
-                <!-- Row 0 -->
-                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Users -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="users.png" HeightRequest="40"/>
+                        <Image Source="users.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Users" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUsersClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Food Categories -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="categories.png" HeightRequest="40"/>
+                        <Image Source="categories.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Food Categories" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodCategoriesClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Food Menu -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="menu.png" HeightRequest="40"/>
+                        <Image Source="menu.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Food Menu" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Grid.Row="0" Grid.Column="3" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Orders -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="orders.png" HeightRequest="40"/>
+                        <Image Source="orders.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Orders" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Row 1 -->
-                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Tables -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="tables.png" HeightRequest="40"/>
+                        <Image Source="tables.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Tables" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnTablesClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Bill Generation -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="bill.png" HeightRequest="40"/>
+                        <Image Source="bill.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Bill Generation" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnBillGenerationClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource DashboardButtonStyle}">
+                <!-- Order Modifications -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Image Source="modify.png" HeightRequest="40"/>
+                        <Image Source="modify.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
                         <Button Text="Order Modifications" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrderModificationsClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- ô trống để cân đối -->
-                <BoxView Grid.Row="1" Grid.Column="3" BackgroundColor="Transparent"/>
-            </Grid>
+            </FlexLayout>
         </ScrollView>
     </Grid>
 </ContentPage>

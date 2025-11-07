@@ -122,6 +122,47 @@
         }
       }
     },
+    "/api/Auth/admin-update/{maNV}": {
+      "put": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "maNV",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUpdateUserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUpdateUserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Auth/soft-delete/{maNV}": {
       "put": {
         "tags": [
@@ -255,7 +296,48 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/dishes/{maMA}": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "parameters": [
+          {
+            "name": "maMA",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonAnDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/add_dish": {
       "post": {
         "tags": [
           "Dishes"
@@ -303,44 +385,7 @@
         }
       }
     },
-    "/api/dishes/{maMA}": {
-      "get": {
-        "tags": [
-          "Dishes"
-        ],
-        "parameters": [
-          {
-            "name": "maMA",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonAnDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonAnDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonAnDto"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/api/update_dish/{maMA}": {
       "put": {
         "tags": [
           "Dishes"
@@ -379,7 +424,9 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/api/softdelete_dish/{maMA}": {
       "delete": {
         "tags": [
           "Dishes"
@@ -404,6 +451,36 @@
   },
   "components": {
     "schemas": {
+      "AdminUpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "matKhau": {
+            "type": "string",
+            "nullable": true
+          },
+          "quyen": {
+            "type": "string",
+            "nullable": true
+          },
+          "hoTen": {
+            "type": "string",
+            "nullable": true
+          },
+          "chucVu": {
+            "type": "string",
+            "nullable": true
+          },
+          "sdt": {
+            "type": "string",
+            "nullable": true
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateMonAnDto": {
         "required": [
           "loai",

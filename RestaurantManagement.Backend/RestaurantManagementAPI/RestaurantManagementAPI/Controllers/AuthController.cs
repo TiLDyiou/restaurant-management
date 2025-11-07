@@ -200,6 +200,58 @@ namespace RestaurentManagementAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpPut("admin-update/{maNV}")]
+        public async Task<IActionResult> AdminUpdateUser(string maNV, [FromBody] AdminUpdateUserDto dto)
+        {
+            var employee = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+
+            if (employee == null)
+                return NotFound("Nhân viên không tồn tại.");
+
+            // Cập nhật thông tin NhanVien
+            if (!string.IsNullOrWhiteSpace(dto.HoTen))
+                employee.HoTen = dto.HoTen;
+
+            if (!string.IsNullOrWhiteSpace(dto.ChucVu))
+                employee.ChucVu = dto.ChucVu;
+
+            if (!string.IsNullOrWhiteSpace(dto.SDT))
+                employee.SDT = dto.SDT;
+
+            if (!string.IsNullOrWhiteSpace(dto.TrangThai))
+            {
+                employee.TrangThai = dto.TrangThai;
+                if (employee.TaiKhoan != null)
+                    employee.TaiKhoan.IsActive = dto.TrangThai == "Đang làm";
+            }
+
+            // Cập nhật thông tin TaiKhoan
+            if (employee.TaiKhoan != null)
+            {
+                if (!string.IsNullOrWhiteSpace(dto.Quyen))
+                    employee.TaiKhoan.Quyen = dto.Quyen;
+
+                if (!string.IsNullOrWhiteSpace(dto.MatKhau))
+                    employee.TaiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+            }
+
+            _context.NHANVIEN.Update(employee);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                maNV = employee.MaNV,
+                hoTen = employee.HoTen,
+                chucVu = employee.ChucVu,
+                sdt = employee.SDT,
+                trangThai = employee.TrangThai,
+                quyen = employee.TaiKhoan?.Quyen
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("soft-delete/{maNV}")]
         public async Task<IActionResult> ToggleStatus(string maNV)
         {
@@ -250,9 +302,6 @@ namespace RestaurentManagementAPI.Controllers
         }
 
         #endregion
-
-        
-
 
         #region ===================== Helper Methods =====================
 

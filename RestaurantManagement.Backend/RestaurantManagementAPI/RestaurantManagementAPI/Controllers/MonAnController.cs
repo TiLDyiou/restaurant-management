@@ -60,8 +60,8 @@ public class DishesController : ControllerBase
         return Ok(dish);
     }
 
-    // POST /api/dishes
-    [HttpPost]
+    // POST /api/add_dish
+    [HttpPost("/api/add_dish")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<MonAnDto>> PostDish([FromBody] CreateMonAnDto createDto)
     {
@@ -104,7 +104,8 @@ public class DishesController : ControllerBase
         return CreatedAtAction(nameof(GetDish), new { maMA = monAn.MaMA }, monAnDto);
     }
 
-    [HttpPut("{maMA}")]
+    // PUT /api/update_dish/{maMA}
+    [HttpPut("/api/update_dish/{maMA}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> PutDish(string maMA, [FromBody] UpdateMonAnDto updateDto)
     {
@@ -128,8 +129,8 @@ public class DishesController : ControllerBase
         return NoContent();
     }
 
-    // DELETE /api/dishes/{maMA}
-    [HttpDelete("{maMA}")]
+    // DELETE /api/softdelete_dish/{maMA}
+    [HttpDelete("/api/softdelete_dish/{maMA}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteDish(string maMA)
     {
