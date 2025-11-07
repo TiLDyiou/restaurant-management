@@ -8,6 +8,6 @@
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers"
   ],
-  "SelectedNode": "\\Frontend\\GUI\\RestaurantManagementGUI.slnx",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\AuthController.cs",
   "PreviewInSolutionExplorer": false
 }

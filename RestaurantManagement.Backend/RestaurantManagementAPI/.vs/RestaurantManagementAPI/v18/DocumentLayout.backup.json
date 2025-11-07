@@ -138,8 +138,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\AuthDtos.cs",
               "ViewState": "AgIAACQAAAAAAAAAAAAIwCoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-01T14:51:29.975Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-01T14:51:29.975Z"
             },
             {
               "$type": "Document",
@@ -151,8 +150,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\TaiKhoan.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T03:11:48.181Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T03:11:48.181Z"
             },
             {
               "$type": "Document",
@@ -164,8 +162,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\NhanVien.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:04:21.367Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:04:21.367Z"
             },
             {
               "$type": "Document",
@@ -175,7 +172,7 @@
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Controllers\\AuthController.cs",
               "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\AuthController.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAOwAAAAAAAAAAAAqwP0AAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAAA8BAAAAAAAAAAAuwP0AAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-30T09:50:46.288Z",
               "EditorCaption": ""
@@ -190,8 +187,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\MonAn.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAADwvyEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-26T12:51:06.686Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-26T12:51:06.686Z"
             },
             {
               "$type": "Document",
@@ -203,8 +199,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\MonAnDtos.cs",
               "ViewState": "AgIAAAoAAAAAAAAAAAAQwCMAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-26T14:17:24.951Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-26T14:17:24.951Z"
             },
             {
               "$type": "Document",
@@ -216,8 +211,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Data\\QLNHDbContext.cs",
               "ViewState": "AgIAAAIAAAAAAAAAAAAgwBMAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-26T14:17:38.332Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-26T14:17:38.332Z"
             },
             {
               "$type": "Document",
@@ -229,8 +223,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\MonAnController.cs",
               "ViewState": "AgIAAIQAAAAAAAAAAAAuwJkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-25T17:48:56.005Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-25T17:48:56.005Z"
             },
             {
               "$type": "Document",
@@ -242,8 +235,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\EmailConfirmation.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAiwBYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-05T07:27:00.678Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-05T07:27:00.678Z"
             },
             {
               "$type": "Document",
@@ -255,8 +247,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Migrations\\QLNHDbContextModelSnapshot.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAL4BAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T02:28:21.358Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T02:28:21.358Z"
             },
             {
               "$type": "Document",
@@ -268,8 +259,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\PhieuNhapKho.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAUwB4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:20:01.757Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:20:01.757Z"
             },
             {
               "$type": "Document",
@@ -281,8 +271,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\BanController.cs",
               "ViewState": "AgIAABoAAAAAAAAAAIBJwDIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:09:57.209Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:09:57.209Z"
             },
             {
               "$type": "Document",
@@ -294,8 +283,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Data\\DataSeeder.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAABdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-27T07:21:22.626Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-27T07:21:22.626Z"
             },
             {
               "$type": "Document",
@@ -307,8 +295,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Hubs\\BanHub.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:07:45.427Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:07:45.427Z"
             },
             {
               "$type": "Document",
@@ -320,8 +307,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Program.cs",
               "ViewState": "AgIAAGYAAAAAAAAAAAAIwFQAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-30T09:51:18.808Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-30T09:51:18.808Z"
             },
             {
               "$type": "Document",
@@ -333,8 +319,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Data\\BanSeeder.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAQwCAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T05:53:07.433Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T05:53:07.433Z"
             },
             {
               "$type": "Document",
@@ -346,8 +331,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-26T12:56:30.465Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-26T12:56:30.465Z"
             },
             {
               "$type": "Document",
@@ -359,8 +343,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\Ban.cs",
               "ViewState": "AgIAAAUAAAAAAAAAAAAiwBcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T02:28:04.596Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T02:28:04.596Z"
             },
             {
               "$type": "Document",
@@ -372,8 +355,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\Kho.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAiwBsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:19:30.706Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:19:30.706Z"
             },
             {
               "$type": "Document",
@@ -385,8 +367,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\DonHangOnline.cs",
               "ViewState": "AgIAAA0AAAAAAAAAAAAcwB4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:19:17.63Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:19:17.63Z"
             },
             {
               "$type": "Document",
@@ -398,8 +379,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\ChiTietPhieuNhap.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAAAcwBUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:19:08.76Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:19:08.76Z"
             },
             {
               "$type": "Document",
@@ -411,8 +391,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\HoaDon.cs",
               "ViewState": "AgIAABkAAAAAAAAAAAAUwCkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T04:03:55.75Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T04:03:55.75Z"
             },
             {
               "$type": "Document",
@@ -424,8 +403,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Properties\\launchSettings.json",
               "ViewState": "AgIAAAEAAAAAAAAAAABhwBMAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-01T16:43:57.494Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-01T16:43:57.494Z"
             }
           ]
         }
