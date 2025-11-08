@@ -23,16 +23,16 @@
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\dtos\\hoadondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\models\\entities\\chitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\models\\entities\\chitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\updateorderstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\dtos\\updateorderstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\migrations\\20251108034852_updatechitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\migrations\\20251108034852_updatechitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -78,8 +78,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T03:55:18.014Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T03:55:18.014Z"
             },
             {
               "$type": "Document",
@@ -91,12 +90,11 @@
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T03:49:38.729Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T03:49:38.729Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "20251108034852_UpdateChiTietHoaDon.cs",
               "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
@@ -104,12 +102,11 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T03:48:52.706Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T03:48:52.706Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 5,
               "Title": "ChiTietHoaDon.cs",
               "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
@@ -117,8 +114,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
               "ViewState": "AgIAABEAAAAAAAAAAAA3wBsAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T03:48:17.634Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T03:48:17.634Z"
             },
             {
               "$type": "Document",
@@ -128,7 +124,7 @@
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Controllers\\OrdersController.cs",
               "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\OrdersController.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\OrdersController.cs",
-              "ViewState": "AgIAAAUBAAAAAAAAAAAowA8BAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAPwAAAAAAAAAAAAowAYBAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-08T03:31:14.422Z",
               "EditorCaption": ""
@@ -143,8 +139,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
               "ViewState": "AgIAABUAAAAAAAAAAAAAwB8AAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T04:11:23.873Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T04:11:23.873Z"
             },
             {
               "$type": "Document",
@@ -156,12 +151,11 @@
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\DatBanController.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAADYAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T04:11:52.324Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T04:11:52.324Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
               "Title": "UpdateOrderStatusDto.cs",
               "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
@@ -169,8 +163,7 @@
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T03:25:41.789Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-08T03:25:41.789Z"
             }
           ]
         }
