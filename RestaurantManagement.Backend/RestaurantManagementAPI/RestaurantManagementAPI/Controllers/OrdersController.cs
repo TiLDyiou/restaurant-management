@@ -21,11 +21,7 @@ namespace RestaurentManagementAPI.Controllers
             _kitchenHubContext = kitchenHubContext;
         }
 
-        // ---------------------------------------------------------------------
-        // HÀM TẠO MÃ HOÁ ĐƠN TỰ ĐỘNG (CẦN THIẾT)
-        // ---------------------------------------------------------------------
-        // Do MaHD của bạn là string(5) và không tự tăng, chúng ta cần 1 logic để tạo mã mới.
-        // Đây là một ví dụ đơn giản. Bạn nên cải tiến nó để đảm bảo an toàn trong môi trường đa luồng.
+        
         private async Task<string> GenerateNewHoaDonIdAsync()
         {
             // Lấy MaHD cuối cùng, ví dụ: "HD001" -> "HD999"
@@ -51,17 +47,17 @@ namespace RestaurentManagementAPI.Controllers
         }
 
         // ---------------------------------------------------------------------
-        // API: GET /api/orders [cite: 74]
+        // API: GET /api/orders 
         // Lấy danh sách tất cả đơn hàng (đã bao gồm chi tiết)
         // ---------------------------------------------------------------------
         [HttpGet("get-all-orders-info")]
         public async Task<ActionResult<IEnumerable<HoaDonDto>>> GetOrders()
         {
             var hoaDons = await _context.HOADON
-                .AsNoTracking() // Hiệu quả hơn cho việc chỉ đọc
+                .AsNoTracking() 
                 .Include(h => h.ChiTietHoaDons) // Tải ChiTietHoaDon
                     .ThenInclude(ct => ct.MonAn) // Tải MonAn từ ChiTietHoaDon
-                .OrderByDescending(h => h.NgayLap) // Mới nhất lên trước
+                .OrderByDescending(h => h.NgayLap) 
                 .Select(h => new HoaDonDto // Sử dụng Select (Projection) để map sang DTO
                 {
                     MaHD = h.MaHD,
@@ -106,7 +102,7 @@ namespace RestaurentManagementAPI.Controllers
 
             try
             {
-                // (Logic nâng cao):
+                
                 // Sau khi cập nhật món này, kiểm tra xem có phải
                 // tất cả món khác trong đơn này đều "Đã xong" không.
                 if (updateDto.NewStatus == "Đã xong")
@@ -131,7 +127,7 @@ namespace RestaurentManagementAPI.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // (SignalR Nâng cao): 
+                
                 // Gửi thông báo real-time về cho Nhân viên/Quản lý
                 // biết món ăn {maMA} đã xong.
                 // await _staffHub.Clients.All.SendAsync("ItemStatusUpdated", maHD, maMA, updateDto.NewStatus);
@@ -291,9 +287,8 @@ namespace RestaurentManagementAPI.Controllers
             {
                 await _context.SaveChangesAsync();
 
-                // (Nâng cao): Bạn cũng có thể dùng SignalR tại đây
-                // để thông báo cho Nhân viên/Quản lý biết là Bếp đã làm xong.
-                // Ví dụ: await _staffHubContext.Clients.All.SendAsync("OrderReady", id);
+                
+               
 
                 return NoContent(); // Trả về 204 No Content (thành công, không có nội dung)
             }
