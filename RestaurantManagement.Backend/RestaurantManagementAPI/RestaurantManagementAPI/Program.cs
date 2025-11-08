@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"Bearer 12345abcdef\""
+        Description = "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"12345abcdef\""
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
