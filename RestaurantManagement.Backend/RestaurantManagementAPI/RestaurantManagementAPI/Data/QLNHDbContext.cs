@@ -17,7 +17,8 @@ namespace RestaurentManagementAPI.Data
         public DbSet<PhieuNhapKho> PHIEUNHAPKHO { get; set; }
         public DbSet<ChiTietPhieuNhap> CHITIETPHIEUNHAP { get; set; }
         public DbSet<DonHangOnline> DONHANG_ONLINE { get; set; }
-        
+        public DbSet<DatBan> DATBAN { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -128,6 +129,16 @@ namespace RestaurentManagementAPI.Data
             // DonHangOnline
             modelBuilder.Entity<DonHangOnline>()
                 .HasKey(d => d.MaDH);
+
+            modelBuilder.Entity<DatBan>()
+            .HasKey(db => db.MaDatBan);
+
+            // DatBan -> Ban (n-1) 
+            modelBuilder.Entity<Ban>()
+                .HasMany<DatBan>() 
+                .WithOne(db => db.Ban)
+                .HasForeignKey(db => db.MaBan)
+                .OnDelete(DeleteBehavior.Restrict); // Không cho xoá Bàn nếu còn lịch sử đặt
         }
     }
 }

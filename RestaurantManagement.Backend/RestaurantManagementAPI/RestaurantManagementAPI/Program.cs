@@ -105,7 +105,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.MapHub<KitchenHub>("/kitchenHub");
 app.UseAuthentication();
 app.UseAuthorization();
 

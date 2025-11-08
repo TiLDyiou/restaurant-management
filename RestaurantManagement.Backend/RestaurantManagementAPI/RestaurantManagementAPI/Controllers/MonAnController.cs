@@ -19,7 +19,7 @@ public class DishesController : ControllerBase
     }
 
     // GET /api/dishes
-    [HttpGet]
+    [HttpGet("get-dishes")]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<MonAnDto>>> GetDishes()
     {
@@ -39,7 +39,7 @@ public class DishesController : ControllerBase
     }
 
     // GET /api/dishes/{maMA}
-    [HttpGet("{maMA}")]
+    [HttpGet("get-dish-info")]
     [AllowAnonymous]
     public async Task<ActionResult<MonAnDto>> GetDish(string maMA)
     {

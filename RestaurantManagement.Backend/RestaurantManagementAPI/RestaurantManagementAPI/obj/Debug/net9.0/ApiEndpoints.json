@@ -179,8 +179,34 @@
   },
   {
     "ContainingType": "DishesController",
+    "Method": "GetDish",
+    "RelativePath": "api/dishes/get-dish-info",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maMA",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "DishesController",
     "Method": "GetDishes",
-    "RelativePath": "api/dishes",
+    "RelativePath": "api/dishes/get-dishes",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -198,22 +224,141 @@
     ]
   },
   {
-    "ContainingType": "DishesController",
-    "Method": "GetDish",
-    "RelativePath": "api/dishes/{maMA}",
+    "ContainingType": "RestaurentManagementAPI.Controllers.OrdersController",
+    "Method": "CreateOrder",
+    "RelativePath": "api/orders/api/create-and-send-orders",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createDto",
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDtos.CreateHoaDonDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDtos.HoaDonDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.OrdersController",
+    "Method": "GetOrderById",
+    "RelativePath": "api/orders/api/orders/get-{id}-order-info",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "maMA",
+        "Name": "id",
         "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "RestaurentManagementAPI.DTOs.MonAnDto",
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDtos.HoaDonDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.OrdersController",
+    "Method": "GetOrders",
+    "RelativePath": "api/orders/get-all-orders-info",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[RestaurentManagementAPI.DTOs.MonAnDtos.HoaDonDto, RestaurantManagementAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.OrdersController",
+    "Method": "UpdateOrderStatus",
+    "RelativePath": "api/orders/update-all-orders-status",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateDto",
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDtos.UpdateOrderStatusDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.OrdersController",
+    "Method": "UpdateOrderItemStatus",
+    "RelativePath": "api/orders/update-dishes-status",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maHD",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "maMA",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateDto",
+        "Type": "RestaurentManagementAPI.DTOs.MonAnDtos.UpdateOrderItemStatusDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RestaurentManagementAPI.Controllers.ReservationsController",
+    "Method": "CreateReservation",
+    "RelativePath": "api/reservations",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createDto",
+        "Type": "RestaurentManagementAPI.DTOs.BanDtos.CreateDatBanDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestaurentManagementAPI.DTOs.BanDtos.DatBanDto",
         "MediaTypes": [
           "text/plain",
           "application/json",

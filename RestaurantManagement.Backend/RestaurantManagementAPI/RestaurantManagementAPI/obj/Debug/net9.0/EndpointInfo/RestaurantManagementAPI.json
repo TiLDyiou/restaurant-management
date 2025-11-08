@@ -260,7 +260,7 @@
         }
       }
     },
-    "/api/dishes": {
+    "/api/dishes/get-dishes": {
       "get": {
         "tags": [
           "Dishes"
@@ -298,7 +298,7 @@
         }
       }
     },
-    "/api/dishes/{maMA}": {
+    "/api/dishes/get-dish-info": {
       "get": {
         "tags": [
           "Dishes"
@@ -306,8 +306,7 @@
         "parameters": [
           {
             "name": "maMA",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "schema": {
               "type": "string"
             }
@@ -447,6 +446,266 @@
           }
         }
       }
+    },
+    "/api/orders/get-all-orders-info": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HoaDonDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HoaDonDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HoaDonDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/update-dishes-status": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "maHD",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "maMA",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderItemStatusDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderItemStatusDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderItemStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/orders/api/create-and-send-orders": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoaDonDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoaDonDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoaDonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoaDonDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoaDonDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoaDonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/api/orders/get-{id}-order-info": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoaDonDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoaDonDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoaDonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/update-all-orders-status": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reservations": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDatBanDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDatBanDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDatBanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatBanDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatBanDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatBanDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -481,6 +740,116 @@
         },
         "additionalProperties": false
       },
+      "ChiTietHoaDonViewDto": {
+        "type": "object",
+        "properties": {
+          "maMA": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenMA": {
+            "type": "string",
+            "nullable": true
+          },
+          "soLuong": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "donGia": {
+            "type": "number",
+            "format": "double"
+          },
+          "thanhTien": {
+            "type": "number",
+            "format": "double"
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateChiTietHoaDonDto": {
+        "required": [
+          "maMA"
+        ],
+        "type": "object",
+        "properties": {
+          "maMA": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "soLuong": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDatBanDto": {
+        "required": [
+          "maBan",
+          "soDienThoai",
+          "tenKhachHang",
+          "thoiGianDat"
+        ],
+        "type": "object",
+        "properties": {
+          "maBan": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "tenKhachHang": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "soDienThoai": {
+            "minLength": 1,
+            "type": "string",
+            "format": "tel"
+          },
+          "thoiGianDat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "soNguoi": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateHoaDonDto": {
+        "required": [
+          "chiTietHoaDons",
+          "maBan",
+          "maNV"
+        ],
+        "type": "object",
+        "properties": {
+          "maBan": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maNV": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "chiTietHoaDons": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateChiTietHoaDonDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateMonAnDto": {
         "required": [
           "loai",
@@ -503,6 +872,78 @@
           },
           "hinhAnh": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DatBanDto": {
+        "type": "object",
+        "properties": {
+          "maDatBan": {
+            "type": "string",
+            "nullable": true
+          },
+          "maBan": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenKhachHang": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "thoiGianDat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "soNguoi": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HoaDonDto": {
+        "type": "object",
+        "properties": {
+          "maHD": {
+            "type": "string",
+            "nullable": true
+          },
+          "maBan": {
+            "type": "string",
+            "nullable": true
+          },
+          "maNV": {
+            "type": "string",
+            "nullable": true
+          },
+          "ngayLap": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "tongTien": {
+            "type": "number",
+            "format": "double"
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
+          },
+          "chiTietHoaDons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChiTietHoaDonViewDto"
+            },
             "nullable": true
           }
         },
@@ -609,6 +1050,32 @@
           "trangThai": {
             "type": "boolean",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateOrderItemStatusDto": {
+        "required": [
+          "newStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "newStatus": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateOrderStatusDto": {
+        "required": [
+          "newStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "newStatus": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
