@@ -61,8 +61,7 @@ namespace RestaurentManagementAPI.Controllers
                 return BadRequest($"Bàn với mã {createDto.MaBan} không tồn tại.");
             }
 
-            // (Nghiệp vụ nâng cao): Bạn có thể kiểm tra xem bàn đó có bị trùng lịch
-            // vào ThoiGianDat hay không. (Tạm thời bỏ qua)
+           
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
