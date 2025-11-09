@@ -28,12 +28,11 @@ namespace RestaurantManagementGUI
                 // Xóa SecureStorage
                 SecureStorage.RemoveAll();
 
-                // Quay l?i trang Login
                 Application.Current.MainPage = new NavigationPage(new LoginPage());
             }
             catch (Exception ex)
             {
-                await DisplayAlert("L?i", $"??ng xu?t th?tt b?i: {ex.Message}", "OK");
+                await DisplayAlert("L?i", $"??ng xu?t th?t b?i: {ex.Message}", "OK");
             }
         }
 
@@ -41,6 +40,6 @@ namespace RestaurantManagementGUI
             => await Navigation.PushAsync(new OrdersPage());
 
         private async void OnUsersClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new UsersPage());
+            => await Navigation.PushAsync(new ChefAndUserProfilePage());
     }
 }

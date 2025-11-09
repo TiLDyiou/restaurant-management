@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\RestaurantManagement.Backend",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers"
   ],
-  "SelectedNode": "\\RestaurantManagementGUI.slnx",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Program.cs",
   "PreviewInSolutionExplorer": false
 }
