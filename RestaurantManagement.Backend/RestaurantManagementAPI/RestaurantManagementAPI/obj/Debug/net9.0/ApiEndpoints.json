@@ -298,7 +298,7 @@
   {
     "ContainingType": "RestaurentManagementAPI.Controllers.OrdersController",
     "Method": "UpdateOrderStatus",
-    "RelativePath": "api/orders/update-all-orders-status",
+    "RelativePath": "api/orders/update-all-dishes-in-{id}-order-status",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -306,7 +306,7 @@
       {
         "Name": "id",
         "Type": "System.String",
-        "IsRequired": false
+        "IsRequired": true
       },
       {
         "Name": "updateDto",

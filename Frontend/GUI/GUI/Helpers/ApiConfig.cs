@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maui.Devices;
-
+using Microsoft.Maui;
 namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
@@ -38,5 +38,7 @@ namespace RestaurantManagementGUI.Helpers
 
         // Admin cập nhật thông tin cho user
         public static string AdminUpdateUser(string maNV) => $"{BaseUrl}Auth/admin-update/{maNV}";
+        public static string GetAllTables => $"{BaseUrl}Ban";
+        public static string UpdateTableStatus(string maBan) => $"{BaseUrl}Ban/{maBan}/trangthai";
     }
 }

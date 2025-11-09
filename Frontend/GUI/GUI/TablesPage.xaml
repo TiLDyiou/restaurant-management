@@ -1,12 +1,170 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RestaurantManagementGUI.TablesPage"
-             Title="TablesPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewModels="clr-namespace:RestaurantManagementGUI.ViewModels"
+    xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
+    xmlns:local="clr-namespace:RestaurantManagementGUI"
+    x:Class="RestaurantManagementGUI.TablesPage"
+    BackgroundColor="#FAF7F2">
+
+    <ContentPage.Resources>
+        <Color x:Key="ColorDarkBrown">#503106</Color>
+        <Color x:Key="ColorLightTan">#fff8ed</Color>
+        <Color x:Key="ColorYellowGold">#ffbd59</Color>
+        <Color x:Key="ColorDarkGray">#263238</Color>
+
+        <Style TargetType="Image" x:Key="TableIconStyle">
+            <Setter Property="Source" Value="table_icon_dark_gray.png" />
+            <Setter Property="HeightRequest" Value="72" />
+            <Setter Property="WidthRequest" Value="72" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+
+        <Style TargetType="Label" x:Key="TableNameStyle">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="FontFamily" Value="RobotoMono" />
+        </Style>
+
+        <Style TargetType="Border" x:Key="TableBorderStyle">
+            <Setter Property="StrokeShape" Value="RoundRectangle 24" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="HeightRequest" Value="150" />
+            <Setter Property="WidthRequest" Value="150" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="Shadow">
+                <Setter.Value>
+                    <Shadow Brush="#22000000" Offset="0,6" Radius="10" Opacity="0.6" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Border" x:Key="LegendBorderStyle">
+            <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="HeightRequest" Value="42" />
+            <Setter Property="Padding" Value="18,6" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid ColumnDefinitions="*, 280" RowDefinitions="Auto, *" Padding="0">
+
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Image Source="cuisine.png" Aspect="AspectFill" Opacity="0.55" />
+
+            <Grid Padding="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ScrollView Grid.Row="1">
+                    <CollectionView ItemsSource="{Binding Tables}" SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Ban">
+                                <Border Style="{StaticResource TableBorderStyle}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding BindingContext.SelectTableCommand, Source={RelativeSource AncestorType={x:Type local:TablesPage}}}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Image x:Name="TableIcon" Style="{StaticResource TableIconStyle}" />
+                                        <Label x:Name="TableName" Text="{Binding TenBan}" Style="{StaticResource TableNameStyle}" />
+                                    </VerticalStackLayout>
+
+                                    
+
+                                    <Border.Triggers>
+
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding TrangThai}"
+                                                     Value="Bàn bận">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorDarkBrown}" />
+                                            <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_light_orange.png" />
+                                            <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorLightTan}" />
+                                        </DataTrigger>
+
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding TrangThai}"
+                                                     Value="Bàn đã đặt">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorYellowGold}" />
+                                            <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_dark_brown.png" />
+                                            <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorDarkBrown}" />
+                                        </DataTrigger>
+
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding TrangThai}"
+                                                     Value="Bàn trống">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorLightTan}" />
+                                            <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_dark_gray.png" />
+                                            <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorDarkGray}" />
+                                        </DataTrigger>
+
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+
+                <HorizontalStackLayout Grid.Row="2" Spacing="12" HorizontalOptions="Center" Margin="0,18,0,18">
+
+                    <Border Style="{StaticResource LegendBorderStyle}" BackgroundColor="{StaticResource ColorDarkBrown}">
+                        <Label Text="Bàn bận" TextColor="{StaticResource ColorLightTan}" VerticalOptions="Center" FontFamily="RobotoMono" FontAttributes="Bold" />
+                    </Border>
+
+                    <Border Style="{StaticResource LegendBorderStyle}" BackgroundColor="{StaticResource ColorLightTan}">
+                        <Label Text="Bàn trống" TextColor="{StaticResource ColorDarkGray}" VerticalOptions="Center" FontFamily="RobotoMono" FontAttributes="Bold" />
+                    </Border>
+
+                    <Border Style="{StaticResource LegendBorderStyle}" BackgroundColor="{StaticResource ColorYellowGold}">
+                        <Label Text="Bàn đã đặt" TextColor="{StaticResource ColorDarkBrown}" VerticalOptions="Center" FontFamily="RobotoMono" FontAttributes="Bold" />
+                    </Border>
+
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.RowSpan="2" BackgroundColor="{StaticResource ColorYellowGold}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <VerticalStackLayout Grid.Row="0" Padding="5,30,16,10" HorizontalOptions="Center" VerticalOptions="Start" Spacing="-6">
+                <Label Text="Sơ" FontSize="46" FontAttributes="Bold" TextColor="{StaticResource ColorDarkBrown}"
+                       FontFamily="RobotoMono" HorizontalOptions="Center" />
+                <Label Text="đồ" FontSize="46" FontAttributes="Bold" TextColor="{StaticResource ColorDarkBrown}"
+                       FontFamily="RobotoMono" HorizontalOptions="Center" />
+                <Label Text="bàn" FontSize="46" FontAttributes="Bold" TextColor="{StaticResource ColorDarkBrown}"
+                       FontFamily="RobotoMono" HorizontalOptions="Center" />
+                <Label Text="ăn" FontSize="46" FontAttributes="Bold" TextColor="{StaticResource ColorDarkBrown}"
+                       FontFamily="RobotoMono" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <BoxView Grid.Row="1" Color="{StaticResource ColorYellowGold}" />
+
+            <VerticalStackLayout Grid.Row="2" Padding="12,12,12,28" Spacing="6" HorizontalOptions="Center" VerticalOptions="End">
+                <Image Source="logo.png" HeightRequest="84" Aspect="AspectFit" />
+                <Label Text="NHÀ HÀNG NHÓM II" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource ColorDarkBrown}"
+                       FontFamily="RobotoMono" HorizontalOptions="Center" />
+                <Label Text="CHỈ VÀI PHÚT ĐỂ CÓ BỮA ĂN NGON" FontSize="11" TextColor="{StaticResource ColorDarkBrown}"
+                       FontFamily="RobotoMono" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
 </ContentPage>

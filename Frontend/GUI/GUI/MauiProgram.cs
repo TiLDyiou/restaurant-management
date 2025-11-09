@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+// Các using liên quan đến DI đã được xóa bỏ
 
 namespace RestaurantManagementGUI
 {
@@ -15,9 +16,10 @@ namespace RestaurantManagementGUI
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("RobotoMono-Regular.ttf", "RobotoMono");
                 });
-                
+
             builder.Logging.AddDebug();
 
+            // Tất cả các đăng ký builder.Services (DI) đã được xóa.
 
             return builder.Build();
         }
