@@ -41,11 +41,8 @@ namespace RestaurentManagementAPI.Controllers
             throw new Exception("Không thể tạo mã đặt bàn mới.");
         }
 
-
-        // ---------------------------------------------------------------------
         // API: POST /api/reservations 
         // Ghi nhận thông tin đặt bàn mới
-        // ---------------------------------------------------------------------
         [HttpPost]
         public async Task<ActionResult<DatBanDto>> CreateReservation([FromBody] CreateDatBanDto createDto)
         {

@@ -67,6 +67,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="ChefAndUserProfilePage.xaml.cs">
+	    <DependentUpon>ChefAndUserProfilePage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="EditChefAndUserProfilePage.xaml.cs">
+	    <DependentUpon>EditChefAndUserProfilePage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="AddUserPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -76,7 +85,13 @@
 	  <MauiXaml Update="ChefDashboardPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="ChefAndUserProfilePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="DashboardPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="EditChefAndUserProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="EditUserPage.xaml">

@@ -17,7 +17,7 @@ namespace RestaurentManagementAPI.Data
 
                 try
                 {
-                    // 1. Kiểm tra xem tài khoản "admin" đã tồn tại chưa
+                    // Kiểm tra xem tài khoản "admin" đã tồn tại chưa
                     if (await context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == "admin"))
                     {
                         return; // Đã có "admin", không làm gì cả
@@ -25,7 +25,7 @@ namespace RestaurentManagementAPI.Data
 
                     logger.LogInformation("Không tìm thấy tài khoản admin. Bắt đầu tạo...");
 
-                    // 2. Kiểm tra xem nhân viên "ADMIN" đã tồn tại chưa (phòng trường hợp lỗi)
+                    // Kiểm tra xem nhân viên "ADMIN" đã tồn tại chưa (phòng trường hợp lỗi)
                     var adminNhanVien = await context.NHANVIEN.FirstOrDefaultAsync(nv => nv.MaNV == "ADMIN");
 
                     if (adminNhanVien == null)
@@ -42,10 +42,10 @@ namespace RestaurentManagementAPI.Data
                         context.NHANVIEN.Add(adminNhanVien);
                     }
 
-                    // 3. Hash mật khẩu (dùng chính xác thư viện của bạn)
+                    // Hash mật khẩu
                     string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
 
-                    // 4. Tạo TaiKhoan
+                    // Tạo TaiKhoan
                     var adminTaiKhoan = new TaiKhoan
                     {
                         TenDangNhap = "admin",

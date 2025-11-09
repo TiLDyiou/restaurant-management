@@ -46,10 +46,8 @@ namespace RestaurentManagementAPI.Controllers
             throw new Exception("Không thể tạo mã hoá đơn mới.");
         }
 
-        // ---------------------------------------------------------------------
         // API: GET /api/orders 
         // Lấy danh sách tất cả đơn hàng (đã bao gồm chi tiết)
-        // ---------------------------------------------------------------------
         [HttpGet("get-all-orders-info")]
         public async Task<ActionResult<IEnumerable<HoaDonDto>>> GetOrders()
         {
@@ -140,10 +138,8 @@ namespace RestaurentManagementAPI.Controllers
             }
         }
 
-        // ---------------------------------------------------------------------
         // API: POST /api/orders 
         // Tạo một đơn hàng mới (Hoá đơn)
-        // ---------------------------------------------------------------------
         [HttpPost("api/create-and-send-orders")]
         public async Task<ActionResult<HoaDonDto>> CreateOrder([FromBody] CreateHoaDonDto createDto)
         {
