@@ -112,5 +112,4 @@ app.UseAuthorization();
 // Map Controllers & SignalR Hubs
 app.MapControllers();
 app.MapHub<BanHub>("/banHub"); // Hub cho trạng thái bàn realtime
-
 app.Run();

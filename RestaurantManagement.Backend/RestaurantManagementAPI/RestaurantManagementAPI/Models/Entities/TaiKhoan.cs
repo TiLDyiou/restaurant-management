@@ -23,6 +23,9 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("HoatDong")]
         public bool IsActive { get; set; } = true;
+
+        [Column("Online")]
+        public bool Online { get; set; } = false;
         public NhanVien NhanVien { get; set; } = null!;
     }
 }

@@ -619,7 +619,7 @@
         }
       }
     },
-    "/api/orders/update-all-orders-status": {
+    "/api/orders/update-all-dishes-in-{id}-order-status": {
       "put": {
         "tags": [
           "Orders"
@@ -627,7 +627,8 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -1102,7 +1103,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"Bearer 12345abcdef\"",
+        "description": "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"12345abcdef\"",
         "scheme": "Bearer",
         "bearerFormat": "JWT"
       }

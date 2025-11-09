@@ -11,7 +11,7 @@ namespace RestaurentManagementAPI.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, "Kitchen");
         }
 
-        // (Tùy chọn) Khi client bếp ngắt kết nối
+        // Khi client bếp ngắt kết nối
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Kitchen");

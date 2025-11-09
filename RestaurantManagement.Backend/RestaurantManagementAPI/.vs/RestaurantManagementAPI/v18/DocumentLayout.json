@@ -1,37 +1,61 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\",
+  "WorkspaceRootPath": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\models\\entities\\taikhoan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\models\\entities\\taikhoan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\models\\entities\\nhanvien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\models\\entities\\nhanvien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\models\\entities\\monan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\models\\entities\\monan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\data\\qlnhdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\data\\qlnhdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\createdatbandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\createdatbandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\dtos\\createdatbandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\controllers\\datbancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\controllers\\datbancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\controllers\\datbancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\updateorderitemstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\updateorderitemstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\dtos\\updateorderitemstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\hoadondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\hoadondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\dtos\\hoadondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\models\\entities\\chitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\models\\entities\\chitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\models\\entities\\chitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\updateorderstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\dtos\\updateorderstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\dtos\\updateorderstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\migrations\\20251108034852_updatechitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|d:\\restaurant-management\\restaurantmanagement.backend\\restaurantmanagementapi\\restaurantmanagementapi\\migrations\\20251108034852_updatechitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A06179C1-5D26-4A60-8EC2-2CEB01D61FA4}|RestaurantManagementAPI\\RestaurantManagementAPI.csproj|solutionrelative:restaurantmanagementapi\\migrations\\20251108034852_updatechitiethoadon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -42,19 +66,15 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 6,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Bookmark",
@@ -69,12 +89,94 @@
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Program.cs",
+              "RelativeDocumentMoniker": "RestaurantManagementAPI\\Program.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Program.cs",
+              "RelativeToolTip": "RestaurantManagementAPI\\Program.cs",
+              "ViewState": "AgIAAGcAAAAAAAAAAAAkwHMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T14:12:19.59Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MonAn.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\MonAn.cs",
+              "RelativeDocumentMoniker": "RestaurantManagementAPI\\Models\\Entities\\MonAn.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\MonAn.cs",
+              "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\MonAn.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T14:00:46.509Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "QLNHDbContext.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Data\\QLNHDbContext.cs",
+              "RelativeDocumentMoniker": "RestaurantManagementAPI\\Data\\QLNHDbContext.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Data\\QLNHDbContext.cs",
+              "RelativeToolTip": "RestaurantManagementAPI\\Data\\QLNHDbContext.cs",
+              "ViewState": "AgIAAHwAAAAAAAAAAAAIwJAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T13:54:07.845Z",
+              "EditorCaption": ""
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "NhanVien.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\NhanVien.cs",
+              "RelativeDocumentMoniker": "RestaurantManagementAPI\\Models\\Entities\\NhanVien.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\NhanVien.cs",
+              "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\NhanVien.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAA3wCAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T13:53:48.591Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TaiKhoan.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\TaiKhoan.cs",
+              "RelativeDocumentMoniker": "RestaurantManagementAPI\\Models\\Entities\\TaiKhoan.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\TaiKhoan.cs",
+              "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\TaiKhoan.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAA7wBsAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T13:53:31.6Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "RestaurantManagementAPI\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAEwAAAAAAAAAAAAIwGAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T13:53:12.769Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "UpdateOrderItemStatusDto.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\UpdateOrderItemStatusDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -82,11 +184,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 10,
               "Title": "HoaDonDto.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\HoaDonDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -94,11 +196,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 13,
               "Title": "20251108034852_UpdateChiTietHoaDon.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\Migrations\\20251108034852_UpdateChiTietHoaDon.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -106,11 +208,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 11,
               "Title": "ChiTietHoaDon.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\Models\\Entities\\ChiTietHoaDon.cs",
               "ViewState": "AgIAABEAAAAAAAAAAAA3wBsAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -118,24 +220,24 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 6,
               "Title": "OrdersController.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\OrdersController.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\OrdersController.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Controllers\\OrdersController.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\OrdersController.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\OrdersController.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\OrdersController.cs",
-              "ViewState": "AgIAAPwAAAAAAAAAAAAowAYBAABIAAAAAAAAAA==",
+              "ViewState": "AgIAAN4AAAAAAAAAAAAowAwBAABXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-08T03:31:14.422Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 7,
               "Title": "CreateDatBanDto.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\CreateDatBanDto.cs",
               "ViewState": "AgIAABUAAAAAAAAAAAAAwB8AAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -143,11 +245,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 8,
               "Title": "DatBanController.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\DatBanController.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\DatBanController.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\Controllers\\DatBanController.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\DatBanController.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\DatBanController.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\Controllers\\DatBanController.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAADYAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -155,11 +257,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 12,
               "Title": "UpdateOrderStatusDto.cs",
-              "DocumentMoniker": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
+              "DocumentMoniker": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
               "RelativeDocumentMoniker": "RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
-              "ToolTip": "D:\\restaurant-management\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
+              "ToolTip": "D:\\restaurant-management\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
               "RelativeToolTip": "RestaurantManagementAPI\\DTOs\\UpdateOrderStatusDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",

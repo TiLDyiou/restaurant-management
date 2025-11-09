@@ -11,6 +11,7 @@ namespace RestaurantManagementGUI
     {
         private readonly HttpClient _httpClient;
         private ObservableCollection<UserModel> _users = new();
+        private List<UserModel> _allUsers = new(); // danh sách gốc để tìm kiếm
 
         public UsersPage()
         {
@@ -53,7 +54,8 @@ namespace RestaurantManagementGUI
                 if (response.IsSuccessStatusCode)
                 {
                     var data = await response.Content.ReadFromJsonAsync<List<UserModel>>();
-                    _users = new ObservableCollection<UserModel>(data ?? new());
+                    _allUsers = data ?? new();
+                    _users = new ObservableCollection<UserModel>(_allUsers);
                     UsersCollectionView.ItemsSource = _users;
                 }
                 else
@@ -65,6 +67,29 @@ namespace RestaurantManagementGUI
             {
                 await DisplayAlert("Lỗi", $"Không thể kết nối: {ex.Message}", "OK");
             }
+        }
+
+        // Tìm kiếm theo mã hoặc tên
+        private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = e.NewTextValue?.Trim().ToLower() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                _users = new ObservableCollection<UserModel>(_allUsers);
+            }
+            else
+            {
+                var filtered = _allUsers
+                    .Where(u =>
+                        (!string.IsNullOrEmpty(u.HoTen) && u.HoTen.ToLower().Contains(keyword)) ||
+                        (!string.IsNullOrEmpty(u.MaNV) && u.MaNV.ToLower().Contains(keyword)))
+                    .ToList();
+
+                _users = new ObservableCollection<UserModel>(filtered);
+            }
+
+            UsersCollectionView.ItemsSource = _users;
         }
 
         private async void OnAddUserClicked(object sender, EventArgs e)
@@ -122,6 +147,7 @@ namespace RestaurantManagementGUI
                 if (response.IsSuccessStatusCode)
                 {
                     _users.Remove(user);
+                    _allUsers.Remove(user);
                     await DisplayAlert("Thành công", "Nhân viên đã bị xóa vĩnh viễn", "OK");
                 }
                 else
