@@ -2,3 +2,4 @@
 # Bỏ qua các thư mục build
 [Bb]in/
 [Oo]bj/
+*.csproj.user
