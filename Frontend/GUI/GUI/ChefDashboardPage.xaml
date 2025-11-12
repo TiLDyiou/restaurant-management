@@ -10,7 +10,7 @@
         <!-- Bên trái -->
         <StackLayout BackgroundColor="#FFBD59"
                      Padding="20"
-                     VerticalOptions="FillAndExpand"
+                     VerticalOptions="Fill"
                      Spacing="25">
 
             <Label Text="NHÓM II"
@@ -42,7 +42,7 @@
                 CornerRadius="10"
                 HeightRequest="40"
                 HorizontalOptions="Center"
-                Clicked="OnLogoutClicked"/>     
+                Clicked="OnLogoutClicked"/>
 
         </StackLayout>
 

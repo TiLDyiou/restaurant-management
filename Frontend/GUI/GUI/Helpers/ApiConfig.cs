@@ -1,4 +1,5 @@
-﻿using System;
+﻿// File: Helpers/ApiConfig.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,34 +10,39 @@ namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
     {
+        // SỬA 1: Xóa /api/ khỏi BaseUrl (vì API Controller của bạn dùng route tuyệt đối)
         public static string BaseUrl =>
             DeviceInfo.Platform == DevicePlatform.Android
-                ? "https://10.0.2.2:7004/api/"
-                : "https://localhost:7004/api/";
+                ? "https://10.0.2.2:7004/" // Xóa /api/
+                : "https://localhost:7004/"; // Xóa /api/
 
 
-        // Đăng ký tài khoản (chỉ dành cho admin)
-        public static string Register => $"{BaseUrl}Auth/register";
+        // SỬA 2: Thêm "api/" vào tất cả các route Auth cũ
+        public static string Register => $"{BaseUrl}api/Auth/register";
+        public static string Login => $"{BaseUrl}api/Auth/login";
+        public static string Me => $"{BaseUrl}api/Auth/me";
+        public static string UpdateProfile => $"{BaseUrl}api/Auth/update-profile";
+        public static string Users => $"{BaseUrl}api/Auth/users";
+        public static string SoftDeleteUser(string maNV) => $"{BaseUrl}api/Auth/soft-delete/{maNV}";
+        public static string HardDeleteUser(string maNV) => $"{BaseUrl}api/Auth/hard-delete/{maNV}";
+        public static string AdminUpdateUser(string maNV) => $"{BaseUrl}api/Auth/admin-update/{maNV}";
 
-        // Đăng nhập
-        public static string Login => $"{BaseUrl}Auth/login";
 
-        // Lấy thông tin người dùng hiện tại
-        public static string Me => $"{BaseUrl}Auth/me";
+        // --- SỬA LỖI API MÓN ĂN (KHỚP VỚI DISHESCONTROLLER.CS) ---
 
-        // Cập nhật hồ sơ cá nhân
-        public static string UpdateProfile => $"{BaseUrl}Auth/update-profile";
+        // GET /api/dishes
+        public static string GetFoodMenu => $"{BaseUrl}api/dishes";
 
-        // Danh sách tất cả user
-        public static string Users => $"{BaseUrl}Auth/users";
+        // POST /api/add_dish
+        public static string AddDish => $"{BaseUrl}api/add_dish"; // <-- SỬA Ở ĐÂY
 
-        // Cho nhân viên nghỉ việc (soft delete)
-        public static string SoftDeleteUser(string maNV) => $"{BaseUrl}Auth/soft-delete/{maNV}";
+        // PUT /api/update_dish/{maMA}
+        public static string UpdateDish(string maMA) => $"{BaseUrl}api/update_dish/{maMA}"; // <-- SỬA Ở ĐÂY
 
-        // Xóa hoàn toàn user khỏi hệ thống (hard delete)
-        public static string HardDeleteUser(string maNV) => $"{BaseUrl}Auth/hard-delete/{maNV}";
+        // DELETE /api/softdelete_dish/{maMA}
+        public static string SoftDeleteDish(string maMA) => $"{BaseUrl}api/softdelete_dish/{maMA}"; // <-- SỬA Ở ĐÂY
 
-        // Admin cập nhật thông tin cho user
-        public static string AdminUpdateUser(string maNV) => $"{BaseUrl}Auth/admin-update/{maNV}";
+        // POST /api/Orders/submit
+        public static string SubmitOrder => $"{BaseUrl}api/Orders/submit";
     }
 }

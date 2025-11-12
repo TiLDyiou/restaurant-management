@@ -43,12 +43,15 @@
                             SelectionMode="Single">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame BorderColor="{StaticResource AccentColor}"
-                               CornerRadius="14"
+                        <Border Stroke="{StaticResource AccentColor}"
+                                StrokeThickness="1"
+                               StrokeShape="RoundRectangle 14"
                                BackgroundColor="{StaticResource LightBackground}"
                                Padding="15"
-                               Margin="0,8"
-                               HasShadow="True">
+                               Margin="0,8">
+                            <Border.Shadow>
+                                <Shadow Brush="#000" Offset="5,5" Radius="10" Opacity="0.1"/>
+                            </Border.Shadow>
                             <VerticalStackLayout Spacing="6">
 
                                 <Label Text="{Binding HoTen, StringFormat='👤 Họ tên: {0}'}"
@@ -110,7 +113,7 @@
                                 </HorizontalStackLayout>
 
                             </VerticalStackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
