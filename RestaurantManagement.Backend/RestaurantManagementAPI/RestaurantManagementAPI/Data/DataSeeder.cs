@@ -1,7 +1,7 @@
 ﻿using RestaurentManagementAPI.Data;
 using RestaurentManagementAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using BCrypt.Net; // Thêm using cho BCrypt
+using BCrypt.Net;
 
 namespace RestaurentManagementAPI.Data
 {
@@ -9,7 +9,6 @@ namespace RestaurentManagementAPI.Data
     {
         public static async Task SeedAdminAsync(IServiceProvider serviceProvider)
         {
-            // Dùng serviceProvider để lấy DbContext và Logger
             using (var scope = serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<QLNHDbContext>();
@@ -17,24 +16,20 @@ namespace RestaurentManagementAPI.Data
 
                 try
                 {
-                    // Kiểm tra xem tài khoản "admin" đã tồn tại chưa
+                    // Kiểm tra admin đã tồn tại chưa
                     if (await context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == "admin"))
-                    {
-                        return; // Đã có "admin", không làm gì cả
-                    }
+                        return;
 
                     logger.LogInformation("Không tìm thấy tài khoản admin. Bắt đầu tạo...");
 
-                    // Kiểm tra xem nhân viên "ADMIN" đã tồn tại chưa (phòng trường hợp lỗi)
+                    // Tạo nhân viên admin nếu chưa có
                     var adminNhanVien = await context.NHANVIEN.FirstOrDefaultAsync(nv => nv.MaNV == "ADMIN");
-
                     if (adminNhanVien == null)
                     {
-                        // Nếu nhân viên "ADMIN" chưa có, tạo mới
                         adminNhanVien = new NhanVien
                         {
-                            MaNV = "ADMIN", // Dùng mã 5 ký tự
-                            HoTen = "Nguyễn Đức Đại", // Đây là [Required]
+                            MaNV = "ADMIN",
+                            HoTen = "Nguyễn Trần Gia Bảo",
                             ChucVu = "Admin",
                             NgayVaoLam = DateTime.Now,
                             TrangThai = "Đang làm"
@@ -42,23 +37,25 @@ namespace RestaurentManagementAPI.Data
                         context.NHANVIEN.Add(adminNhanVien);
                     }
 
-                    // Hash mật khẩu
+                    // Hash mật khẩu admin
                     string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
 
-                    // Tạo TaiKhoan
+                    // Tạo tài khoản admin với email và tự xác thực
                     var adminTaiKhoan = new TaiKhoan
                     {
                         TenDangNhap = "admin",
                         MatKhau = hashedPassword,
-                        MaNV = adminNhanVien.MaNV, // Gán khóa ngoại
-                        Quyen = "Admin" // Đặt quyền là "Admin"
+                        MaNV = adminNhanVien.MaNV,
+                        Quyen = "Admin",
+                        Email = "nguyentrangiabao7100@gmail.com", // gán email admin
+                        IsActive = true,
+                        IsVerified = true // tự xác thực
                     };
-                    context.TAIKHOAN.Add(adminTaiKhoan);
 
-                    // 5. Lưu tất cả thay đổi vào Database
+                    context.TAIKHOAN.Add(adminTaiKhoan);
                     await context.SaveChangesAsync();
 
-                    logger.LogInformation("Tạo tài khoản admin thành công!");
+                    logger.LogInformation("Tạo tài khoản admin thành công với email đã xác thực!");
                 }
                 catch (Exception ex)
                 {

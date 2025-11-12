@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurentManagementAPI.Data;
 
@@ -11,9 +12,11 @@ using RestaurentManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    partial class QLNHDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112025724_AddEmail")]
+    partial class AddEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using RestaurentManagementAPI.Data;
 using RestaurentManagementAPI.DTOs;
 using RestaurentManagementAPI.Models.Entities;
+using RestaurentManagementAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -18,16 +19,19 @@ namespace RestaurentManagementAPI.Controllers
     {
         private readonly QLNHDbContext _context;
         private readonly IConfiguration _config;
+        private readonly EmailService _emailService;
 
-        public AuthController(QLNHDbContext context, IConfiguration config)
+        public AuthController(QLNHDbContext context, IConfiguration config, EmailService emailService)
         {
             _context = context;
             _config = config;
+            _emailService = emailService;
         }
 
         #region ===================== Public APIs =====================
 
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.TenDangNhap) || string.IsNullOrWhiteSpace(dto.MatKhau))
@@ -55,13 +59,31 @@ namespace RestaurentManagementAPI.Controllers
                 MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau),
                 MaNV = newMaNV,
                 Quyen = string.IsNullOrWhiteSpace(dto.Quyen) ? "NhanVien" : dto.Quyen,
-                IsActive = true
+                IsActive = false,
+                Email = dto.Email,
+                IsVerified = false
             };
             _context.TAIKHOAN.Add(tk);
-
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Đăng ký thành công", maNV = newMaNV });
+            if (!string.IsNullOrWhiteSpace(dto.Email))
+            {
+                try
+                {
+                    var otp = new Random().Next(100000, 999999).ToString();
+                    tk.OTP = otp;
+                    tk.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
+                    await _context.SaveChangesAsync();
+
+                    await _emailService.SendEmailAsync(dto.Email, "OTP Xác Thực Email", $"Mã OTP của bạn là: {otp}");
+                }
+                catch
+                {
+                    return Ok(new { message = "Tài khoản đã tạo, nhưng gửi email OTP thất bại.", maNV = newMaNV });
+                }
+            }
+
+            return Ok(new { message = "Tài khoản đã tạo, vui lòng kiểm tra email để xác thực.", maNV = newMaNV });
         }
 
         [HttpPost("login")]
@@ -80,13 +102,9 @@ namespace RestaurentManagementAPI.Controllers
                 return Unauthorized("Tài khoản của bạn đã bị vô hiệu hóa.");
 
             bool matched = false;
-            try
-            {
-                matched = BCrypt.Net.BCrypt.Verify(dto.MatKhau, user.MatKhau);
-            }
+            try { matched = BCrypt.Net.BCrypt.Verify(dto.MatKhau, user.MatKhau); }
             catch { matched = false; }
 
-            // Trường hợp mật khẩu chưa hash
             if (!matched && dto.MatKhau == user.MatKhau)
             {
                 matched = true;
@@ -96,6 +114,7 @@ namespace RestaurentManagementAPI.Controllers
             }
 
             if (!matched) return Unauthorized("Sai tài khoản hoặc mật khẩu.");
+            if (!user.IsVerified) return Unauthorized("Tài khoản chưa xác thực email.");
 
             var token = GenerateJwtToken(user);
 
@@ -109,6 +128,98 @@ namespace RestaurentManagementAPI.Controllers
                 chucVu = user.NhanVien?.ChucVu
             });
         }
+
+        [HttpPost("send-register-otp")]
+        public async Task<IActionResult> SendRegisterOtp([FromBody] EmailDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                return BadRequest("Email không được để trống.");
+
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            var otp = new Random().Next(100000, 999999).ToString();
+            user.OTP = otp;
+            user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
+            await _context.SaveChangesAsync();
+
+            await _emailService.SendEmailAsync(user.Email!, "OTP Xác Thực Email", $"Mã OTP: {otp}");
+            return Ok(new { message = "OTP đã được gửi đến email." });
+        }
+
+        [HttpPost("verify-register-otp")]
+        public async Task<IActionResult> VerifyRegisterOtp([FromBody] VerifyOtpDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.OTP))
+                return BadRequest("Email và OTP không được để trống.");
+
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow)
+                return BadRequest("OTP không hợp lệ hoặc đã hết hạn.");
+
+            user.IsVerified = true;
+            user.IsActive = true;
+            user.OTP = null;
+            user.OTPExpireTime = null;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Xác thực đăng ký thành công." });
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] EmailDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email)) return BadRequest("Email không được để trống.");
+
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            var otp = new Random().Next(100000, 999999).ToString();
+            user.OTP = otp;
+            user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
+            await _context.SaveChangesAsync();
+
+            await _emailService.SendEmailAsync(user.Email!, "OTP đổi mật khẩu", $"Mã OTP: {otp}");
+            return Ok(new { message = "OTP đổi mật khẩu đã gửi đến email." });
+        }
+
+        [HttpPost("verify-forgot-otp")]
+        public async Task<IActionResult> VerifyForgotOtp([FromBody] VerifyOtpDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.OTP))
+                return BadRequest("Email và OTP không được để trống.");
+
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow)
+                return BadRequest("OTP không hợp lệ hoặc đã hết hạn.");
+
+            return Ok(new { message = "OTP hợp lệ, bạn có thể đặt lại mật khẩu." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.OTP) || string.IsNullOrWhiteSpace(dto.NewPassword))
+                return BadRequest("Email, OTP và mật khẩu mới không được để trống.");
+
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow)
+                return BadRequest("OTP không hợp lệ hoặc đã hết hạn.");
+
+            user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.OTP = null;
+            user.OTPExpireTime = null;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đổi mật khẩu thành công." });
+        }
+
         #endregion
 
         #region ===================== User APIs (Authenticated) =====================
@@ -132,7 +243,9 @@ namespace RestaurentManagementAPI.Controllers
                 maNV = user.MaNV,
                 hoTen = user.NhanVien?.HoTen,
                 chucVu = user.NhanVien?.ChucVu,
-                sdt = user.NhanVien?.SDT
+                sdt = user.NhanVien?.SDT,
+                email = user.Email,
+                isVerified = user.IsVerified
             });
         }
 
@@ -162,6 +275,23 @@ namespace RestaurentManagementAPI.Controllers
                 user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             }
 
+            if (!string.IsNullOrWhiteSpace(dto.Email))
+            {
+                user.Email = dto.Email;
+                user.IsVerified = false;
+                var otp = new Random().Next(100000, 999999).ToString();
+                user.OTP = otp;
+                user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
+                try
+                {
+                    await _emailService.SendEmailAsync(dto.Email, "OTP Xác Thực Email", $"Mã OTP của bạn là: {otp}");
+                }
+                catch
+                {
+                    return BadRequest("Gửi email OTP thất bại.");
+                }
+            }
+
             _context.TAIKHOAN.Update(user);
             await _context.SaveChangesAsync();
 
@@ -169,7 +299,9 @@ namespace RestaurentManagementAPI.Controllers
             {
                 message = "Cập nhật thông tin thành công",
                 username = user.TenDangNhap,
-                sdt = user.NhanVien.SDT
+                sdt = user.NhanVien.SDT,
+                email = user.Email,
+                isVerified = user.IsVerified
             });
         }
 
@@ -192,7 +324,9 @@ namespace RestaurentManagementAPI.Controllers
                     quyen = nv.TaiKhoan.Quyen,
                     tenDangNhap = nv.TaiKhoan.TenDangNhap,
                     trangThai = nv.TrangThai,
-                    hoatDong = nv.TaiKhoan.IsActive
+                    hoatDong = nv.TaiKhoan.IsActive,
+                    email = nv.TaiKhoan.Email,
+                    isVerified = nv.TaiKhoan.IsVerified
                 })
                 .ToListAsync();
 
@@ -207,19 +341,11 @@ namespace RestaurentManagementAPI.Controllers
                 .Include(e => e.TaiKhoan)
                 .FirstOrDefaultAsync(e => e.MaNV == maNV);
 
-            if (employee == null)
-                return NotFound("Nhân viên không tồn tại.");
+            if (employee == null) return NotFound("Nhân viên không tồn tại.");
 
-            // Cập nhật thông tin NhanVien
-            if (!string.IsNullOrWhiteSpace(dto.HoTen))
-                employee.HoTen = dto.HoTen;
-
-            if (!string.IsNullOrWhiteSpace(dto.ChucVu))
-                employee.ChucVu = dto.ChucVu;
-
-            if (!string.IsNullOrWhiteSpace(dto.SDT))
-                employee.SDT = dto.SDT;
-
+            if (!string.IsNullOrWhiteSpace(dto.HoTen)) employee.HoTen = dto.HoTen;
+            if (!string.IsNullOrWhiteSpace(dto.ChucVu)) employee.ChucVu = dto.ChucVu;
+            if (!string.IsNullOrWhiteSpace(dto.SDT)) employee.SDT = dto.SDT;
             if (!string.IsNullOrWhiteSpace(dto.TrangThai))
             {
                 employee.TrangThai = dto.TrangThai;
@@ -227,14 +353,11 @@ namespace RestaurentManagementAPI.Controllers
                     employee.TaiKhoan.IsActive = dto.TrangThai == "Đang làm";
             }
 
-            // Cập nhật thông tin TaiKhoan
             if (employee.TaiKhoan != null)
             {
-                if (!string.IsNullOrWhiteSpace(dto.Quyen))
-                    employee.TaiKhoan.Quyen = dto.Quyen;
-
-                if (!string.IsNullOrWhiteSpace(dto.MatKhau))
-                    employee.TaiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+                if (!string.IsNullOrWhiteSpace(dto.Quyen)) employee.TaiKhoan.Quyen = dto.Quyen;
+                if (!string.IsNullOrWhiteSpace(dto.MatKhau)) employee.TaiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+                if (!string.IsNullOrWhiteSpace(dto.Email)) employee.TaiKhoan.Email = dto.Email;
             }
 
             _context.NHANVIEN.Update(employee);
@@ -259,25 +382,16 @@ namespace RestaurentManagementAPI.Controllers
                 .Include(e => e.TaiKhoan)
                 .FirstOrDefaultAsync(e => e.MaNV == maNV);
 
-            if (employee == null)
-                return NotFound("Nhân viên không tồn tại.");
+            if (employee == null) return NotFound("Nhân viên không tồn tại.");
 
-            // Toggle trạng thái NHANVIEN
             employee.TrangThai = employee.TrangThai == "Đang làm" ? "Đã nghỉ" : "Đang làm";
-
-            // Đồng bộ sang TaiKhoan
             if (employee.TaiKhoan != null)
                 employee.TaiKhoan.IsActive = employee.TrangThai == "Đang làm";
 
             _context.NHANVIEN.Update(employee);
             await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                maNV = employee.MaNV,
-                TrangThai = employee.TrangThai,
-                HoatDong = employee.TaiKhoan?.IsActive
-            });
+            return Ok(new { maNV = employee.MaNV, TrangThai = employee.TrangThai, HoatDong = employee.TaiKhoan?.IsActive });
         }
 
         [Authorize(Roles = "Admin")]
@@ -292,9 +406,7 @@ namespace RestaurentManagementAPI.Controllers
 
             if (employee == null) return NotFound();
 
-            if (employee.TaiKhoan != null)
-                _context.TAIKHOAN.Remove(employee.TaiKhoan);
-
+            if (employee.TaiKhoan != null) _context.TAIKHOAN.Remove(employee.TaiKhoan);
             _context.NHANVIEN.Remove(employee);
             await _context.SaveChangesAsync();
 

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Maui.Devices;
-using Microsoft.Maui;
+
 namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
@@ -13,7 +9,6 @@ namespace RestaurantManagementGUI.Helpers
             DeviceInfo.Platform == DevicePlatform.Android
                 ? "https://10.0.2.2:7004/api/"
                 : "https://localhost:7004/api/";
-
 
         // Đăng ký tài khoản (chỉ dành cho admin)
         public static string Register => $"{BaseUrl}Auth/register";
@@ -38,7 +33,13 @@ namespace RestaurantManagementGUI.Helpers
 
         // Admin cập nhật thông tin cho user
         public static string AdminUpdateUser(string maNV) => $"{BaseUrl}Auth/admin-update/{maNV}";
+
         public static string GetAllTables => $"{BaseUrl}Ban";
         public static string UpdateTableStatus(string maBan) => $"{BaseUrl}Ban/{maBan}/trangthai";
+
+        // Quên mật khẩu
+        public static string SendForgotOtp => $"{BaseUrl}Auth/forgot-password";
+        public static string VerifyForgotOtp => $"{BaseUrl}Auth/verify-forgot-otp";
+        public static string ResetPassword => $"{BaseUrl}Auth/reset-password";
     }
 }
