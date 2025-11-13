@@ -21,5 +21,7 @@ namespace RestaurantManagementGUI.Models
 
         [JsonPropertyName("quyen")]
         public string Quyen { get; set; }
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
     }
 }

@@ -79,6 +79,10 @@
                                        FontSize="14"
                                        TextColor="#444444" />
 
+                                <Label Text="{Binding Email, StringFormat='📧 Email: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#444444" />
+
                                 <Label Text="{Binding Quyen, StringFormat='🔒 Quyền: {0}'}"
                                        FontSize="14"
                                        TextColor="#757575" />

@@ -5,79 +5,41 @@
              Title="Thêm nhân viên"
              BackgroundColor="#FAFAFA">
 
-    <!-- Màu chủ đề -->
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Color x:Key="PrimaryBrandColor">#263238</Color>
-            <Color x:Key="AccentColor">#FFBD59</Color>
-            <Color x:Key="InputBackground">#FFFFFF</Color>
-            <Color x:Key="BorderColor">#E0E0E0</Color>
-            <Color x:Key="PlaceholderColor">#9E9E9E</Color>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <ScrollView>
         <VerticalStackLayout Padding="25" Spacing="18">
 
-            <!-- Tiêu đề -->
             <Label Text="THÊM NHÂN VIÊN"
                    FontSize="22"
                    FontAttributes="Bold"
-                   TextColor="{StaticResource PrimaryBrandColor}"
+                   TextColor="#263238"
                    HorizontalOptions="Center"
                    Margin="0,10,0,20" />
 
-            <!-- Các trường nhập liệu -->
-            <Frame BackgroundColor="{StaticResource InputBackground}"
-                   BorderColor="{StaticResource BorderColor}"
-                   CornerRadius="12"
-                   Padding="10">
-                <Entry x:Name="UsernameEntry"
-                       Placeholder="Tên đăng nhập"
-                       PlaceholderColor="{StaticResource PlaceholderColor}" />
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="HoTenEntry" Placeholder="Họ tên" />
             </Frame>
 
-            <Frame BackgroundColor="{StaticResource InputBackground}"
-                   BorderColor="{StaticResource BorderColor}"
-                   CornerRadius="12"
-                   Padding="10">
-                <Entry x:Name="PasswordEntry"
-                       Placeholder="Mật khẩu"
-                       PlaceholderColor="{StaticResource PlaceholderColor}" />
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="UsernameEntry" Placeholder="Tên đăng nhập" />
             </Frame>
 
-            <Frame BackgroundColor="{StaticResource InputBackground}"
-                   BorderColor="{StaticResource BorderColor}"
-                   CornerRadius="12"
-                   Padding="10">
-                <Entry x:Name="HoTenEntry"
-                       Placeholder="Họ tên"
-                       PlaceholderColor="{StaticResource PlaceholderColor}" />
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="PasswordEntry" Placeholder="Mật khẩu" IsPassword="True" />
             </Frame>
 
-            <Frame BackgroundColor="{StaticResource InputBackground}"
-                   BorderColor="{StaticResource BorderColor}"
-                   CornerRadius="12"
-                   Padding="10">
-                <Entry x:Name="ChucVuEntry"
-                       Placeholder="Chức vụ"
-                       PlaceholderColor="{StaticResource PlaceholderColor}" />
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="SDTEntry" Placeholder="Số điện thoại" Keyboard="Telephone" />
             </Frame>
 
-            <Frame BackgroundColor="{StaticResource InputBackground}"
-                   BorderColor="{StaticResource BorderColor}"
-                   CornerRadius="12"
-                   Padding="10">
-                <Entry x:Name="SDTEntry"
-                       Placeholder="Số điện thoại"
-                       Keyboard="Telephone"
-                       PlaceholderColor="{StaticResource PlaceholderColor}" />
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
             </Frame>
 
-            <Frame BackgroundColor="{StaticResource InputBackground}"
-                   BorderColor="{StaticResource BorderColor}"
-                   CornerRadius="12"
-                   Padding="10">
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="ChucVuEntry" Placeholder="Chức vụ" />
+            </Frame>
+
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
                 <Picker x:Name="QuyenPicker" Title="Chọn quyền">
                     <Picker.Items>
                         <x:String>NhanVien</x:String>
@@ -86,17 +48,14 @@
                 </Picker>
             </Frame>
 
-            <!-- Nút thêm -->
             <Button Text="➕ Thêm nhân viên"
                     Clicked="OnAddUserClicked"
-                    BackgroundColor="{StaticResource AccentColor}"
-                    TextColor="{StaticResource PrimaryBrandColor}"
+                    BackgroundColor="#FFBD59"
+                    TextColor="#263238"
                     FontAttributes="Bold"
                     CornerRadius="12"
                     HeightRequest="50"
-                    Shadow="5,5,10,#00000030"
                     Margin="0,20,0,0"/>
-
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

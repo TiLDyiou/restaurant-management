@@ -19,7 +19,7 @@
         public string MatKhau { get; set; } = string.Empty;
     }
 
-    // DTO admin update user
+    /* DTO admin update user
     public class AdminUpdateUserDto
     {
         public string? MatKhau { get; set; }
@@ -38,7 +38,18 @@
         public string? Email { get; set; }            // đổi email -> sẽ gửi OTP
         public string? CurrentPassword { get; set; }  // nếu đổi password cần mật khẩu hiện tại
         public string? NewPassword { get; set; }      // mật khẩu mới
+    }*/
+
+    public class UpdateUserDto
+    {
+        public string? HoTen { get; set; }
+        public string? ChucVu { get; set; }       // Admin mới dùng
+        public string? SDT { get; set; }
+        public string? Quyen { get; set; }        // Admin mới dùng
+        public string? MatKhau { get; set; }      // Admin hoặc user
+        public string? Email { get; set; }        // Cả 2 đều có thể đổi email
     }
+
 
     // DTO gửi email (OTP hoặc quên mật khẩu)
     public class EmailDto

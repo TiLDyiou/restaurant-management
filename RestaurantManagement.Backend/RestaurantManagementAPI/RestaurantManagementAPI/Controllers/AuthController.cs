@@ -220,6 +220,31 @@ namespace RestaurentManagementAPI.Controllers
             return Ok(new { message = "Đổi mật khẩu thành công." });
         }
 
+        [Authorize]
+        [HttpPost("verify-email-otp")]
+        public async Task<IActionResult> VerifyEmailOtp([FromBody] VerifyOtpDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.OTP))
+                return BadRequest("Email và OTP không được để trống.");
+
+            // Lấy tài khoản theo email mới
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            // Kiểm tra OTP
+            if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow)
+                return BadRequest("OTP không hợp lệ hoặc đã hết hạn.");
+
+            // Xác thực email thành công
+            user.IsVerified = true;
+            user.OTP = null;
+            user.OTPExpireTime = null;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Xác thực email thành công." });
+        }
+
         #endregion
 
         #region ===================== User APIs (Authenticated) =====================
@@ -249,7 +274,7 @@ namespace RestaurentManagementAPI.Controllers
             });
         }
 
-        [Authorize]
+        /*[Authorize]
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
         {
@@ -303,7 +328,7 @@ namespace RestaurentManagementAPI.Controllers
                 email = user.Email,
                 isVerified = user.IsVerified
             });
-        }
+        }*/
 
         #endregion
 
@@ -333,7 +358,7 @@ namespace RestaurentManagementAPI.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "Admin")]
+        /*[Authorize(Roles = "Admin")]
         [HttpPut("admin-update/{maNV}")]
         public async Task<IActionResult> AdminUpdateUser(string maNV, [FromBody] AdminUpdateUserDto dto)
         {
@@ -371,6 +396,103 @@ namespace RestaurentManagementAPI.Controllers
                 sdt = employee.SDT,
                 trangThai = employee.TrangThai,
                 quyen = employee.TaiKhoan?.Quyen
+            });
+        }*/
+
+        [Authorize]
+        [HttpPost("resend-email-otp")]
+        public async Task<IActionResult> ResendEmailOtp([FromBody] EmailDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                return BadRequest("Email không được để trống.");
+
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("Email không tồn tại.");
+
+            if (user.IsVerified)
+                return BadRequest("Email đã được xác thực.");
+
+            // Tạo OTP mới
+            var otp = new Random().Next(100000, 999999).ToString();
+            user.OTP = otp;
+            user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
+
+            try
+            {
+                await _emailService.SendEmailAsync(user.Email, "OTP Xác Thực Email", $"Mã OTP của bạn là: {otp}");
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "OTP đã được gửi lại đến email." });
+            }
+            catch
+            {
+                return BadRequest("Gửi email OTP thất bại.");
+            }
+        }
+
+        [Authorize]
+        [HttpPut("update-user/{maNV?}")]
+        public async Task<IActionResult> UpdateUser(string? maNV, [FromBody] UpdateUserDto dto)
+        {
+            TaiKhoan user;
+            bool isAdmin = User.IsInRole("Admin");
+
+            if (isAdmin && !string.IsNullOrEmpty(maNV))
+            {
+                // Admin cập nhật cho bất kỳ nhân viên nào
+                user = await _context.TAIKHOAN.Include(t => t.NhanVien)
+                         .FirstOrDefaultAsync(u => u.MaNV == maNV);
+                if (user == null) return NotFound("Nhân viên không tồn tại.");
+            }
+            else
+            {
+                // Người dùng cập nhật thông tin cá nhân
+                var username = User.Identity?.Name;
+                if (username == null) return Unauthorized();
+                user = await _context.TAIKHOAN.Include(t => t.NhanVien)
+                         .FirstOrDefaultAsync(u => u.TenDangNhap == username);
+                if (user == null) return NotFound();
+            }
+
+            // Cập nhật thông tin
+            if (!string.IsNullOrWhiteSpace(dto.HoTen))
+                user.NhanVien.HoTen = dto.HoTen.Trim();
+            if (!string.IsNullOrWhiteSpace(dto.ChucVu) && isAdmin)
+                user.NhanVien.ChucVu = dto.ChucVu.Trim();
+            if (!string.IsNullOrWhiteSpace(dto.SDT))
+                user.NhanVien.SDT = dto.SDT.Trim();
+            if (!string.IsNullOrWhiteSpace(dto.Quyen) && isAdmin)
+                user.Quyen = dto.Quyen.Trim();
+            if (!string.IsNullOrWhiteSpace(dto.MatKhau))
+                user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+
+            // Nếu đổi email → gửi OTP và đánh dấu chưa xác thực
+            if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != user.Email)
+            {
+                user.Email = dto.Email.Trim();
+                user.IsVerified = false;
+                var otp = new Random().Next(100000, 999999).ToString();
+                user.OTP = otp;
+                user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
+
+                try
+                {
+                    await _emailService.SendEmailAsync(dto.Email, "OTP Xác Thực Email", $"Mã OTP của bạn là: {otp}");
+                }
+                catch
+                {
+                    return BadRequest("Gửi email OTP thất bại.");
+                }
+            }
+
+            _context.TAIKHOAN.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Cập nhật thông tin thành công",
+                tenDangNhap = user.TenDangNhap,
+                email = user.Email,
+                isVerified = user.IsVerified
             });
         }
 
