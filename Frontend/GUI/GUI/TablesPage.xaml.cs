@@ -1,4 +1,4 @@
-﻿using RestaurantManagementGUI.ViewModels;
+using RestaurantManagementGUI.ViewModels;
 using System.Diagnostics;
 namespace RestaurantManagementGUI; // Đảm bảo namespace này khớp với dự án của bạn
 

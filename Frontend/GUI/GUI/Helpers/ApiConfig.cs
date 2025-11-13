@@ -1,6 +1,10 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Devices;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace RestaurantManagementGUI.Helpers
 {
@@ -49,5 +53,20 @@ namespace RestaurantManagementGUI.Helpers
         public static string VerifyEmailOtp => $"{BaseUrl}Auth/verify-email-otp";
         // Gửi lại Email OTP
         public static string ResendEmailOtp => $"{BaseUrl}Auth/resend-email-otp";
+
+        // POST /api/Orders/submit
+        public static string SubmitOrder => $"{BaseUrl}Orders/submit";
+
+        // DELETE /api/softdelete_dish/{maMA}
+        public static string SoftDeleteDish(string maMA) => $"{BaseUrl}softdelete_dish/{maMA}"; // <-- SỬA Ở ĐÂY
+
+        // PUT /api/update_dish/{maMA}
+        public static string UpdateDish(string maMA) => $"{BaseUrl}update_dish/{maMA}"; // <-- SỬA Ở ĐÂY
+
+        // GET /api/dishes
+        public static string GetFoodMenu => $"{BaseUrl}dishes/get-dishes";
+
+        // POST /api/add_dish
+        public static string AddDish => $"{BaseUrl}add_dish"; // <-- SỬA Ở ĐÂY
     }
 }

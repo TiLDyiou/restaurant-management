@@ -54,8 +54,7 @@ namespace RestaurantManagementGUI
                 await DisplayAlert("Lỗi", $"Không thể mở trang: {ex.Message}", "OK");
             }
         }
-
-        private async void OnFoodCategoriesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodCategoriesPage());
+        private async void OnFoodCategoriesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new QuanLyMonAnPage());
         private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
         private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrdersPage());
         private async void OnTablesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TablesPage());

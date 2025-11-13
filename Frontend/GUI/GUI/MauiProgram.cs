@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-// Các using liên quan đến DI đã được xóa bỏ
+using Microsoft.Extensions.Logging;
+using RestaurantManagementGUI.Models;
+using RestaurantManagementGUI;
 
-namespace RestaurantManagementGUI
+namespace RestaurantManagementGUI;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
@@ -18,10 +19,8 @@ namespace RestaurantManagementGUI
                 });
 
             builder.Logging.AddDebug();
-
-            // Tất cả các đăng ký builder.Services (DI) đã được xóa.
-
-            return builder.Build();
-        }
+            builder.Services.AddTransient<FoodMenuViewModel>();
+            builder.Services.AddTransient<FoodMenuPage>();
+        return builder.Build();
     }
 }

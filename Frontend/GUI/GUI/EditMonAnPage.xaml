@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.EditMonAnPage"
+             Title="Sửa Món Ăn"
+             BackgroundColor="#F5F7FA">
+
+    <VerticalStackLayout Spacing="10" Padding="20">
+        <Label Text="Cập nhật thông tin món ăn" FontSize="20" FontAttributes="Bold"/>
+
+        <Label Text="Tên món ăn"/>
+        <Entry x:Name="EntryTenMA" />
+
+        <Label Text="Giá tiền"/>
+        <Entry x:Name="EntryDonGia" Keyboard="Numeric" />
+
+        <Label Text="Loại"/>
+        <Entry x:Name="EntryLoai" />
+
+        <Label Text="Tên file ảnh"/>
+        <Entry x:Name="EntryHinhAnh" />
+
+        <Label Text="Trạng thái (true = đang bán, false = nghỉ bán)"/>
+        <Switch x:Name="SwitchTrangThai" />
+
+        <Button Text="LƯU THAY ĐỔI" 
+                Clicked="Save_Clicked" 
+                Style="{StaticResource TableStyle_Occupied}" 
+                Margin="0,20,0,0" />
+
+        <Button Text="HỦY" 
+                Clicked="Cancel_Clicked" 
+                Style="{StaticResource TableStyle_Empty}" />
+    </VerticalStackLayout>
+
+</ContentPage>

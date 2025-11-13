@@ -15,7 +15,7 @@ namespace RestaurentManagementAPI.DTOs
     // DTO để tạo mới (POST)
     public class CreateMonAnDto
     {
-        
+
 
         [Required]
         public string TenMA { get; set; }
