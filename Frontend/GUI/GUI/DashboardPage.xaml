@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.DashboardPage"
+             BackgroundColor="White"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <!-- Style cho Border các nút -->
+        <Style x:Key="DashboardButtonStyle" TargetType="Border">
+            <Setter Property="Stroke" Value="#E0E0E0"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="15"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="White"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="MinimumHeightRequest" Value="120"/>
+        </Style>
+
+        <!-- Style cho Button bên trong Border -->
+        <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
+            <Setter Property="TextColor" Value="#263238"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+            <Setter Property="LineBreakMode" Value="WordWrap"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <!-- Grid chính: cột trái nhỏ để phần phải rộng hơn Android -->
+    <Grid ColumnDefinitions="160,*" RowDefinitions="*" BackgroundColor="White">
+
+        <!-- Bên trái -->
+        <StackLayout BackgroundColor="#FFBD59"
+                     Padding="20"
+                     VerticalOptions="FillAndExpand"
+                     Spacing="25">
+
+            <Label Text="NHÓM II"
+                   TextColor="#263238"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Restaurant Management System"
+                   TextColor="#263238"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   HorizontalOptions="FillAndExpand" />
+
+            <BoxView HeightRequest="2" BackgroundColor="#263238" Opacity="0.2" Margin="0,10,0,10" />
+
+            <Label x:Name="WelcomeLabel"
+                   Text="Welcome, User"
+                   FontSize="16"
+                   TextColor="#263238"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0" />
+
+            <Button Text="Đăng xuất"
+                    x:Name="LogoutButton"
+                    TextColor="White"
+                    BackgroundColor="#263238"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    HeightRequest="40"
+                    HorizontalOptions="Center"
+                    Clicked="OnLogoutClicked"/>
+        </StackLayout>
+
+        <!-- Bên phải -->
+        <ScrollView Grid.Column="1" Padding="30">
+            <FlexLayout x:Name="ButtonsLayout"
+                        Direction="Row"
+                        Wrap="Wrap"
+                        JustifyContent="Start"
+                        AlignItems="Start"
+                        AlignContent="Start">
+
+                <!-- Users -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="users.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Users" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUsersClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Food Categories -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="categories.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Food Categories" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodCategoriesClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Food Menu -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="menu.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Food Menu" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Orders -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="orders.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Orders" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Tables -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="tables.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Tables" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnTablesClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Bill Generation -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="bill.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Bill Generation" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnBillGenerationClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Order Modifications -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="modify.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Order Modifications" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrderModificationsClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </FlexLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

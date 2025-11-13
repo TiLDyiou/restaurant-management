@@ -18,7 +18,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MenuNhaHang")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+17d065336fd6188514a603b35eba13e2ef12e869")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+7561e83c2c941d8c335b96a483cb2fc2078c3281")]
 [assembly: System.Reflection.AssemblyProductAttribute("MenuNhaHang")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MenuNhaHang")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

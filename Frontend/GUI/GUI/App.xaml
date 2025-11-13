@@ -1,0 +1,55 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RestaurantManagementGUI"
+             x:Class="RestaurantManagementGUI.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Border" x:Key="BaseTableStyle">
+                <Setter Property="StrokeShape" Value="RoundRectangle 15"/>
+                <Setter Property="StrokeThickness" Value="1"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="5,10,5,10"/>
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="#000" Offset="3,3" Radius="8" Opacity="0.1"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Border" x:Key="SmallTableStyle" BasedOn="{StaticResource BaseTableStyle}">
+                <Setter Property="Stroke" Value="#B0BEC5"/>
+                <Setter Property="BackgroundColor" Value="#E3F2FD"/>
+            </Style>
+
+            <Style TargetType="Border" x:Key="LargeTableStyle" BasedOn="{StaticResource BaseTableStyle}">
+                <Setter Property="Stroke" Value="#F57C00"/>
+                <Setter Property="BackgroundColor" Value="#FFF8E1"/>
+            </Style>
+
+            <Style TargetType="Border" x:Key="OccupiedTableStyle" BasedOn="{StaticResource BaseTableStyle}">
+                <Setter Property="Stroke" Value="#E65100"/>
+                <Setter Property="BackgroundColor" Value="#FFD180"/>
+            </Style>
+
+            <Style TargetType="Label" x:Key="TableLabelStyle">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="TextColor" Value="#3E2723"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+
+            <Style TargetType="Image" x:Key="PlantStyle">
+                <Setter Property="Source" Value="chaucay.png"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="Opacity" Value="0.7"/>
+            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

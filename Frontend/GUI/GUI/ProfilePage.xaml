@@ -1,0 +1,34 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.ProfilePage"
+             Title="Profile"
+             BackgroundColor="White">
+
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="15">
+
+            <Label Text="Thông tin cá nhân"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Username" FontAttributes="Bold"/>
+            <Entry x:Name="UsernameEntry" IsReadOnly="True" />
+
+            <Label Text="Họ tên" FontAttributes="Bold"/>
+            <Entry x:Name="FullNameEntry" IsReadOnly="True" />
+
+            <Label Text="Chức vụ" FontAttributes="Bold"/>
+            <Entry x:Name="RoleEntry" IsReadOnly="True" />
+
+            <Label Text="Số điện thoại" FontAttributes="Bold"/>
+            <Entry x:Name="PhoneEntry" Keyboard="Telephone"/>
+
+            <Label Text="Đổi mật khẩu" FontAttributes="Bold"/>
+            <Entry x:Name="CurrentPasswordEntry" IsPassword="True" Placeholder="Mật khẩu hiện tại"/>
+            <Entry x:Name="NewPasswordEntry" IsPassword="True" Placeholder="Mật khẩu mới"/>
+
+            <Button Text="Cập nhật" BackgroundColor="#FFBD59" TextColor="#263238" Clicked="OnUpdateProfileClicked"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
