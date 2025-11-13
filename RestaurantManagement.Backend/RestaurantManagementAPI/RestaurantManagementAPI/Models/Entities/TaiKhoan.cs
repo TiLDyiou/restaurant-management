@@ -23,6 +23,23 @@ namespace RestaurentManagementAPI.Models.Entities
 
         [Column("HoatDong")]
         public bool IsActive { get; set; } = true;
+
+        [Column("Online")]
+        public bool Online { get; set; } = false;
+
+        [Column("Email")]
+        [StringLength(100)]
+        public string? Email { get; set; }
+
+        [Column("OTP")]
+        public string? OTP { get; set; }
+
+        [Column("OTPExpireTime")]
+        public DateTime? OTPExpireTime { get; set; }
+
+        [Column("IsVerified")]
+        public bool IsVerified { get; set; } = false;
+
         public NhanVien NhanVien { get; set; } = null!;
     }
 }

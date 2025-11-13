@@ -26,9 +26,21 @@ namespace RestaurantManagementGUI
             string user = UsernameEntry.Text?.Trim() ?? string.Empty;
             string pass = PasswordEntry.Text ?? string.Empty;
 
-            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
+            if (string.IsNullOrEmpty(user) && string.IsNullOrEmpty(pass))
             {
                 await DisplayAlert("Lỗi", "Vui lòng nhập tên đăng nhập và mật khẩu.", "OK");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(user))
+            {
+                await DisplayAlert("Lỗi", "Vui lòng nhập tên đăng nhập.", "OK");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(pass))
+            {
+                await DisplayAlert("Lỗi", "Vui lòng nhập mật khẩu.", "OK");
                 return;
             }
 
@@ -69,10 +81,8 @@ namespace RestaurantManagementGUI
                 }
                 else
                 {
-                    string msg = responseBody.Contains("vô hiệu hóa", StringComparison.OrdinalIgnoreCase)
-                        ? "Tài khoản đã bị vô hiệu hóa."
-                        : "Sai tên đăng nhập hoặc mật khẩu.";
-                    await DisplayAlert("Lỗi", msg, "OK");
+                    // API trả lỗi chi tiết (chưa kích hoạt, chưa xác thực, sai mật khẩu)
+                    await DisplayAlert("Lỗi", responseBody, "OK");
                 }
             }
             catch (Exception ex)
@@ -88,7 +98,7 @@ namespace RestaurantManagementGUI
 
         private async void OnForgotPasswordClicked(object sender, EventArgs e)
         {
-            await DisplayAlert("Quên mật khẩu", "Vui lòng liên hệ quản trị viên để được hỗ trợ.", "OK");
+            await Navigation.PushAsync(new ForgotPasswordPage());
         }
 
         private HttpClientHandler GetInsecureHandler()

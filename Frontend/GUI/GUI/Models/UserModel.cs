@@ -46,5 +46,7 @@ namespace RestaurantManagementGUI.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        public string Email { get; set; }
+        public bool IsVerified { get; set; } = true;
     }
 }

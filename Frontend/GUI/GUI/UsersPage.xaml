@@ -22,12 +22,23 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <!-- Tiêu đề nhỏ bên trong -->
+            <!-- Tiêu đề -->
             <Label Text="Danh sách nhân viên"
                    FontSize="22"
                    FontAttributes="Bold"
                    TextColor="{StaticResource AccentColor}"
                    HorizontalOptions="Center"/>
+
+            <!-- Thanh tìm kiếm -->
+            <SearchBar x:Name="SearchBarUsers"
+                       Placeholder="🔍 Tìm kiếm theo mã hoặc tên nhân viên..."
+                       PlaceholderColor="#B0BEC5"
+                       TextColor="#FFFFFF"
+                       BackgroundColor="#37474F"
+                       HeightRequest="45"
+                       FontSize="16"
+                       Margin="0,5,0,10"
+                       TextChanged="OnSearchTextChanged" />
 
             <!-- Nút thêm nhân viên -->
             <Button Text="➕ Thêm nhân viên"
@@ -68,6 +79,10 @@
                                        TextColor="#444444" />
 
                                 <Label Text="{Binding SDT, StringFormat='📞 Số điện thoại: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#444444" />
+
+                                <Label Text="{Binding Email, StringFormat='📧 Email: {0}'}"
                                        FontSize="14"
                                        TextColor="#444444" />
 

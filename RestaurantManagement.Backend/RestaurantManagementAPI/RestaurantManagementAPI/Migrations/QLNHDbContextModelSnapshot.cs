@@ -22,6 +22,39 @@ namespace RestaurantManagementAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("NhanVien", b =>
+                {
+                    b.Property<string>("MaNV")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)")
+                        .HasColumnName("MaNV");
+
+                    b.Property<string>("ChucVu")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ChucVu");
+
+                    b.Property<string>("HoTen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("HoTen");
+
+                    b.Property<DateTime?>("NgayVaoLam")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("NgayVaoLam");
+
+                    b.Property<string>("SDT")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("SDT");
+
+                    b.Property<string>("TrangThai")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("TrangThai");
+
+                    b.HasKey("MaNV");
+
+                    b.ToTable("NHANVIEN");
+                });
+
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.Ban", b =>
                 {
                     b.Property<string>("MaBan")
@@ -70,6 +103,11 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnName("ThanhTien")
                         .HasComputedColumnSql("[SoLuong] * [DonGia]", true);
 
+                    b.Property<string>("TrangThai")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("TrangThai");
+
                     b.HasKey("MaHD", "MaMA");
 
                     b.HasIndex("MaMA");
@@ -96,6 +134,51 @@ namespace RestaurantManagementAPI.Migrations
                     b.HasIndex("MaNL");
 
                     b.ToTable("CHITIETPHIEUNHAP");
+                });
+
+            modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.DatBan", b =>
+                {
+                    b.Property<string>("MaDatBan")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("MaDatBan");
+
+                    b.Property<string>("MaBan")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)")
+                        .HasColumnName("MaBan");
+
+                    b.Property<string>("SoDienThoai")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("SoDienThoai");
+
+                    b.Property<int>("SoNguoi")
+                        .HasColumnType("int")
+                        .HasColumnName("SoNguoi");
+
+                    b.Property<string>("TenKhachHang")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("TenKhachHang");
+
+                    b.Property<DateTime>("ThoiGianDat")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ThoiGianDat");
+
+                    b.Property<string>("TrangThai")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("TrangThai");
+
+                    b.HasKey("MaDatBan");
+
+                    b.HasIndex("MaBan");
+
+                    b.ToTable("DATBAN");
                 });
 
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.DonHangOnline", b =>
@@ -235,39 +318,6 @@ namespace RestaurantManagementAPI.Migrations
                     b.ToTable("MONAN");
                 });
 
-            modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.NhanVien", b =>
-                {
-                    b.Property<string>("MaNV")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)")
-                        .HasColumnName("MaNV");
-
-                    b.Property<string>("ChucVu")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("ChucVu");
-
-                    b.Property<string>("HoTen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("HoTen");
-
-                    b.Property<DateTime?>("NgayVaoLam")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("NgayVaoLam");
-
-                    b.Property<string>("SDT")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("SDT");
-
-                    b.Property<string>("TrangThai")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("TrangThai");
-
-                    b.HasKey("MaNV");
-
-                    b.ToTable("NHANVIEN");
-                });
-
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.PhieuNhapKho", b =>
                 {
                     b.Property<string>("MaPN")
@@ -302,9 +352,18 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnType("nvarchar(30)")
                         .HasColumnName("TenDangNhap");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Email");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("HoatDong");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsVerified");
 
                     b.Property<string>("MaNV")
                         .IsRequired()
@@ -316,6 +375,18 @@ namespace RestaurantManagementAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("MatKhau");
+
+                    b.Property<string>("OTP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OTP");
+
+                    b.Property<DateTime?>("OTPExpireTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("OTPExpireTime");
+
+                    b.Property<bool>("Online")
+                        .HasColumnType("bit")
+                        .HasColumnName("Online");
 
                     b.Property<string>("Quyen")
                         .HasColumnType("nvarchar(max)")
@@ -367,6 +438,17 @@ namespace RestaurantManagementAPI.Migrations
                     b.Navigation("PhieuNhapKho");
                 });
 
+            modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.DatBan", b =>
+                {
+                    b.HasOne("RestaurentManagementAPI.Models.Entities.Ban", "Ban")
+                        .WithMany()
+                        .HasForeignKey("MaBan")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ban");
+                });
+
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.HoaDon", b =>
                 {
                     b.HasOne("RestaurentManagementAPI.Models.Entities.Ban", "Ban")
@@ -375,7 +457,7 @@ namespace RestaurantManagementAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RestaurentManagementAPI.Models.Entities.NhanVien", "NhanVien")
+                    b.HasOne("NhanVien", "NhanVien")
                         .WithMany("HoaDons")
                         .HasForeignKey("MaNV")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -388,7 +470,7 @@ namespace RestaurantManagementAPI.Migrations
 
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.PhieuNhapKho", b =>
                 {
-                    b.HasOne("RestaurentManagementAPI.Models.Entities.NhanVien", "NhanVien")
+                    b.HasOne("NhanVien", "NhanVien")
                         .WithMany("PhieuNhapKhos")
                         .HasForeignKey("MaNV")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -398,13 +480,22 @@ namespace RestaurantManagementAPI.Migrations
 
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.TaiKhoan", b =>
                 {
-                    b.HasOne("RestaurentManagementAPI.Models.Entities.NhanVien", "NhanVien")
+                    b.HasOne("NhanVien", "NhanVien")
                         .WithOne("TaiKhoan")
                         .HasForeignKey("RestaurentManagementAPI.Models.Entities.TaiKhoan", "MaNV")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("NhanVien");
+                });
+
+            modelBuilder.Entity("NhanVien", b =>
+                {
+                    b.Navigation("HoaDons");
+
+                    b.Navigation("PhieuNhapKhos");
+
+                    b.Navigation("TaiKhoan");
                 });
 
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.Ban", b =>
@@ -425,15 +516,6 @@ namespace RestaurantManagementAPI.Migrations
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.MonAn", b =>
                 {
                     b.Navigation("ChiTietHoaDons");
-                });
-
-            modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.NhanVien", b =>
-                {
-                    b.Navigation("HoaDons");
-
-                    b.Navigation("PhieuNhapKhos");
-
-                    b.Navigation("TaiKhoan");
                 });
 
             modelBuilder.Entity("RestaurentManagementAPI.Models.Entities.PhieuNhapKho", b =>

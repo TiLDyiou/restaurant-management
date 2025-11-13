@@ -24,7 +24,6 @@ namespace RestaurantManagementGUI
 #else
             _httpClient = new HttpClient();
 #endif
-
             _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
         }
 
@@ -34,49 +33,97 @@ namespace RestaurantManagementGUI
             {
                 var newUser = new AddUserRequestModel
                 {
+                    HoTen = HoTenEntry.Text?.Trim(),
                     TenDangNhap = UsernameEntry.Text?.Trim(),
                     MatKhau = PasswordEntry.Text?.Trim(),
-                    HoTen = HoTenEntry.Text?.Trim(),
-                    ChucVu = ChucVuEntry.Text?.Trim(),
                     SDT = SDTEntry.Text?.Trim(),
+                    Email = EmailEntry.Text?.Trim(),
+                    ChucVu = ChucVuEntry.Text?.Trim(),
                     Quyen = QuyenPicker.SelectedItem?.ToString() ?? "NhanVien"
                 };
 
-                if (string.IsNullOrWhiteSpace(newUser.TenDangNhap) || string.IsNullOrWhiteSpace(newUser.MatKhau))
+                if (string.IsNullOrWhiteSpace(newUser.HoTen) ||
+                    string.IsNullOrWhiteSpace(newUser.TenDangNhap) ||
+                    string.IsNullOrWhiteSpace(newUser.MatKhau) ||
+                    string.IsNullOrWhiteSpace(newUser.SDT) ||
+                    string.IsNullOrWhiteSpace(newUser.Email) ||
+                    string.IsNullOrWhiteSpace(newUser.ChucVu))
                 {
-                    await DisplayAlert("Thiếu thông tin", "Vui lòng nhập tên đăng nhập và mật khẩu.", "OK");
+                    await DisplayAlert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin!", "OK");
                     return;
                 }
 
-                // Gắn token nếu API cần xác thực
                 var token = await SecureStorage.Default.GetAsync("auth_token");
                 if (!string.IsNullOrEmpty(token))
                     _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                // Gọi endpoint Register từ ApiConfig
+                // 🔹 Tạo user
                 var response = await _httpClient.PostAsJsonAsync(ApiConfig.Register, newUser);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var data = JsonSerializer.Deserialize<RegisterResponse>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                    await DisplayAlert("Thành công",
-                        $"Thêm nhân viên thành công!\nMã NV: {data?.MaNV ?? "(chưa rõ)"}",
-                        "OK");
-
-                    // Xóa form sau khi thêm
-                    UsernameEntry.Text = PasswordEntry.Text = HoTenEntry.Text = ChucVuEntry.Text = SDTEntry.Text = "";
-                    QuyenPicker.SelectedIndex = -1;
-                }
-                else
+                if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
                     await DisplayAlert("Lỗi", $"Không thể thêm nhân viên!\n{error}", "OK");
+                    return;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<RegisterResponse>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                // 🔹 Prompt nhập OTP và hỗ trợ gửi lại
+                bool verified = false;
+                while (!verified)
+                {
+                    string otp = await DisplayPromptAsync(
+                        "Xác thực Email",
+                        $"Một mã OTP đã được gửi tới {newUser.Email}.\nNhập OTP hoặc gõ 'Resend' để gửi lại:",
+                        "Xác nhận",
+                        "Hủy",
+                        placeholder: "Nhập OTP",
+                        keyboard: Keyboard.Text,
+                        maxLength: 6);
+
+                    if (string.IsNullOrWhiteSpace(otp))
+                    {
+                        await DisplayAlert("Thông báo", "Bạn đã hủy xác thực Email.", "OK");
+                        return;
+                    }
+
+                    if (otp.Equals("Resend", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Gọi API resend-email-otp
+                        var resendResp = await _httpClient.PostAsJsonAsync(ApiConfig.ResendEmailOtp, new { Email = newUser.Email });
+                        if (!resendResp.IsSuccessStatusCode)
+                        {
+                            var msg = await resendResp.Content.ReadAsStringAsync();
+                            await DisplayAlert("Lỗi", $"Gửi lại OTP thất bại:\n{msg}", "OK");
+                            return;
+                        }
+                        continue; // prompt lại
+                    }
+
+                    // Verify OTP
+                    var verifyResponse = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyRegisterOtp,
+                        new { Email = newUser.Email, OTP = otp });
+                    if (verifyResponse.IsSuccessStatusCode)
+                    {
+                        await DisplayAlert("Thành công",
+                            $"Nhân viên {newUser.HoTen} đã được tạo và xác thực!\nMã NV: {data?.MaNV ?? "(chưa rõ)"}",
+                            "OK");
+                        verified = true;
+
+                        // Xóa form
+                        HoTenEntry.Text = UsernameEntry.Text = PasswordEntry.Text = SDTEntry.Text = EmailEntry.Text = ChucVuEntry.Text = "";
+                        QuyenPicker.SelectedIndex = -1;
+                    }
+                    else
+                    {
+                        var err = await verifyResponse.Content.ReadAsStringAsync();
+                        await DisplayAlert("Lỗi", $"OTP không hợp lệ: {err}", "OK");
+                    }
                 }
             }
             catch (Exception ex)

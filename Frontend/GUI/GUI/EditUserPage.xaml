@@ -5,10 +5,15 @@
 
     <ScrollView Padding="20">
         <VerticalStackLayout Spacing="15">
+
             <Label x:Name="MaNVLabel" FontAttributes="Bold" />
+
             <Entry x:Name="HoTenEntry" Placeholder="Họ tên" />
             <Entry x:Name="ChucVuEntry" Placeholder="Chức vụ" />
             <Entry x:Name="SDTEntry" Placeholder="Số điện thoại" Keyboard="Telephone" />
+            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
+            <Entry x:Name="MatKhauEntry" Placeholder="Mật khẩu mới" IsPassword="True" />
+
             <Picker x:Name="QuyenPicker" Title="Quyền">
                 <Picker.Items>
                     <x:String>NhanVien</x:String>
@@ -16,8 +21,12 @@
                 </Picker.Items>
             </Picker>
 
-            <Button Text="Cập nhật nhân viên" Clicked="OnUpdateUserClicked"
-                    BackgroundColor="#4CAF50" TextColor="White" CornerRadius="10" />
+            <Button Text="Cập nhật nhân viên"
+                    Clicked="OnUpdateUserClicked"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="10" />
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

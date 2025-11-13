@@ -23,7 +23,9 @@ namespace RestaurentManagementAPI.Models.Entities
         [Column("ThanhTien")]
         public decimal ThanhTien { get; set; }
 
-        
+        [Column("TrangThai")]
+        [StringLength(50)]
+        public string? TrangThai { get; set; }
         public HoaDon? HoaDon { get; set; }
         public MonAn? MonAn { get; set; }
     }

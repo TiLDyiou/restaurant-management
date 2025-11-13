@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using RestaurentManagementAPI.Data;
 using RestaurentManagementAPI.Hubs;
 using RestaurentManagementAPI.Seeders;
+using RestaurentManagementAPI.Services;
 using System.Runtime;
 using System.Text;
 
@@ -79,7 +80,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
-
+builder.Services.AddScoped<EmailService>();
 var app = builder.Build();
 
 // Seed dữ liệu admin và bàn
@@ -87,7 +88,7 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
-        await DataSeeder.SeedAdminAsync(scope.ServiceProvider);
+        
         await BanSeeder.SeedTableAsync(scope.ServiceProvider);
     }
 }
@@ -105,12 +106,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.MapHub<KitchenHub>("/kitchenHub");
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Map Controllers & SignalR Hubs
 app.MapControllers();
 app.MapHub<BanHub>("/banHub"); // Hub cho trạng thái bàn realtime
-
 app.Run();

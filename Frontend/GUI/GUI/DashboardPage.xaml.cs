@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Devices;
+using Microsoft.Maui.Storage;
 
 namespace RestaurantManagementGUI
 {
@@ -36,7 +37,23 @@ namespace RestaurantManagementGUI
             }
         }
 
-        private async void OnUsersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new UsersPage());
+        // Users: admin mở UsersPage, còn các chức vụ khác mở profile
+        private async void OnUsersClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var role = await SecureStorage.Default.GetAsync("user_role") ?? "User";
+
+                if (role.Trim().ToLower() == "admin")
+                    await Navigation.PushAsync(new UsersPage());
+                else
+                    await Navigation.PushAsync(new ChefAndUserProfilePage());
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Lỗi", $"Không thể mở trang: {ex.Message}", "OK");
+            }
+        }
         private async void OnFoodCategoriesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new QuanLyMonAnPage());
         private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
         private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrdersPage());
@@ -49,19 +66,12 @@ namespace RestaurantManagementGUI
             base.OnAppearing();
             AdjustButtonSizes();
         }
+
         private void AdjustButtonSizes()
         {
             var screenWidth = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
-
-            // Cột trái 160px, ScrollView padding + margin tổng cộng ~60
-            double availableWidth = screenWidth - 160 - 60;
-
-            double buttonWidth;
-
-            if (screenWidth >= 1000) // Desktop → 4 cột
-                buttonWidth = availableWidth / 4;
-            else // Android → 2 cột
-                buttonWidth = availableWidth / 2;
+            double availableWidth = screenWidth - 160 - 60; // trừ cột trái + margin/padding
+            double buttonWidth = screenWidth >= 1000 ? availableWidth / 4 : availableWidth / 2;
 
             foreach (var child in ButtonsLayout.Children)
             {
@@ -69,12 +79,11 @@ namespace RestaurantManagementGUI
                 {
                     border.WidthRequest = buttonWidth;
 
-                    // Nút bên trong rộng đầy Border và tăng chiều cao
                     if (border.Content is VerticalStackLayout stack && stack.Children.Count > 1 && stack.Children[1] is Button btn)
                     {
-                        btn.WidthRequest = buttonWidth - 20; // margin
-                        btn.HeightRequest = 80; // tăng chiều cao để chữ không bị cắt
-                        btn.FontSize = 14; // giảm font nếu cần
+                        btn.WidthRequest = buttonWidth - 20;
+                        btn.HeightRequest = 80;
+                        btn.FontSize = 14;
                     }
                 }
             }
