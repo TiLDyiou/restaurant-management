@@ -103,6 +103,9 @@
 	  <MauiXaml Update="EditUserPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="FlyoutMenuView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="QuanLyMonAn.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
