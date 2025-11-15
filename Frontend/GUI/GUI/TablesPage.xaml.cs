@@ -5,6 +5,18 @@ namespace RestaurantManagementGUI; // Đảm bảo namespace này khớp với d
 public partial class TablesPage : ContentPage
 {
     private readonly TablesViewModel _viewModel;
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+
+#if WINDOWS
+    var window = App.Current?.Windows[0];
+    if (window != null)
+    {
+        window.Title = "";
+    }
+#endif
+    }
 
     // 1. Yêu cầu Dependency Injection "tiêm" ViewModel vào constructor
     public TablesPage()
