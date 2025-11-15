@@ -58,12 +58,10 @@ public partial class QuanLyMonAnPage : ContentPage
         await LoadDishesAsync();
     }
 
-    // HÀM TẢI API (GET /api/dishes - [AllowAnonymous])
     private async Task LoadDishesAsync()
     {
         try
         {
-            // API này không cần token (AllowAnonymous)
             var items = await _httpClient.GetFromJsonAsync<List<FoodModel>>(ApiConfig.GetFoodMenu);
 
             MainThread.BeginInvokeOnMainThread(() =>
@@ -115,7 +113,6 @@ public partial class QuanLyMonAnPage : ContentPage
                 return;
             }
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            // --------------------------
 
             var response = await _httpClient.PostAsync(ApiConfig.AddDish, content);
 
@@ -155,7 +152,6 @@ public partial class QuanLyMonAnPage : ContentPage
 
         try
         {
-            // --- THÊM TOKEN VÀO ĐÂY ---
             var token = await SecureStorage.Default.GetAsync("auth_token");
             if (string.IsNullOrEmpty(token))
             {
@@ -163,7 +159,6 @@ public partial class QuanLyMonAnPage : ContentPage
                 return;
             }
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            // --------------------------
 
             var response = await _httpClient.DeleteAsync(ApiConfig.SoftDeleteDish(foodItem.Id));
             if (response.IsSuccessStatusCode)

@@ -1,16 +1,16 @@
-﻿using RestaurantManagementGUI.Helpers;
-using RestaurantManagementGUI.Models;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Models;
+using System.Net.Http.Headers;
 
 namespace RestaurantManagementGUI
 {
     public partial class EditChefAndUserProfilePage : ContentPage
     {
         private readonly HttpClient _httpClient;
-        private readonly UserModel _user;
+        private UserModel _user;
 
         public EditChefAndUserProfilePage(UserModel user)
         {
@@ -29,63 +29,129 @@ namespace RestaurantManagementGUI
 #endif
             _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
 
+            // Load data
+            MaNVLabel.Text = _user.MaNV;
+            HoTenEntry.Text = _user.HoTen;
+            ChucVuEntry.Text = _user.ChucVu;
             SDTEntry.Text = _user.SDT;
+            EmailEntry.Text = _user.Email;
         }
 
-        private async void OnSaveClicked(object sender, EventArgs e)
+        private async void OnUpdateUserClicked(object sender, EventArgs e)
         {
+            string email = EmailEntry.Text?.Trim();
+            string password = MatKhauEntry.Text?.Trim();
+            string confirmPassword = ConfirmPasswordEntry.Text?.Trim();
+
+            UpdateButton.IsEnabled = false;
+            UpdateButton.Text = "Đang cập nhật...";
+
             try
             {
+                if (!string.IsNullOrEmpty(password))
+                {
+                    if (string.IsNullOrEmpty(confirmPassword))
+                    {
+                        await DisplayAlert("Lỗi", "Vui lòng nhập xác nhận mật khẩu.", "OK");
+                        return;
+                    }
+
+                    if (password != confirmPassword)
+                    {
+                        await DisplayAlert("Lỗi", "Mật khẩu và xác nhận mật khẩu không khớp.", "OK");
+                        return;
+                    }
+                }
+
                 var token = await SecureStorage.Default.GetAsync("auth_token");
-                if (string.IsNullOrEmpty(token))
+                if (!string.IsNullOrEmpty(token))
+                    _httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
+
+                var updateUser = new UpdateUserRequestModel
                 {
-                    await DisplayAlert("Lỗi", "Chưa Đăng nhập hoặc token hết hạn!", "OK");
-                    return;
-                }
-
-                string newPassword = PasswordEntry.Text?.Trim();
-                string currentPassword = CurrentPasswordEntry.Text?.Trim();
-
-                if (!string.IsNullOrWhiteSpace(newPassword) && string.IsNullOrWhiteSpace(currentPassword))
-                {
-                    await DisplayAlert("Lỗi", "Vui lòng nhập mật khẩu hiện tại!", "OK");
-                    return;
-                }
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var payload = new
-                {
-                    sdt = SDTEntry.Text?.Trim(),
-                    currentPassword = string.IsNullOrWhiteSpace(newPassword) ? null : currentPassword,
-                    newPassword = string.IsNullOrWhiteSpace(newPassword) ? null : newPassword
+                    HoTen = HoTenEntry.Text?.Trim(),
+                    ChucVu = ChucVuEntry.Text?.Trim(),
+                    SDT = SDTEntry.Text?.Trim(),
+                    Email = email,
+                    MatKhau = password 
                 };
 
-                string jsonPayload = JsonSerializer.Serialize(payload);
-                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateUser(), updateUser);
 
-                var response = await _httpClient.PutAsync(ApiConfig.UpdateProfile, content);
-
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    using var doc = JsonDocument.Parse(responseJson);
-                    var root = doc.RootElement;
-
-                    _user.SDT = root.TryGetProperty("sdt", out var sdtProp) ? sdtProp.GetString() : _user.SDT;
-
-                    await DisplayAlert("Thành công", "Cập nhật thông tin cá nhân thành công!", "OK");
-                    await Navigation.PopAsync();
+                    var err = await response.Content.ReadAsStringAsync();
+                    await DisplayAlert("Lỗi", $"Cập nhật thất bại:\n{err}", "OK");
+                    return;
                 }
-                else
+
+                var result = await response.Content.ReadFromJsonAsync<UpdateUserResponse>();
+
+                // gửi OTP
+                if (result != null && !result.IsVerified)
                 {
-                    string err = await response.Content.ReadAsStringAsync();
-                    await DisplayAlert("Lỗi", $"Cập nhật thất bại: {err}", "OK");
+                    bool verified = false;
+
+                    while (!verified)
+                    {
+                        string otp = await DisplayPromptAsync(
+                            "Xác thực Email",
+                            $"Một mã OTP đã được gửi tới {email}.\nNhập OTP (hoặc gõ 'Resend' để gửi lại):",
+                            "Xác nhận",
+                            "Hủy",
+                            placeholder: "Nhập OTP",
+                            keyboard: Keyboard.Numeric,
+                            maxLength: 6);
+
+                        if (string.IsNullOrWhiteSpace(otp))
+                        {
+                            await DisplayAlert("Thông báo", "Bạn đã hủy xác thực Email.", "OK");
+                            return;
+                        }
+
+                        if (otp.Equals("Resend", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var resendResp = await _httpClient.PostAsJsonAsync(
+                                ApiConfig.ResendEmailOtp, new { Email = email });
+
+                            if (!resendResp.IsSuccessStatusCode)
+                            {
+                                var msg = await resendResp.Content.ReadAsStringAsync();
+                                await DisplayAlert("Lỗi", $"Gửi lại OTP thất bại:\n{msg}", "OK");
+                                return;
+                            }
+
+                            continue;
+                        }
+
+                        var verifyResp = await _httpClient.PostAsJsonAsync(
+                            ApiConfig.VerifyEmailOtp, new { Email = email, OTP = otp });
+
+                        if (verifyResp.IsSuccessStatusCode)
+                        {
+                            await DisplayAlert("Thành công", "Email đã được xác thực!", "OK");
+                            verified = true;
+                        }
+                        else
+                        {
+                            var errMsg = await verifyResp.Content.ReadAsStringAsync();
+                            await DisplayAlert("Lỗi", $"OTP không hợp lệ: {errMsg}", "OK");
+                        }
+                    }
                 }
+
+                await DisplayAlert("Thành công", "Cập nhật thông tin thành công!", "OK");
+                await Navigation.PopAsync();
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi kết nối", $"Không thể kết nối: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi", $"Không thể kết nối đến máy chủ:\n{ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateButton.IsEnabled = true;
+                UpdateButton.Text = "Cập nhật thông tin";
             }
         }
     }

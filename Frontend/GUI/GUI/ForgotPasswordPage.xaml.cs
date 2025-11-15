@@ -26,7 +26,7 @@ namespace RestaurantManagementGUI
             _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
         }
 
-        // Gửi OTP
+        // Step 1: Gửi OTP
         private async void OnSendOtpClicked(object sender, EventArgs e)
         {
             _email = EmailEntry.Text?.Trim();
@@ -35,6 +35,7 @@ namespace RestaurantManagementGUI
                 await DisplayAlert("Lỗi", "Vui lòng nhập email.", "OK");
                 return;
             }
+
             SendOtpButton.IsEnabled = false;
             SendOtpButton.Text = "Đang gửi mã...";
             try
@@ -57,9 +58,14 @@ namespace RestaurantManagementGUI
             {
                 await DisplayAlert("Lỗi kết nối", $"Không thể kết nối: {ex.Message}", "OK");
             }
+            finally
+            {
+                SendOtpButton.IsEnabled = true;
+                SendOtpButton.Text = "Gửi OTP";
+            }
         }
 
-        // Xác minh OTP
+        // Step 2: Xác minh OTP
         private async void OnVerifyOtpClicked(object sender, EventArgs e)
         {
             _otp = OtpEntry.Text?.Trim();
@@ -68,9 +74,9 @@ namespace RestaurantManagementGUI
                 await DisplayAlert("Lỗi", "Vui lòng nhập mã OTP.", "OK");
                 return;
             }
+
             VerifyOtpButton.IsEnabled = false;
             VerifyOtpButton.Text = "Đang xác minh...";
-            await Task.Delay(500);
             try
             {
                 var response = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyForgotOtp, new { email = _email, otp = _otp });
@@ -91,9 +97,50 @@ namespace RestaurantManagementGUI
             {
                 await DisplayAlert("Lỗi kết nối", $"Không thể xác minh OTP: {ex.Message}", "OK");
             }
+            finally
+            {
+                VerifyOtpButton.IsEnabled = true;
+                VerifyOtpButton.Text = "Xác nhận OTP";
+            }
         }
 
-        // Đổi mật khẩu
+        // Step 2: Gửi lại OTP
+        private async void OnResendOtpClicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(_email))
+            {
+                await DisplayAlert("Lỗi", "Email chưa được nhập.", "OK");
+                return;
+            }
+
+            ResendOtpButton.IsEnabled = false;
+            ResendOtpButton.Text = "Đang gửi lại...";
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.SendForgotOtp, new { email = _email });
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await DisplayAlert("Thành công", "OTP đã được gửi lại đến email.", "OK");
+                }
+                else
+                {
+                    await DisplayAlert("Lỗi", $"Gửi lại OTP thất bại: {result}", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Lỗi kết nối", $"Không thể gửi lại OTP: {ex.Message}", "OK");
+            }
+            finally
+            {
+                ResendOtpButton.IsEnabled = true;
+                ResendOtpButton.Text = "Gửi lại OTP";
+            }
+        }
+
+        // Step 3: Đặt lại mật khẩu
         private async void OnResetPasswordClicked(object sender, EventArgs e)
         {
             string newPassword = NewPasswordEntry.Text?.Trim();
@@ -110,6 +157,7 @@ namespace RestaurantManagementGUI
                 await DisplayAlert("Lỗi", "Mật khẩu xác nhận không trùng khớp.", "OK");
                 return;
             }
+
             ResetPasswordButton.IsEnabled = false;
             ResetPasswordButton.Text = "Đang đặt lại mật khẩu...";
             try
@@ -135,6 +183,11 @@ namespace RestaurantManagementGUI
             catch (Exception ex)
             {
                 await DisplayAlert("Lỗi kết nối", $"Không thể kết nối: {ex.Message}", "OK");
+            }
+            finally
+            {
+                ResetPasswordButton.IsEnabled = true;
+                ResetPasswordButton.Text = "Đổi mật khẩu";
             }
         }
     }
