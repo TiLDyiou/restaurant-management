@@ -4,145 +4,579 @@
              x:Class="RestaurantManagementGUI.OrdersPage"
              xmlns:vm="clr-namespace:RestaurantManagementGUI"
              xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
-             Title="Thực đơn"
+             xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="#F6F6F6">
+             BackgroundColor="#F6F6F6"
+             NavigationPage.HasNavigationBar="False">
+
+ 
 
     <ContentPage.BindingContext>
         <vm:FoodMenuViewModel />
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="Auto, *" ColumnDefinitions="*, 350" RowSpacing="0" ColumnSpacing="0">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Converter cho nút ghi chú -->
+            <converters:NoteButtonTextConverter x:Key="NoteButtonTextConverter"/>
 
-        <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="Auto, *" Padding="15,10" BackgroundColor="White">
-            <ImageButton Grid.Column="0" Source="arrow_back.png" HeightRequest="24" WidthRequest="24"
-                         VerticalOptions="Center" HorizontalOptions="Start" Clicked="OnBackButtonClicked"
-                         Margin="0,0,10,0" BackgroundColor="Transparent"/>
-            <Label Grid.Column="1" Text="{Binding TenBan}" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Start" />
-        </Grid>
+            <!-- Style cho category buttons -->
+            <Style x:Key="CategoryButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="White"/>
+                <Setter Property="TextColor" Value="#263238"/>
+                <Setter Property="BorderColor" Value="#E0E0E0"/>
+                <Setter Property="BorderWidth" Value="1"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal"/>
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#FFBD59"/>
+                                    <Setter Property="TextColor" Value="#263238"/>
+                                    <Setter Property="BorderColor" Value="#FFBD59"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
-        <Grid Grid.Row="0" Grid.Column="1" Padding="15,10" BackgroundColor="White">
-            <Label Text="Đơn hàng của bàn" FontSize="22" FontAttributes="Bold" TextColor="Black" HorizontalOptions="Center" VerticalOptions="Center"/>
-        </Grid>
+    <Grid RowDefinitions="Auto, *" ColumnDefinitions="*, 380" RowSpacing="0" ColumnSpacing="0">
+
+        <!-- HEADER SECTION - Đơn giản, gọn gàng -->
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                BackgroundColor="#263238"
+                Padding="20,15">
+            <Grid ColumnDefinitions="Auto, *, Auto, Auto" 
+                  ColumnSpacing="15">
+
+             
+
+                <!-- Thông tin bàn -->
+                <VerticalStackLayout Grid.Column="1" 
+                                     Spacing="4" 
+                                     VerticalOptions="Center">
+                    <Label Text="{Binding TenBan}" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="White"/>
+                    <HorizontalStackLayout Spacing="8">
+                        <Image Source="restaurant.png" 
+                               HeightRequest="14" 
+                               WidthRequest="14"
+                               VerticalOptions="Center"/>
+                        <Label Text="Chọn món từ thực đơn bên dưới" 
+                               FontSize="12" 
+                               TextColor="#B0BEC5"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Số món trong giỏ -->
+                <Border Grid.Column="2"
+                        StrokeShape="RoundRectangle 20"
+                        BackgroundColor="#FFBD59"
+                        Padding="12,6"
+                        VerticalOptions="Center"
+                        IsVisible="{Binding CartItems.Count}">
+                    <HorizontalStackLayout Spacing="6">
+                        <Image Source="shopping_cart.png" 
+                               HeightRequest="16" 
+                               WidthRequest="16"/>
+                        <Label Text="{Binding CartItems.Count, StringFormat='{0} món'}" 
+                               FontSize="13" 
+                               FontAttributes="Bold"
+                               TextColor="#263238"/>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Tổng tiền preview -->
+                <Border Grid.Column="3"
+                        StrokeShape="RoundRectangle 20"
+                        BackgroundColor="#34464F"
+                        Padding="12,6"
+                        VerticalOptions="Center"
+                        IsVisible="{Binding CartItems.Count}">
+                    <Label Text="{Binding Total, StringFormat='{0:N0} VNĐ'}" 
+                           FontSize="13" 
+                           FontAttributes="Bold"
+                           TextColor="#FFBD59"/>
+                </Border>
+            </Grid>
+        </Border>
 
 
-        <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="Auto, Auto, *" Padding="15,10" RowSpacing="15">
-            <Border Grid.Row="0" StrokeShape="RoundRectangle 8" Stroke="#CCCCCC" BackgroundColor="#F0F0F0" Padding="10,0" VerticalOptions="Center" HeightRequest="40">
-                <SearchBar Placeholder="Tìm kiếm món ăn..."
-                           Text="{Binding SearchText, Mode=TwoWay}"
-                           FontSize="14" TextColor="Black" PlaceholderColor="#888888"
-                           BackgroundColor="Transparent"
-                           HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+        <!-- MENU SECTION - Phần hiển thị thực đơn -->
+        <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="Auto, Auto, *" Padding="20,15" RowSpacing="15">
+
+            <!-- Search Bar với icon -->
+            <Border Grid.Row="0" 
+                    StrokeShape="RoundRectangle 12" 
+                    Stroke="#E0E0E0" 
+                    BackgroundColor="White" 
+                    Padding="12,0" 
+                    HeightRequest="48">
+                <Border.Shadow>
+                    <Shadow Brush="#000" Offset="0,2" Radius="4" Opacity="0.05"/>
+                </Border.Shadow>
+                <Grid ColumnDefinitions="Auto, *">
+                    <Image Grid.Column="0" 
+                           Source="restaurant.png" 
+                           HeightRequest="20" 
+                           WidthRequest="20"
+                           Margin="0,0,10,0"
+                           VerticalOptions="Center"/>
+                    <SearchBar Grid.Column="1"
+                               Placeholder="Tìm kiếm món ăn..."
+                               Text="{Binding SearchText, Mode=TwoWay}"
+                               FontSize="15" 
+                               TextColor="#263238" 
+                               PlaceholderColor="#737373"
+                               BackgroundColor="Transparent"
+                               HorizontalOptions="FillAndExpand" 
+                               VerticalOptions="Center" />
+                </Grid>
             </Border>
 
-            <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Margin="0,10">
-                <StackLayout Orientation="Horizontal" Spacing="10" BindableLayout.ItemsSource="{Binding Categories}">
+            <!-- Category Filters -->
+            <ScrollView Grid.Row="1" 
+                        Orientation="Horizontal" 
+                        HorizontalScrollBarVisibility="Never">
+                <StackLayout Orientation="Horizontal" 
+                             Spacing="10" 
+                             BindableLayout.ItemsSource="{Binding Categories}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
                             <Button Text="{Binding .}"
-                                    CornerRadius="20" Padding="15,5" FontSize="14"
+                                    CornerRadius="20" 
+                                    Padding="20,8" 
+                                    FontSize="14"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=FilterCommand}"
                                     CommandParameter="{Binding .}"
-                                    Style="{StaticResource CategoryButtonStyle}" />
+                                    Style="{StaticResource CategoryButtonStyle}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button"
+                                                 Binding="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=SelectedCategory}"
+                                                 Value="{Binding .}">
+                                        <Setter Property="BackgroundColor" Value="#FFBD59"/>
+                                        <Setter Property="TextColor" Value="#263238"/>
+                                        <Setter Property="BorderColor" Value="#FFBD59"/>
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
             </ScrollView>
 
+            <!-- Food Items Grid -->
             <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand">
-                <VerticalStackLayout Spacing="20">
-                    <Label Text="{Binding SelectedCategory}" FontSize="20" FontAttributes="Bold" />
+                <VerticalStackLayout Spacing="15">
+                    <!-- Category Title -->
+                    <Label Text="{Binding SelectedCategory}" 
+                           FontSize="22" 
+                           FontAttributes="Bold"
+                           TextColor="#263238"
+                           Margin="0,5,0,0"/>
 
-                    <CollectionView ItemsSource="{Binding DisplayedFoodItems}" SelectionMode="None">
+                    <!-- Food Items Collection -->
+                    <CollectionView ItemsSource="{Binding DisplayedFoodItems}" 
+                                    SelectionMode="None">
                         <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="15" VerticalItemSpacing="20" />
+                            <GridItemsLayout Orientation="Vertical" 
+                                             Span="2" 
+                                             HorizontalItemSpacing="15" 
+                                             VerticalItemSpacing="20" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:FoodModel">
-                                <Border StrokeShape="RoundRectangle 10" Padding="0" Stroke="#EEEEEE" StrokeThickness="1" BackgroundColor="White">
+                                <Border StrokeShape="RoundRectangle 15" 
+                                        Padding="0" 
+                                        Stroke="Transparent" 
+                                        BackgroundColor="White">
                                     <Border.Shadow>
-                                        <Shadow Brush="#000" Offset="3,3" Radius="8" Opacity="0.1"/>
+                                        <Shadow Brush="#000" Offset="0,4" Radius="12" Opacity="0.08"/>
                                     </Border.Shadow>
-                                    <VerticalStackLayout Spacing="10">
-                                        <Image Source="{Binding ImageUrl}" Aspect="AspectFill" HeightRequest="120">
-                                            <Image.Clip>
-                                                <RoundRectangleGeometry CornerRadius="10,10,0,0" />
-                                            </Image.Clip>
-                                        </Image>
-                                        <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" Margin="10,0,10,0"/>
-                                        <Label Text="{Binding Price, StringFormat='{0:N0} VNĐ'}" TextColor="#FF6347" FontSize="15" FontAttributes="Bold" Margin="10,0,10,0"/>
 
-                                        <Button Text="Thêm món"
+                                    <Grid RowDefinitions="140, Auto, Auto, Auto, Auto" RowSpacing="0">
+                                        <!-- Image Container với Placeholder -->
+                                        <Border Grid.Row="0" 
+                                                StrokeShape="RoundRectangle 15,15,0,0"
+                                                BackgroundColor="#F0F0F0">
+                                            <Grid>
+                                                <!-- Placeholder Image khi không có ảnh -->
+                                                <Image Source="restaurant.png" 
+                                                       Aspect="Center" 
+                                                       HeightRequest="60"
+                                                       WidthRequest="60"
+                                                       Opacity="0.3"/>
+                                                <!-- Text hiển thị hinhAnh từ API -->
+                                                <Label Text="{Binding ImageUrl}" 
+                                                       FontSize="11" 
+                                                       TextColor="#999"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"
+                                                       Margin="0,70,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Món ăn Name -->
+                                        <Label Grid.Row="1"
+                                               Text="{Binding Name}" 
+                                               FontAttributes="Bold" 
+                                               FontSize="16" 
+                                               TextColor="#263238"
+                                               Margin="12,12,12,5"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="2"/>
+
+                                        <!-- Category Badge -->
+                                        <Border Grid.Row="2"
+                                                StrokeShape="RoundRectangle 10"
+                                                BackgroundColor="#F5F5F5"
+                                                Padding="8,3"
+                                                Margin="12,0,12,8"
+                                                HorizontalOptions="Start">
+                                            <Label Text="{Binding Category}" 
+                                                   TextColor="#737373" 
+                                                   FontSize="11"/>
+                                        </Border>
+
+                                        <!-- Price -->
+                                        <Label Grid.Row="3"
+                                               Text="{Binding Price, StringFormat='{0:N0} VNĐ'}" 
+                                               TextColor="#FFBD59" 
+                                               FontSize="18" 
+                                               FontAttributes="Bold" 
+                                               Margin="12,0,12,10"/>
+
+                                        <!-- Add to Cart Button -->
+                                        <Button Grid.Row="4"
+                                                Text="Thêm món"
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=AddToCartCommand}"
                                                 CommandParameter="{Binding .}"
-                                                BackgroundColor="#FF6347" TextColor="White"
-                                                CornerRadius="5" Margin="10,0,10,10"
-                                                HeightRequest="40" FontSize="14"/>
-                                    </VerticalStackLayout>
+                                                BackgroundColor="#FFBD59" 
+                                                TextColor="#263238"
+                                                CornerRadius="10" 
+                                                Margin="12,0,12,12"
+                                                HeightRequest="42" 
+                                                FontSize="15"
+                                                FontAttributes="Bold"/>
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
+
+                        <!-- Empty View khi không có món -->
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Spacing="15" 
+                                                 VerticalOptions="Center" 
+                                                 HorizontalOptions="Center"
+                                                 Margin="0,50,0,0">
+                                <Image Source="restaurant.png" 
+                                       HeightRequest="80" 
+                                       WidthRequest="80"
+                                       Opacity="0.3"/>
+                                <Label Text="Không tìm thấy món ăn" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold"
+                                       TextColor="#737373"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Thử tìm kiếm hoặc chọn danh mục khác" 
+                                       FontSize="14" 
+                                       TextColor="#999"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
                     </CollectionView>
                 </VerticalStackLayout>
             </ScrollView>
         </Grid>
 
 
-        <Border Grid.Row="1" Grid.Column="1" BackgroundColor="White" Padding="20,10"
-                StrokeThickness="1" Stroke="#EEEEEE">
+        <!-- CART SECTION - Phần giỏ hàng -->
+        <Border Grid.Row="1" 
+                Grid.Column="1" 
+                BackgroundColor="White" 
+                Padding="0"
+                StrokeThickness="0">
 
-            <Grid RowDefinitions="Auto, *, Auto" RowSpacing="15">
+            <Grid RowDefinitions="*, Auto" RowSpacing="0">
 
-                <VerticalStackLayout Grid.Row="0" Spacing="10">
-                    <Label Text="Món đã chọn" FontAttributes="Bold" FontSize="16"/>
-                    <ScrollView VerticalScrollBarVisibility="Never">
-                        <CollectionView ItemsSource="{Binding CartItems}" EmptyView="Giỏ hàng trống.">
+                <!-- Cart Items List -->
+                <ScrollView Grid.Row="0" 
+                            VerticalScrollBarVisibility="Default"
+                            Padding="20,15,20,0">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Món đã chọn" 
+                               FontAttributes="Bold" 
+                               FontSize="17"
+                               TextColor="#263238"
+                               Margin="0,0,0,10"/>
+
+                        <!-- Cart Items Collection -->
+                        <CollectionView ItemsSource="{Binding CartItems}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:CartItemModel">
-                                    <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="10" Margin="0,5">
-                                        <Label Grid.Column="0" Text="{Binding Quantity}" VerticalOptions="Center" FontAttributes="Bold"/>
-                                        <Label Grid.Column="1" Text="{Binding FoodItem.Name}" VerticalOptions="Center"/>
-                                        <Label Grid.Column="2" Text="{Binding TotalPrice, StringFormat='{0:N0} VNĐ'}" VerticalOptions="Center"/>
-                                        <HorizontalStackLayout Grid.Column="3" Spacing="5">
-                                            <Button Text="-" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=DecreaseQuantityCommand}"
-                                                    CommandParameter="{Binding .}" WidthRequest="30" HeightRequest="30" CornerRadius="15" Padding="0" BackgroundColor="#F0F0F0" TextColor="Black"/>
-                                            <Button Text="+" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=IncreaseQuantityCommand}"
-                                                    CommandParameter="{Binding .}" WidthRequest="30" HeightRequest="30" CornerRadius="15" Padding="0" BackgroundColor="#F0F0F0" TextColor="Black"/>
-                                        </HorizontalStackLayout>
-                                    </Grid>
+                                    <Border StrokeShape="RoundRectangle 12"
+                                            BackgroundColor="#F8F8F8"
+                                            Padding="12"
+                                            Margin="0,0,0,10">
+                                        <Grid RowDefinitions="Auto, Auto" RowSpacing="10">
+
+                                            <!-- Main Cart Item Row -->
+                                            <Grid Grid.Row="0"
+                                                  ColumnDefinitions="Auto, *, Auto" 
+                                                  RowDefinitions="Auto, Auto"
+                                                  ColumnSpacing="12"
+                                                  RowSpacing="8">
+
+                                                <!-- Quantity Badge -->
+                                                <Border Grid.Column="0" 
+                                                        Grid.RowSpan="2"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        BackgroundColor="#FFBD59"
+                                                        Padding="12,8"
+                                                        VerticalOptions="Center">
+                                                    <Label Text="{Binding Quantity}" 
+                                                           FontAttributes="Bold"
+                                                           FontSize="18"
+                                                           TextColor="#263238"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center"/>
+                                                </Border>
+
+                                                <!-- Food Name -->
+                                                <Label Grid.Column="1" 
+                                                       Grid.Row="0"
+                                                       Text="{Binding FoodItem.Name}" 
+                                                       FontSize="15"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#263238"
+                                                       VerticalOptions="Center"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1"/>
+
+                                                <!-- Price per item -->
+                                                <Label Grid.Column="1" 
+                                                       Grid.Row="1"
+                                                       Text="{Binding FoodItem.Price, StringFormat='{0:N0} VNĐ/món'}" 
+                                                       FontSize="12"
+                                                       TextColor="#737373"
+                                                       VerticalOptions="Center"/>
+
+                                                <!-- Total Price & Controls -->
+                                                <VerticalStackLayout Grid.Column="2" 
+                                                                     Grid.RowSpan="2"
+                                                                     Spacing="8"
+                                                                     VerticalOptions="Center">
+                                                    <Label Text="{Binding TotalPrice, StringFormat='{0:N0} VNĐ'}" 
+                                                           FontSize="16"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#FFBD59"
+                                                           HorizontalOptions="End"/>
+
+                                                    <!-- Quantity Controls - Căn giữa hoàn hảo -->
+                                                    <HorizontalStackLayout Spacing="8" HorizontalOptions="End">
+                                                        <Button Text="−" 
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=DecreaseQuantityCommand}"
+                                                                CommandParameter="{Binding .}" 
+                                                                WidthRequest="36" 
+                                                                HeightRequest="36" 
+                                                                CornerRadius="18" 
+                                                                Padding="0" 
+                                                                BackgroundColor="#E0E0E0" 
+                                                                TextColor="#263238"
+                                                                FontSize="22"
+                                                                FontAttributes="Bold"
+                                                                HorizontalOptions="Center"
+                                                                VerticalOptions="Center"/>
+                                                        <Button Text="+" 
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=IncreaseQuantityCommand}"
+                                                                CommandParameter="{Binding .}" 
+                                                                WidthRequest="36" 
+                                                                HeightRequest="36" 
+                                                                CornerRadius="18" 
+                                                                Padding="0" 
+                                                                BackgroundColor="#FFBD59" 
+                                                                TextColor="#263238"
+                                                                FontSize="20"
+                                                                FontAttributes="Bold"
+                                                                HorizontalOptions="Center"
+                                                                VerticalOptions="Center"/>
+                                                    </HorizontalStackLayout>
+                                                </VerticalStackLayout>
+                                            </Grid>
+
+                                            <!-- Note Section -->
+                                            <VerticalStackLayout Grid.Row="1" Spacing="8">
+                                                <!-- Display Note if exists -->
+                                                <Border StrokeShape="RoundRectangle 8"
+                                                        BackgroundColor="#FFF9E6"
+                                                        Padding="10,8"
+                                                        IsVisible="{Binding HasNote}">
+                                                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="8">
+                                                        <Image Grid.Column="0"
+                                                               Source="note.png" 
+                                                               HeightRequest="16" 
+                                                               WidthRequest="16"
+                                                               VerticalOptions="Start"
+                                                               Margin="0,2,0,0"/>
+                                                        <Label Grid.Column="1"
+                                                               Text="{Binding Note}" 
+                                                               FontSize="13"
+                                                               TextColor="#8B7355"
+                                                               VerticalOptions="Center"
+                                                               LineBreakMode="WordWrap"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Note Action Buttons -->
+                                                <HorizontalStackLayout Spacing="8" HorizontalOptions="End">
+                                                    <!-- Add/Edit Note Button -->
+                                                    <Border StrokeShape="RoundRectangle 8"
+                                                            BackgroundColor="#E8F5E9"
+                                                            Padding="10,6">
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer 
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=AddNoteCommand}"
+                                                                CommandParameter="{Binding .}"/>
+                                                        </Border.GestureRecognizers>
+                                                        <HorizontalStackLayout Spacing="5">
+                                                            <Image Source="note.png" 
+                                                                   HeightRequest="16" 
+                                                                   WidthRequest="16"
+                                                                   VerticalOptions="Center"/>
+                                                            <Label FontSize="12"
+                                                                   TextColor="#2E7D32"
+                                                                   FontAttributes="Bold"
+                                                                   VerticalOptions="Center">
+                                                                <Label.Text>
+                                                                    <Binding Path="HasNote" Converter="{StaticResource NoteButtonTextConverter}"/>
+                                                                </Label.Text>
+                                                            </Label>
+                                                        </HorizontalStackLayout>
+                                                    </Border>
+
+                                                    <!-- Remove Note Button (only visible if has note) -->
+                                                    <Border StrokeShape="RoundRectangle 8"
+                                                            BackgroundColor="#FFEBEE"
+                                                            Padding="10,6"
+                                                            IsVisible="{Binding HasNote}">
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer 
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FoodMenuViewModel}}, Path=RemoveNoteCommand}"
+                                                                CommandParameter="{Binding .}"/>
+                                                        </Border.GestureRecognizers>
+                                                        <HorizontalStackLayout Spacing="5">
+                                                            <Image Source="delete.png" 
+                                                                   HeightRequest="16" 
+                                                                   WidthRequest="16"
+                                                                   VerticalOptions="Center"/>
+                                                            <Label Text="Xóa"
+                                                                   FontSize="12"
+                                                                   TextColor="#C62828"
+                                                                   FontAttributes="Bold"
+                                                                   VerticalOptions="Center"/>
+                                                        </HorizontalStackLayout>
+                                                    </Border>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
+
+                            <!-- Empty Cart View -->
+                            <CollectionView.EmptyView>
+                                <VerticalStackLayout Spacing="15" 
+                                                     VerticalOptions="Center" 
+                                                     HorizontalOptions="Center"
+                                                     Margin="0,80,0,0">
+                                    <Image Source="shopping_cart.png" 
+                                           HeightRequest="80" 
+                                           WidthRequest="80"
+                                           Opacity="0.2"/>
+                                    <Label Text="Giỏ hàng trống" 
+                                           FontSize="18" 
+                                           FontAttributes="Bold"
+                                           TextColor="#737373"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="Thêm món ăn từ thực đơn" 
+                                           FontSize="14" 
+                                           TextColor="#999"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </CollectionView.EmptyView>
                         </CollectionView>
-                    </ScrollView>
-                </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </ScrollView>
 
-                <BoxView Grid.Row="1" Color="Transparent" />
+                <!-- Bottom Summary & Actions -->
+                <VerticalStackLayout Grid.Row="1" 
+                                     Spacing="12" 
+                                     Padding="20,20,20,20"
+                                     BackgroundColor="White">
 
-                <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="0,15,0,0">
-                    <BoxView HeightRequest="1" Color="#F0F0F0"/>
+                    <!-- Divider -->
+                    <BoxView HeightRequest="2" 
+                             Color="#F0F0F0"
+                             Margin="0,0,0,8"/>
 
-                    <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" RowSpacing="5">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Tạm tính" TextColor="#666666"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Subtotal, StringFormat='{0:N0} VNĐ'}"/>
-                        <Label Grid.Row="1" Grid.Column="0" Text="TỔNG CỘNG" FontAttributes="Bold" FontSize="18"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Total, StringFormat='{0:N0} VNĐ'}" FontAttributes="Bold" FontSize="18" TextColor="#FF6347"/>
+                    <!-- Price Summary -->
+                    <Grid ColumnDefinitions="*, Auto" 
+                          RowDefinitions="Auto, Auto" 
+                          RowSpacing="8">
+                        <Label Grid.Row="0" 
+                               Grid.Column="0" 
+                               Text="Tạm tính" 
+                               TextColor="#737373"
+                               FontSize="14"/>
+                        <Label Grid.Row="0" 
+                               Grid.Column="1" 
+                               Text="{Binding Subtotal, StringFormat='{0:N0} VNĐ'}"
+                               TextColor="#263238"
+                               FontSize="14"/>
+
+                        <Label Grid.Row="1" 
+                               Grid.Column="0" 
+                               Text="TỔNG CỘNG" 
+                               FontAttributes="Bold" 
+                               FontSize="20"
+                               TextColor="#263238"/>
+                        <Label Grid.Row="1" 
+                               Grid.Column="1" 
+                               Text="{Binding Total, StringFormat='{0:N0} VNĐ'}" 
+                               FontAttributes="Bold" 
+                               FontSize="20" 
+                               TextColor="#FFBD59"/>
                     </Grid>
 
+                    <!-- Action Buttons -->
                     <Button Text="THANH TOÁN"
                             Command="{Binding CheckoutCommand}"
-                            BackgroundColor="#FFA500"
-                            TextColor="White"
-                            CornerRadius="10"
-                            HeightRequest="50"
-                            FontSize="16" />
+                            BackgroundColor="#FFBD59"
+                            TextColor="#263238"
+                            CornerRadius="12"
+                            HeightRequest="54"
+                            FontSize="17"
+                            FontAttributes="Bold">
+                        <Button.Shadow>
+                            <Shadow Brush="#FFBD59" Offset="0,4" Radius="8" Opacity="0.3"/>
+                        </Button.Shadow>
+                    </Button>
 
                     <Button Text="HỦY ĐƠN"
                             Command="{Binding CancelOrderCommand}"
-                            BackgroundColor="#E0E0E0"
-                            TextColor="#333333"
-                            CornerRadius="10"
+                            BackgroundColor="#F5F5F5"
+                            TextColor="#737373"
+                            CornerRadius="12"
                             HeightRequest="50"
-                            FontSize="16" />
+                            FontSize="16"
+                            FontAttributes="Bold"/>
                 </VerticalStackLayout>
             </Grid>
         </Border>

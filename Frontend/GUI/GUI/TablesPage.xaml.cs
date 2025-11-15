@@ -142,8 +142,9 @@ public partial class TablesPage : ContentPage
     {
         await FlyoutMenu.CloseAsync();
 
-        // Điều hướng đến OrdersPage với thông tin bàn
-        await Navigation.PushAsync(new OrdersPage());
+        // Truyền tên bàn vào OrdersPage
+        var ordersPage = new OrdersPage(table.TenBan);
+        await Navigation.PushAsync(ordersPage);
     }
 
     /// <summary>

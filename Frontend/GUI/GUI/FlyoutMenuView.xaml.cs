@@ -74,7 +74,6 @@ namespace RestaurantManagementGUI
             }
         }
 
-        // Helper: Lấy emoji theo trạng thái
         private static string GetStatusEmoji(string status)
         {
             return status switch

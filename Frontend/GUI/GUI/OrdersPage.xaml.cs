@@ -1,40 +1,40 @@
 ﻿// File: OrdersPage.xaml.cs
-namespace RestaurantManagementGUI;
+using Microsoft.Maui.Controls;
 
-public partial class OrdersPage : ContentPage
+namespace RestaurantManagementGUI
 {
-    private FoodMenuViewModel _viewModel;
-
-    // Hàm 1 (cho DashboardPage gọi)
-    public OrdersPage()
+    public partial class OrdersPage : ContentPage
     {
-        InitializeComponent();
-        _viewModel = new FoodMenuViewModel();
-        BindingContext = _viewModel;
-    }
+        private readonly FoodMenuViewModel _viewModel;
 
-    // Hàm 2 (cho TablesPage gọi)
-    public OrdersPage(string tenBan)
-    {
-        InitializeComponent();
-        _viewModel = new FoodMenuViewModel();
-        _viewModel.TenBan = $"Số bàn: {tenBan}";
-        BindingContext = _viewModel;
-    }
-
-    // Tải API mỗi khi trang được hiển thị
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        if (_viewModel != null)
+        // Constructor mặc định (dự phòng)
+        public OrdersPage() : this("Đơn tự do")
         {
+        }
+
+        // Constructor nhận tên bàn
+        public OrdersPage(string tenBan)
+        {
+            InitializeComponent();
+            _viewModel = (FoodMenuViewModel)BindingContext;
+
+            // Set tên bàn trực tiếp
+            _viewModel.TenBan = $"{tenBan}";
+        }
+
+        // Được gọi khi page xuất hiện
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // Initialize ViewModel để load dữ liệu
             await _viewModel.InitializeAsync();
         }
-    }
 
-    private async void OnBackButtonClicked(object sender, EventArgs e)
-    {
-        // Dùng PopAsync vì đang dùng NavigationPage
-        await Navigation.PopAsync();
+        // Handler cho nút Back
+        private async void OnBackButtonClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+        }
     }
 }
