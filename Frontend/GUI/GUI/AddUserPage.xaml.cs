@@ -58,7 +58,7 @@ namespace RestaurantManagementGUI
                     _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                // 🔹 Tạo user
+                // Tạo user
                 var response = await _httpClient.PostAsJsonAsync(ApiConfig.Register, newUser);
                 if (!response.IsSuccessStatusCode)
                 {
