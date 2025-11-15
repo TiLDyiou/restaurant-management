@@ -556,7 +556,7 @@
                     </Grid>
 
                     <!-- Action Buttons -->
-                    <Button Text="THANH TOÁN"
+                    <Button Text="GỬI ĐƠN"
                             Command="{Binding CheckoutCommand}"
                             BackgroundColor="#FFBD59"
                             TextColor="#263238"
