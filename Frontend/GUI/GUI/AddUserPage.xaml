@@ -27,6 +27,10 @@
             </Frame>
 
             <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
+                <Entry x:Name="ConfirmPassword" Placeholder="Xác nhận mật khẩu" IsPassword="True" />
+            </Frame>
+            
+            <Frame BackgroundColor="#FFFFFF" BorderColor="#E0E0E0" CornerRadius="12" Padding="10">
                 <Entry x:Name="SDTEntry" Placeholder="Số điện thoại" Keyboard="Telephone" />
             </Frame>
 
@@ -47,7 +51,8 @@
                 </Picker>
             </Frame>
 
-            <Button Text="➕ Thêm nhân viên"
+            <Button x:Name="AddButton"
+                    Text="➕ Thêm nhân viên"
                     Clicked="OnAddUserClicked"
                     BackgroundColor="#FFBD59"
                     TextColor="#263238"

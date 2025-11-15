@@ -32,10 +32,9 @@ public partial class OrdersPage : ContentPage
         }
     }
 
-    // THÊM HÀM NÀY ĐỂ FIX LỖI XC0002 (Nút quay lại)
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
-        // Dùng PopAsync vì bạn đang dùng NavigationPage (code cũ)
+        // Dùng PopAsync vì đang dùng NavigationPage
         await Navigation.PopAsync();
     }
 }
