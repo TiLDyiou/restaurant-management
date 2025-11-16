@@ -1,5 +1,6 @@
 ﻿using Microsoft.Maui.Devices;
 using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Views;
 
 namespace RestaurantManagementGUI
 {

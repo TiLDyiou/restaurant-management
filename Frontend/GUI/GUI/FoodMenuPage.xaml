@@ -1,12 +1,65 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RestaurantManagementGUI.FoodMenuPage"
-             Title="FoodMenuPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:Class="RestaurantManagementGUI.Views.FoodMenuPage"
+             xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
+             Title="Thực Đơn Nhà Hàng">
+
+    <ScrollView Orientation="Horizontal" Padding="10">
+
+        <HorizontalStackLayout BindableLayout.ItemsSource="{Binding GroupedDishes}"
+                                 Spacing="10">
+
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="models:DishGroup">
+
+                    <VerticalStackLayout WidthRequest="250" Spacing="5">
+
+                        <Frame BackgroundColor="#004d40" CornerRadius="8" Padding="15, 8">
+                            <Label Text="{Binding Category}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" 
+                                   TextColor="White"
+                                   HorizontalOptions="Center" />
+                        </Frame>
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding .}"
+                                             Spacing="10">
+
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:Dish">
+
+                                    <Border StrokeShape="RoundRectangle 10" 
+                                            StrokeThickness="1"
+                                            Stroke="LightGray"
+                                            Padding="0">
+
+                                        <VerticalStackLayout Spacing="5">
+                                            <Image Source="{Binding HinhAnh}" 
+                                                   HeightRequest="120" 
+                                                   Aspect="AspectFit" 
+                                                   BackgroundColor="White" />
+
+                                            <Label Text="{Binding TenMA}" 
+                                                   FontAttributes="Bold" 
+                                                   FontSize="16"
+                                                   TextColor="#004d40"
+                                                   HorizontalOptions="Center"
+                                                   Margin="0,5,0,0"/>
+
+                                            <Label Text="{Binding FormattedPrice}" 
+                                                   FontSize="14" 
+                                                   TextColor="Gray"
+                                                   HorizontalOptions="Center" 
+                                                   Margin="0,0,0,10"/>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </HorizontalStackLayout>
+    </ScrollView>
 </ContentPage>

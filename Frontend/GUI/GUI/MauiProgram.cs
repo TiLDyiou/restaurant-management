@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI;
+using RestaurantManagementGUI.Views;
 
 namespace RestaurantManagementGUI;
 

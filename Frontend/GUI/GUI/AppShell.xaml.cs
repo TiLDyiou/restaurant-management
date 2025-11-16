@@ -1,4 +1,6 @@
-﻿namespace RestaurantManagementGUI
+﻿using RestaurantManagementGUI.Views;
+
+namespace RestaurantManagementGUI
 {
     public partial class AppShell : Shell
     {
