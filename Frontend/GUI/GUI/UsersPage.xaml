@@ -4,8 +4,7 @@
              xmlns:conv="clr-namespace:RestaurantManagementGUI.Converters"
              x:Class="RestaurantManagementGUI.UsersPage"
              BackgroundColor="#263238"
-             Shell.NavBarIsVisible="True"
-             Title="Quản lý nhân viên">
+             Shell.NavBarIsVisible="True">
 
     <ContentPage.Resources>
         <Color x:Key="PrimaryColor">#263238</Color>

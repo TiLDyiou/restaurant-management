@@ -18,7 +18,7 @@
 
         <Border Grid.Row="0" StrokeShape="RoundRectangle 10" BackgroundColor="White" Padding="15" Margin="10">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Thêm món ăn mới (Thay thế Swagger)" FontAttributes="Bold" FontSize="18"/>
+                <Label Text="Thêm món ăn mới" FontAttributes="Bold" FontSize="18"/>
 
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto, Auto" 
                       ColumnSpacing="10" RowSpacing="5">
