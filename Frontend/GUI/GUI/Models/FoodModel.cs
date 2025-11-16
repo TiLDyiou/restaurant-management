@@ -1,5 +1,6 @@
 ﻿// File: Models/FoodModel.cs
 using System.Text.Json.Serialization;
+using Microsoft.Maui.Graphics;
 
 namespace RestaurantManagementGUI.Models
 {
@@ -27,34 +28,20 @@ namespace RestaurantManagementGUI.Models
         // ===== Properties hỗ trợ UI =====
 
         /// <summary>
-        /// Xử lý ImageUrl để hiển thị đúng
+        /// Đường dẫn ảnh để hiển thị. Nếu API trả null hoặc rỗng, dùng placeholder.
         /// </summary>
-        public string DisplayImageUrl
-        {
-            get
-            {
-                // Nếu không có ảnh, trả về ảnh placeholder từ URL
-                if (string.IsNullOrWhiteSpace(ImageUrl))
-                    return "https://via.placeholder.com/300x200/EEEEEE/999999?text=No+Image";
-
-                // Nếu đã là URL đầy đủ
-                if (ImageUrl.StartsWith("http://") || ImageUrl.StartsWith("https://"))
-                    return ImageUrl;
-
-                // Nếu là đường dẫn tương đối, ghép với base URL
-                // TODO: Thay YOUR_API_BASE_URL bằng URL thực tế của bạn
-                // Ví dụ: return $"https://yourapi.com{ImageUrl}";
-                return $"https://YOUR_API_BASE_URL{ImageUrl}";
-            }
-        }
+        public string DisplayImageUrl =>
+            string.IsNullOrWhiteSpace(ImageUrl)
+                ? "https://via.placeholder.com/300x200/EEEEEE/999999?text=No+Image"
+                : ImageUrl;
 
         /// <summary>
-        /// Hiển thị giá đã format
+        /// Giá hiển thị đã format
         /// </summary>
         public string FormattedPrice => $"{Price:N0} ₫";
 
         /// <summary>
-        /// Badge hiển thị trạng thái
+        /// Badge hiển thị trạng thái món
         /// </summary>
         public string StatusBadge => TrangThai ? "Còn món" : "Hết món";
 
