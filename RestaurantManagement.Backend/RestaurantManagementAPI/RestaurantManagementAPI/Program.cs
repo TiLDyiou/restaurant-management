@@ -88,7 +88,7 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
-        
+        await DataSeeder.SeedAdminAsync(scope.ServiceProvider);
         await BanSeeder.SeedTableAsync(scope.ServiceProvider);
     }
 }
