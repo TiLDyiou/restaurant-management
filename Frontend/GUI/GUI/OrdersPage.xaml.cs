@@ -1,41 +1,29 @@
-﻿// File: OrdersPage.xaml.cs
-namespace RestaurantManagementGUI;
+﻿using Microsoft.Maui.Controls;
 
-public partial class OrdersPage : ContentPage
+namespace RestaurantManagementGUI
 {
-    private FoodMenuViewModel _viewModel;
-
-    // Hàm 1 (cho DashboardPage gọi)
-    public OrdersPage()
+    public partial class OrdersPage : ContentPage
     {
-        InitializeComponent();
-        _viewModel = new FoodMenuViewModel();
-        BindingContext = _viewModel;
-    }
+        private readonly FoodMenuViewModel _viewModel;
 
-    // Hàm 2 (cho TablesPage gọi)
-    public OrdersPage(string tenBan)
-    {
-        InitializeComponent();
-        _viewModel = new FoodMenuViewModel();
-        _viewModel.TenBan = $"Số bàn: {tenBan}";
-        BindingContext = _viewModel;
-    }
+        public OrdersPage() : this("Đơn tự do") { }
 
-    // Tải API mỗi khi trang được hiển thị
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        if (_viewModel != null)
+        public OrdersPage(string tenBan)
         {
+            InitializeComponent();
+            _viewModel = (FoodMenuViewModel)BindingContext;
+            _viewModel.TenBan = tenBan;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
             await _viewModel.InitializeAsync();
         }
-    }
 
-    // THÊM HÀM NÀY ĐỂ FIX LỖI XC0002 (Nút quay lại)
-    private async void OnBackButtonClicked(object sender, EventArgs e)
-    {
-        // Dùng PopAsync vì bạn đang dùng NavigationPage (code cũ)
-        await Navigation.PopAsync();
+        private async void OnBackButtonClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+        }
     }
 }

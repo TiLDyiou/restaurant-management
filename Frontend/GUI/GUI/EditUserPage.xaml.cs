@@ -37,23 +37,46 @@ namespace RestaurantManagementGUI
 
         private async void OnUpdateUserClicked(object sender, EventArgs e)
         {
-            var email = EmailEntry.Text?.Trim();
+            string email = EmailEntry.Text?.Trim();
+            string password = MatKhauEntry.Text?.Trim();
+            string confirmPassword = ConfirmPasswordEntry.Text?.Trim();
+
+            UpdateButton.IsEnabled = false;
+            UpdateButton.Text = "Đang cập nhật thông tin...";
 
             try
             {
+                // kiểm tra mật khẩu
+                if (!string.IsNullOrEmpty(password))
+                {
+                    if (string.IsNullOrEmpty(confirmPassword))
+                    {
+                        await DisplayAlert("Lỗi", "Vui lòng nhập xác nhận mật khẩu.", "OK");
+                        return;
+                    }
+
+                    if (password != confirmPassword)
+                    {
+                        await DisplayAlert("Lỗi", "Mật khẩu và xác nhận mật khẩu không khớp.", "OK");
+                        return;
+                    }
+                }
+
+                // Lấy token
                 var token = await SecureStorage.Default.GetAsync("auth_token");
                 if (!string.IsNullOrEmpty(token))
+                {
                     _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
 
-                // 🔹 UpdateUser (Admin) 
                 var updateUser = new UpdateUserRequestModel
                 {
                     HoTen = HoTenEntry.Text?.Trim(),
                     ChucVu = ChucVuEntry.Text?.Trim(),
                     SDT = SDTEntry.Text?.Trim(),
                     Email = email,
-                    MatKhau = MatKhauEntry.Text?.Trim(),
+                    MatKhau = password,  // OK
                     Quyen = QuyenPicker.SelectedItem?.ToString()?.Trim()
                 };
 
@@ -68,20 +91,22 @@ namespace RestaurantManagementGUI
 
                 var result = await response.Content.ReadFromJsonAsync<UpdateUserResponse>();
 
-                // 🔹 Nếu email chưa xác thực → prompt nhập OTP
+                // Nếu cần OTP
                 if (result != null && !result.IsVerified)
                 {
                     bool verified = false;
+
                     while (!verified)
                     {
                         string otp = await DisplayPromptAsync(
                             "Xác thực Email",
-                            $"Một mã OTP đã được gửi tới {email}.\nNhập OTP (hoặc gõ 'Resend' để gửi lại):",
+                            $"Một mã OTP đã được gửi tới {email}.\nNhập OTP (hoặc 'Resend' để gửi lại):",
                             "Xác nhận",
                             "Hủy",
                             placeholder: "Nhập OTP",
                             keyboard: Keyboard.Numeric,
-                            maxLength: 6);
+                            maxLength: 6
+                        );
 
                         if (string.IsNullOrWhiteSpace(otp))
                         {
@@ -89,30 +114,33 @@ namespace RestaurantManagementGUI
                             return;
                         }
 
-                        if (otp.Equals("Resend", StringComparison.OrdinalIgnoreCase))
+                        if (otp.Equals("resend", StringComparison.OrdinalIgnoreCase))
                         {
-                            // Gọi API resend-email-otp
-                            var resendResp = await _httpClient.PostAsJsonAsync(ApiConfig.ResendEmailOtp, new { Email = email });
-                            if (!resendResp.IsSuccessStatusCode)
+                            var resend = await _httpClient.PostAsJsonAsync(ApiConfig.ResendEmailOtp, new { Email = email });
+                            if (!resend.IsSuccessStatusCode)
                             {
-                                var msg = await resendResp.Content.ReadAsStringAsync();
+                                var msg = await resend.Content.ReadAsStringAsync();
                                 await DisplayAlert("Lỗi", $"Gửi lại OTP thất bại:\n{msg}", "OK");
-                                return;
                             }
-                            continue; // prompt lại
+                            else
+                            {
+                                await DisplayAlert("Thành công", "Đã gửi lại OTP tới email!", "OK");
+                            }
+                            continue;
                         }
 
-                        // Verify OTP
-                        var verifyResponse = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyEmailOtp, new { Email = email, OTP = otp });
-                        if (verifyResponse.IsSuccessStatusCode)
+                        var verify = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyEmailOtp,
+                            new { Email = email, OTP = otp });
+
+                        if (!verify.IsSuccessStatusCode)
                         {
-                            await DisplayAlert("Thành công", "Email đã được xác thực!", "OK");
-                            verified = true;
+                            var msg = await verify.Content.ReadAsStringAsync();
+                            await DisplayAlert("Lỗi", $"OTP không hợp lệ:\n{msg}", "OK");
                         }
                         else
                         {
-                            var err = await verifyResponse.Content.ReadAsStringAsync();
-                            await DisplayAlert("Lỗi", $"OTP không hợp lệ: {err}", "OK");
+                            await DisplayAlert("Thành công", "Email đã được xác thực!", "OK");
+                            verified = true;
                         }
                     }
                 }
@@ -123,6 +151,11 @@ namespace RestaurantManagementGUI
             catch (Exception ex)
             {
                 await DisplayAlert("Lỗi", $"Không thể kết nối đến máy chủ:\n{ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateButton.IsEnabled = true;
+                UpdateButton.Text = "Cập nhật nhân viên";
             }
         }
     }

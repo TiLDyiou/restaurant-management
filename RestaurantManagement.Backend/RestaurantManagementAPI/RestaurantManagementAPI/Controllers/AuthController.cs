@@ -97,7 +97,8 @@ namespace RestaurentManagementAPI.Controllers
 
             if (user == null)
                 return Unauthorized("Sai tài khoản hoặc mật khẩu.");
-
+            if (!user.IsVerified)
+                return Unauthorized("Tài khoản chưa xác thực email.");
             if (!user.IsActive)
                 return Unauthorized("Tài khoản của bạn đã bị vô hiệu hóa.");
 
@@ -114,7 +115,7 @@ namespace RestaurentManagementAPI.Controllers
             }
 
             if (!matched) return Unauthorized("Sai tài khoản hoặc mật khẩu.");
-            if (!user.IsVerified) return Unauthorized("Tài khoản chưa xác thực email.");
+            
 
             var token = GenerateJwtToken(user);
 
@@ -274,62 +275,6 @@ namespace RestaurentManagementAPI.Controllers
             });
         }
 
-        /*[Authorize]
-        [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
-        {
-            var username = User.Identity?.Name;
-            if (username == null) return Unauthorized();
-
-            var user = await _context.TAIKHOAN.Include(t => t.NhanVien)
-                .FirstOrDefaultAsync(t => t.TenDangNhap == username);
-
-            if (user == null) return NotFound();
-
-            if (!string.IsNullOrWhiteSpace(dto.SDT))
-                user.NhanVien.SDT = dto.SDT;
-
-            if (!string.IsNullOrWhiteSpace(dto.NewPassword))
-            {
-                if (string.IsNullOrWhiteSpace(dto.CurrentPassword))
-                    return BadRequest("Cần cung cấp mật khẩu hiện tại để đổi mật khẩu.");
-
-                if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.MatKhau))
-                    return BadRequest("Mật khẩu hiện tại không đúng.");
-
-                user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            }
-
-            if (!string.IsNullOrWhiteSpace(dto.Email))
-            {
-                user.Email = dto.Email;
-                user.IsVerified = false;
-                var otp = new Random().Next(100000, 999999).ToString();
-                user.OTP = otp;
-                user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
-                try
-                {
-                    await _emailService.SendEmailAsync(dto.Email, "OTP Xác Thực Email", $"Mã OTP của bạn là: {otp}");
-                }
-                catch
-                {
-                    return BadRequest("Gửi email OTP thất bại.");
-                }
-            }
-
-            _context.TAIKHOAN.Update(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = "Cập nhật thông tin thành công",
-                username = user.TenDangNhap,
-                sdt = user.NhanVien.SDT,
-                email = user.Email,
-                isVerified = user.IsVerified
-            });
-        }*/
-
         #endregion
 
         #region ===================== Admin APIs =====================
@@ -357,47 +302,6 @@ namespace RestaurentManagementAPI.Controllers
 
             return Ok(users);
         }
-
-        /*[Authorize(Roles = "Admin")]
-        [HttpPut("admin-update/{maNV}")]
-        public async Task<IActionResult> AdminUpdateUser(string maNV, [FromBody] AdminUpdateUserDto dto)
-        {
-            var employee = await _context.NHANVIEN
-                .Include(e => e.TaiKhoan)
-                .FirstOrDefaultAsync(e => e.MaNV == maNV);
-
-            if (employee == null) return NotFound("Nhân viên không tồn tại.");
-
-            if (!string.IsNullOrWhiteSpace(dto.HoTen)) employee.HoTen = dto.HoTen;
-            if (!string.IsNullOrWhiteSpace(dto.ChucVu)) employee.ChucVu = dto.ChucVu;
-            if (!string.IsNullOrWhiteSpace(dto.SDT)) employee.SDT = dto.SDT;
-            if (!string.IsNullOrWhiteSpace(dto.TrangThai))
-            {
-                employee.TrangThai = dto.TrangThai;
-                if (employee.TaiKhoan != null)
-                    employee.TaiKhoan.IsActive = dto.TrangThai == "Đang làm";
-            }
-
-            if (employee.TaiKhoan != null)
-            {
-                if (!string.IsNullOrWhiteSpace(dto.Quyen)) employee.TaiKhoan.Quyen = dto.Quyen;
-                if (!string.IsNullOrWhiteSpace(dto.MatKhau)) employee.TaiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
-                if (!string.IsNullOrWhiteSpace(dto.Email)) employee.TaiKhoan.Email = dto.Email;
-            }
-
-            _context.NHANVIEN.Update(employee);
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                maNV = employee.MaNV,
-                hoTen = employee.HoTen,
-                chucVu = employee.ChucVu,
-                sdt = employee.SDT,
-                trangThai = employee.TrangThai,
-                quyen = employee.TaiKhoan?.Quyen
-            });
-        }*/
 
         [Authorize]
         [HttpPost("resend-email-otp")]

@@ -1,144 +1,165 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel; // vẫn dùng ObservableObject cho INotifyPropertyChanged tiện lợi
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Microsoft.Maui.Controls;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Microsoft.Maui.ApplicationModel; // cho MainThread (nếu bạn dùng MAUI)
 
 namespace RestaurantManagementGUI.ViewModels
 {
+    // partial vẫn được, nhưng giờ chúng ta khai báo property/command rõ ràng
     public partial class TablesViewModel : ObservableObject
     {
         private readonly ApiService _apiService;
-        [ObservableProperty]
-        private ObservableCollection<Ban> _tables;
+        private readonly TableHubService _tableHubService;
 
-        // Thuộc tính này rất quan trọng, giữ nguyên
-        public Page CurrentPage { get; set; }
+        // Danh sách gốc, luôn chứa TẤT CẢ các bàn
+        private ObservableCollection<Ban> _allTables;
 
-        public TablesViewModel()
+        // Explicit public property (thay vì [ObservableProperty])
+        private ObservableCollection<Ban> _filteredTables;
+        public ObservableCollection<Ban> FilteredTables
         {
-            _apiService = new ApiService();
-            Tables = new ObservableCollection<Ban>();
+            get => _filteredTables;
+            private set
+            {
+                if (_filteredTables != value)
+                {
+                    _filteredTables = value;
+                    OnPropertyChanged(nameof(FilteredTables));
+                }
+            }
         }
 
-        [RelayCommand]
+        // ICommand cho lọc (thay vì [RelayCommand])
+        public ICommand FilterTablesCommand { get; private set; }
+        public ICommand SelectTableCommand { get; private set; }
+
+        public Page CurrentPage { get; set; }
+        public event EventHandler<Ban> TableSelected;
+
+        public TablesViewModel(ApiService apiService, TableHubService tableHubService)
+        {
+            _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+            _tableHubService = tableHubService ?? throw new ArgumentNullException(nameof(tableHubService));
+
+            _allTables = new ObservableCollection<Ban>();
+            FilteredTables = new ObservableCollection<Ban>();
+
+            // Khởi tạo command thủ công
+            FilterTablesCommand = new RelayCommand(param => FilterTables(param as string));
+            SelectTableCommand = new RelayCommand(param => SelectTable(param as Ban));
+
+            // Đăng ký SignalR (hoặc event) nhận cập nhật
+            _tableHubService.OnTableStatusChanged += HandleTableStatusUpdate;
+        }
+
+        // Load dữ liệu (async)
         public async Task LoadTablesAsync()
         {
-            // Không cần try-catch ở đây,
-            // TablesPage.xaml.cs (OnAppearing) đã xử lý
+            if (!_tableHubService.IsConnected)
+            {
+                await _tableHubService.InitAsync();
+            }
+
             var tableList = await _apiService.GetTablesAsync();
 
-            Tables.Clear();
-            foreach (var table in tableList)
+            // Đảm bảo chạy trên UI thread (MAUI)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                Tables.Add(table);
-            }
+                _allTables.Clear();
+                FilteredTables.Clear();
+                foreach (var table in tableList)
+                {
+                    _allTables.Add(table);
+                    FilteredTables.Add(table);
+                }
+            });
         }
 
-        // --- HÀM SELECTTABLE ĐÃ ĐƯỢC CẬP NHẬT HOÀN TOÀN ---
-        [RelayCommand]
-        private async Task SelectTable(Ban selectedTable)
+        private void HandleTableStatusUpdate(TableStatusUpdateDto update)
         {
-            // Thêm kiểm tra an toàn cho Application.Current.MainPage
-            if (selectedTable == null || Application.Current.MainPage == null) return;
+            Debug.WriteLine($"[SignalR] Nhận cập nhật: Bàn {update.MaBan} -> {update.TrangThai}");
 
-            try
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                // LUỒNG 1: Nếu bàn "Trống" (Theo JSON API của bạn)
-                if (selectedTable.TrangThai == "Bàn trống")
+                var tableInMasterList = _allTables.FirstOrDefault(t => t.MaBan == update.MaBan);
+                if (tableInMasterList != null)
                 {
-                    // SỬA LỖI: Truyền MaBan và dùng Application.Current.MainPage
-                    await Application.Current.MainPage.Navigation.PushAsync(new OrdersPage());
-                    return;
+                    tableInMasterList.TrangThai = update.TrangThai;
                 }
 
-                // ---
-                // LUỒNG 2: Nếu bàn KHÔNG trống
-                // ---
-                string action = await Application.Current.MainPage.DisplayActionSheet(
-                    $"Bàn: {selectedTable.TenBan} (Hiện tại: {selectedTable.TrangThai})",
-                    "Hủy",
-                    null,
-                    // Các lựa chọn mới theo yêu cầu
-                    "Thanh toán",
-                    "Xem / Thêm món",
-                    "Đổi trạng thái bàn"
-                );
-
-                switch (action)
+                var tableInFilteredList = FilteredTables.FirstOrDefault(t => t.MaBan == update.MaBan);
+                if (tableInFilteredList != null)
                 {
-                    case "Thanh toán":
-                        // Giả định: Điều hướng đến BillGenerationPage
-                        await Application.Current.MainPage.Navigation.PushAsync(new BillGenerationPage());
-                        break;
-
-                    case "Xem / Thêm món":
-                        // Điều hướng đến OrdersPage
-                        await Application.Current.MainPage.Navigation.PushAsync(new OrdersPage());
-                        break;
-
-                    case "Đổi trạng thái bàn":
-                        // Gọi hàm riêng để xử lý việc đổi trạng thái
-                        await ShowChangeStatusOptions(selectedTable);
-                        break;
-
-                    case "Hủy":
-                    default:
-                        return; // Không làm gì cả
+                    tableInFilteredList.TrangThai = update.TrangThai;
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Lỗi SelectTable: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Đã xảy ra lỗi, vui lòng thử lại.", "OK");
-            }
+            });
         }
 
-        /// <summary>
-        /// Hàm trợ giúp (helper) để hiển thị menu đổi trạng thái
-        /// </summary>
-        private async Task ShowChangeStatusOptions(Ban selectedTable)
+        // Hàm lọc (giữ private, command gọi vào)
+        private void FilterTables(string filterType)
         {
-            var possibleStatuses = new[] { "Bàn bận", "Bàn trống", "Bàn đã đặt" };
-            var otherStatuses = possibleStatuses
-                .Where(s => s != selectedTable.TrangThai)
-                .ToArray();
+            if (_allTables == null) return;
 
-            // SỬA LỖI: Dùng Application.Current.MainPage
-            string statusAction = await Application.Current.MainPage.DisplayActionSheet(
-                $"Chọn trạng thái mới cho {selectedTable.TenBan}",
-                "Hủy",
-                null,
-                otherStatuses
-            );
+            ObservableCollection<Ban> filteredList;
 
-            if (statusAction == null || statusAction == "Hủy")
-                return;
-
-            string newStatus = statusAction;
-
-            try
+            switch (filterType)
             {
-                bool success = await _apiService.UpdateTableStatusAsync(selectedTable.MaBan, newStatus);
+                case "Bàn trống":
+                    filteredList = new ObservableCollection<Ban>(_allTables.Where(t => t.TrangThai == "Bàn trống"));
+                    break;
+                case "Bàn bận":
+                    filteredList = new ObservableCollection<Ban>(_allTables.Where(t => t.TrangThai == "Bàn bận"));
+                    break;
+                case "Bàn đã đặt":
+                    filteredList = new ObservableCollection<Ban>(_allTables.Where(t => t.TrangThai == "Bàn đã đặt"));
+                    break;
+                case "Tất cả bàn":
+                default:
+                    filteredList = new ObservableCollection<Ban>(_allTables);
+                    break;
+            }
 
-                if (success)
-                {
-                    await LoadTablesAsync(); // Tải lại để cập nhật màu
-                }
-                else
-                {
-                    // SỬA LỖI: Dùng Application.Current.MainPage
-                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể cập nhật trạng thái bàn.", "OK");
-                }
-            }
-            catch (Exception ex)
+            // Cập nhật danh sách hiển thị
+            FilteredTables = filteredList;
+        }
+
+        public void SelectTable(Ban selectedTable)
+        {
+            if (selectedTable == null) return;
+            TableSelected?.Invoke(this, selectedTable);
+        }
+
+        public void Cleanup()
+        {
+            _tableHubService.OnTableStatusChanged -= HandleTableStatusUpdate;
+            Debug.WriteLine("TablesViewModel đã dọn dẹp.");
+        }
+
+        // Simple RelayCommand implementation (không phụ thuộc toolkit source-gen)
+        private class RelayCommand : ICommand
+        {
+            private readonly Action<object?> _execute;
+            private readonly Func<object?, bool>? _canExecute;
+
+            public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
             {
-                Debug.WriteLine($"Lỗi cập nhật trạng thái: {ex.Message}");
-                // SỬA LỖI: Dùng Application.Current.MainPage
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Có lỗi xảy ra khi cập nhật.", "OK");
+                _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+                _canExecute = canExecute;
             }
+
+            public bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;
+
+            public void Execute(object? parameter) => _execute(parameter);
+
+            public event EventHandler? CanExecuteChanged;
+
+            public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

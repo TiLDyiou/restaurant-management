@@ -58,15 +58,15 @@ namespace RestaurantManagementGUI.Helpers
         public static string SubmitOrder => $"{BaseUrl}Orders/submit";
 
         // DELETE /api/softdelete_dish/{maMA}
-        public static string SoftDeleteDish(string maMA) => $"{BaseUrl}softdelete_dish/{maMA}"; // <-- SỬA Ở ĐÂY
+        public static string SoftDeleteDish(string maMA) => $"{BaseUrl}softdelete_dish/{maMA}";
 
         // PUT /api/update_dish/{maMA}
-        public static string UpdateDish(string maMA) => $"{BaseUrl}update_dish/{maMA}"; // <-- SỬA Ở ĐÂY
+        public static string UpdateDish(string maMA) => $"{BaseUrl}update_dish/{maMA}";
 
         // GET /api/dishes
         public static string GetFoodMenu => $"{BaseUrl}dishes/get-dishes";
 
         // POST /api/add_dish
-        public static string AddDish => $"{BaseUrl}add_dish"; // <-- SỬA Ở ĐÂY
+        public static string AddDish => $"{BaseUrl}add_dish";
     }
 }

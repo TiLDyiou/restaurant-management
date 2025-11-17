@@ -54,31 +54,15 @@ namespace RestaurantManagementGUI
                     var json = await response.Content.ReadAsStringAsync();
                     _user = JsonSerializer.Deserialize<UserModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new UserModel();
 
-                    using var doc = JsonDocument.Parse(json);
-                    var root = doc.RootElement;
-
-                    _user.TenDangNhap ??= root.GetProperty("username").GetString();
-                    _user.Quyen ??= root.GetProperty("role").GetString();
-                    _user.MaNV ??= root.GetProperty("maNV").GetString();
-                    _user.ChucVu ??= root.GetProperty("chucVu").GetString();
-                    _user.SDT ??= root.TryGetProperty("sdt", out var sdtProp) ? sdtProp.GetString() : "";
+                    MaNVLabel.Text = _user.MaNV;
+                    HoTenLabel.Text = _user.HoTen;
+                    ChucVuLabel.Text = _user.ChucVu;
+                    QuyenLabel.Text = _user.Quyen;
+                    TenDangNhapLabel.Text = _user.TenDangNhap;
+                    TrangThaiLabel.Text = _user.TrangThai;
+                    SDTLabel.Text = _user.SDT;
+                    EmailLabel.Text = _user.Email;
                 }
-                else
-                {
-                    _user.TenDangNhap = await SecureStorage.Default.GetAsync("user_username");
-                    _user.MaNV = await SecureStorage.Default.GetAsync("user_manv");
-                    _user.Quyen = await SecureStorage.Default.GetAsync("user_role");
-                    _user.ChucVu = await SecureStorage.Default.GetAsync("user_chucvu");
-                    _user.HoTen = _user.TenDangNhap;
-                }
-
-                MaNVLabel.Text = _user.MaNV;
-                HoTenLabel.Text = _user.HoTen;
-                ChucVuLabel.Text = _user.ChucVu;
-                QuyenLabel.Text = _user.Quyen;
-                TenDangNhapLabel.Text = _user.TenDangNhap;
-                TrangThaiLabel.Text = _user.TrangThai;
-                SDTLabel.Text = _user.SDT;
             }
             catch (Exception ex)
             {

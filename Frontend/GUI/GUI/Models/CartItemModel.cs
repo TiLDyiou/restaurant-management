@@ -1,18 +1,30 @@
 ﻿// File: Models/CartItemModel.cs
-using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using Microsoft.Maui.Graphics;
 
 namespace RestaurantManagementGUI.Models
 {
-    public partial class CartItemModel : ObservableObject
+    public class CartItemModel : BindableObject
     {
-        public FoodModel FoodItem { get; set; } = new FoodModel();
+        private int _quantity = 1;
+        private string? _note;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalPrice))]
-        int _quantity;
+        public FoodModel FoodItem { get; set; } = new();
 
-        // SỬA LỖI MODEL: Dùng 'decimal'
+        public int Quantity
+        {
+            get => _quantity;
+            set { _quantity = value; OnPropertyChanged(); OnPropertyChanged(nameof(TotalPrice)); }
+        }
+
+        public string? Note
+        {
+            get => _note;
+            set { _note = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasNote)); }
+        }
+
+        public bool HasNote => !string.IsNullOrWhiteSpace(Note);
+
         public decimal TotalPrice => FoodItem.Price * Quantity;
-        public string DisplayName => $"{Quantity} x {FoodItem.Name}";
     }
 }

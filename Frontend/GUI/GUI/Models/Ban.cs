@@ -1,19 +1,39 @@
-﻿using System.Text.Json.Serialization; // <-- 1. BẮT BUỘC PHẢI CÓ DÒNG NÀY
+﻿
+
+using CommunityToolkit.Mvvm.ComponentModel; 
+using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
-    public class Ban
+   
+    public class Ban : ObservableObject
     {
-        // 2. Ánh xạ "maBan" (JSON) tới "MaBan" (C#)
+        
+        private string _maBan = string.Empty;
         [JsonPropertyName("maBan")]
-        public string MaBan { get; set; } = string.Empty;
+        public string MaBan
+        {
+            get => _maBan;
+            set => SetProperty(ref _maBan, value); 
+        }
 
-        // 3. Ánh xạ "tenBan" (JSON) tới "TenBan" (C#)
+     
+        private string? _tenBan;
         [JsonPropertyName("tenBan")]
-        public string? TenBan { get; set; }
+        public string? TenBan
+        {
+            get => _tenBan;
+            set => SetProperty(ref _tenBan, value); 
+        }
 
-        // 4. Ánh xạ "trangThai" (JSON) tới "TrangThai" (C#)
+   
+        private string? _trangThai;
         [JsonPropertyName("trangThai")]
-        public string? TrangThai { get; set; }
+        public string? TrangThai
+        {
+            get => _trangThai;
+            
+            set => SetProperty(ref _trangThai, value);
+        }
     }
 }

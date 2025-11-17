@@ -1,5 +1,11 @@
 ﻿using Microsoft.Maui.Devices;
 using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Views;
+using RestaurantManagementGUI.Services;
+using RestaurantManagementGUI.ViewModels;
+using Microsoft.Maui; 
+using Microsoft.Extensions.DependencyInjection; 
+
 
 namespace RestaurantManagementGUI
 {
@@ -57,7 +63,38 @@ namespace RestaurantManagementGUI
         private async void OnFoodCategoriesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new QuanLyMonAnPage());
         private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
         private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrdersPage());
-        private async void OnTablesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TablesPage());
+        private async void OnTablesClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                // Lấy DI container chính xác trong MAUI
+                var services = App.Current?.Handler?.MauiContext?.Services;
+
+                TablesPage page = null;
+
+                if (services != null)
+                {
+                    page = services.GetService<TablesPage>();
+                }
+
+                if (page == null)
+                {
+                    // fallback nếu DI không đăng ký
+                    var apiService = new ApiService();
+                    var tableHubService = new TableHubService();
+                    var vm = new TablesViewModel(apiService, tableHubService);
+                    page = new TablesPage(vm, apiService);
+                }
+
+                await Navigation.PushAsync(page);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Lỗi", $"Không thể mở trang bàn: {ex.Message}", "OK");
+            }
+        }
+
+
         private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BillGenerationPage());
         private async void OnOrderModificationsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrderModificationsPage());
 
