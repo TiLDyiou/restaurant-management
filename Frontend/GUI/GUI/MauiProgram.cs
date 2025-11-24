@@ -18,17 +18,19 @@ public static class MauiProgram
             IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(nativeWindow);
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(windowHandle);
             var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-
             if (appWindow.TitleBar != null)
             {
                 appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
                 appWindow.TitleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
                 appWindow.TitleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
             }
+
 #endif
         });
 
         var builder = MauiApp.CreateBuilder();
+        builder.Services.AddSingleton<RestaurantManagementGUI.ViewModels.ChefOrdersViewModel>();
+        builder.Services.AddSingleton<RestaurantManagementGUI.ChefOrdersPage>();
 
         builder
             .UseMauiApp<App>()

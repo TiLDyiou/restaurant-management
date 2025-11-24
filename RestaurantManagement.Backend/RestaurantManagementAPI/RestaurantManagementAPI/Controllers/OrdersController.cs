@@ -148,37 +148,29 @@ namespace RestaurentManagementAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Sử dụng Transaction để đảm bảo tính toàn vẹn dữ liệu
-            // Hoặc tạo HoaDon và ChiTietHoaDon thành công, hoặc rollback tất cả.
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 decimal tongTien = 0;
                 var chiTietEntities = new List<ChiTietHoaDon>();
                 var newMaHD = await GenerateNewHoaDonIdAsync();
-                HoaDonDto hoaDonDtoToReturn;
-                // 1. Xử lý các chi tiết hoá đơn
+
+                // 1. Xử lý chi tiết hóa đơn
                 foreach (var itemDto in createDto.ChiTietHoaDons)
                 {
                     var monAn = await _context.MONAN.FindAsync(itemDto.MaMA);
-
-                    // Kiểm tra món ăn có tồn tại và còn bán không
-                    if (monAn == null || !monAn.TrangThai)
+                    if (monAn == null)
                     {
-                        await transaction.RollbackAsync();
-                        return BadRequest($"Món ăn với mã {itemDto.MaMA} không tồn tại hoặc đã ngừng bán.");
+                        await transaction.RollbackAsync(); // Quan trọng: Rollback nếu lỗi
+                        return BadRequest($"Món ăn {itemDto.MaMA} không tồn tại.");
                     }
-
-                    // Tính thành tiền (Dựa trên DonGia từ DB, không tin tưởng client)
-                    // ThanhTien trong DB của bạn là cột tự tính, nhưng ta cần DonGia
 
                     var chiTiet = new ChiTietHoaDon
                     {
-                        MaHD = newMaHD, // Gán mã HD mới
+                        MaHD = newMaHD,
                         MaMA = itemDto.MaMA,
                         SoLuong = itemDto.SoLuong,
-                        DonGia = monAn.DonGia, // Lấy đơn giá từ DB
-                        // ThanhTien sẽ được DB tự tính (như trong OnModelCreating)
+                        DonGia = monAn.DonGia,
                         TrangThai = "Chờ làm"
                     };
 
@@ -186,71 +178,67 @@ namespace RestaurentManagementAPI.Controllers
                     tongTien += itemDto.SoLuong * monAn.DonGia;
                 }
 
-                // 2. Tạo đối tượng Hoá Đơn
+                // 2. Tạo Hóa Đơn
                 var hoaDon = new HoaDon
                 {
                     MaHD = newMaHD,
                     MaBan = createDto.MaBan,
                     MaNV = createDto.MaNV,
-                    NgayLap = DateTime.UtcNow, // Giờ server (UTC)
+                    NgayLap = DateTime.Now, // Dùng giờ hiện tại của Server
                     TongTien = tongTien,
-                    TrangThai = "Chờ xử lý" // Trạng thái ban đầu
+                    TrangThai = "Chờ xử lý"
                 };
 
-                // 3. Lưu vào Database
                 await _context.HOADON.AddAsync(hoaDon);
                 await _context.CHITIETHOADON.AddRangeAsync(chiTietEntities);
 
-                // 4. Cập nhật trạng thái Bàn
+                // 3. Cập nhật trạng thái Bàn
                 var ban = await _context.BAN.FindAsync(createDto.MaBan);
                 if (ban != null)
                 {
-                    ban.TrangThai = "Đang có khách";
+                    ban.TrangThai = "Có người";
                 }
 
-                // 5. Lưu tất cả thay đổi
+                // 4. Lưu vào DB
                 await _context.SaveChangesAsync();
-
-                // 6. Commit transaction
                 await transaction.CommitAsync();
-                hoaDonDtoToReturn = new HoaDonDto
+
+                // =========================================================
+                // 5. GỬI SIGNALR NGAY TẠI ĐÂY (Đảm bảo chạy 100%)
+                // =========================================================
+
+                // Tạo dữ liệu để gửi sang Bếp (Map từ Entity sang DTO)
+                var orderForKitchen = new HoaDonDto
                 {
                     MaHD = hoaDon.MaHD,
                     MaBan = hoaDon.MaBan,
-                    MaNV = hoaDon.MaNV,
                     NgayLap = hoaDon.NgayLap,
-                    TongTien = hoaDon.TongTien,
-                    TrangThai = hoaDon.TrangThai, // Trạng thái tổng
+                    TrangThai = hoaDon.TrangThai,
                     ChiTietHoaDons = chiTietEntities.Select(ct => new ChiTietHoaDonViewDto
                     {
                         MaMA = ct.MaMA,
-                        TenMA = _context.MONAN.Find(ct.MaMA)?.TenMA ?? "N/A",
+                        TenMA = _context.MONAN.FirstOrDefault(m => m.MaMA == ct.MaMA)?.TenMA ?? "Món lạ",
                         SoLuong = ct.SoLuong,
-                        DonGia = ct.DonGia,
-                        // ThanhTien sẽ là 0 vì chưa có trong DB,
-                        // Cần tính thủ công nếu muốn hiển thị ngay
-                        ThanhTien = ct.SoLuong * ct.DonGia,
-
-                        // GỬI TRẠNG THÁI MÓN ĂN:
                         TrangThai = ct.TrangThai
                     }).ToList()
                 };
 
-                // Gửi qua SignalR
-                await _kitchenHubContext.Clients.Group("Kitchen")
-                    .SendAsync("ReceiveOrder", hoaDonDtoToReturn);
+                // GỬI CHO TẤT CẢ (Clients.All) ĐỂ CHẮC CHẮN BẾP NHẬN ĐƯỢC
+                await _kitchenHubContext.Clients.All.SendAsync("ReceiveOrder", orderForKitchen);
 
-                // Lấy lại dữ liệu vừa tạo để trả về (nếu cần)
-                // (Bỏ qua bước này để đơn giản, trả về CreatedAtAction)
+                // =========================================================
 
-                return CreatedAtAction(nameof(GetOrderById), new { id = hoaDon.MaHD }, hoaDonDtoToReturn);
+                return Ok(orderForKitchen);
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, $"Lỗi nội bộ server: {ex.Message}");
+                // Ghi log ra cửa sổ Output để bạn thấy lỗi nếu có
+                System.Diagnostics.Debug.WriteLine("LỖI CREATE ORDER: " + ex.ToString());
+                return StatusCode(500, "Lỗi Server: " + ex.Message);
             }
         }
+
 
         // Hàm hỗ trợ cho CreatedAtAction (Bạn có thể tạo API Get theo ID đầy đủ sau)
         [HttpGet("api/orders/get-{id}-order-info")]

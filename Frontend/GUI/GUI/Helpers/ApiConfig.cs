@@ -55,7 +55,7 @@ namespace RestaurantManagementGUI.Helpers
         public static string ResendEmailOtp => $"{BaseUrl}Auth/resend-email-otp";
 
         // POST /api/Orders/submit
-        public static string SubmitOrder => $"{BaseUrl}Orders/submit";
+        public static string SubmitOrder => $"{BaseUrl}orders/api/create-and-send-orders";
 
         // DELETE /api/softdelete_dish/{maMA}
         public static string SoftDeleteDish(string maMA) => $"{BaseUrl}softdelete_dish/{maMA}";

@@ -37,7 +37,7 @@ namespace RestaurantManagementGUI
         }
 
         private async void OnOrdersClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new OrdersPage());
+            => await Navigation.PushAsync(new ChefOrdersPage());
 
         private async void OnUsersClicked(object sender, EventArgs e)
             => await Navigation.PushAsync(new ChefAndUserProfilePage());

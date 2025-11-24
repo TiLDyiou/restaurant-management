@@ -186,25 +186,63 @@ namespace RestaurantManagementGUI
             OnPropertyChanged(nameof(CartItems));
         }
 
+        public string RealTableId { get; set; } = "B01";
         private async void Checkout()
         {
-            if (CartItems.Count == 0)
+            // 1. Kiểm tra giỏ hàng
+            if (CartItems == null || CartItems.Count == 0)
             {
-                await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống", "OK");
+                await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống, vui lòng chọn món!", "OK");
                 return;
             }
 
-            // TODO: Gọi API SubmitOrder
-            bool confirmed = await Application.Current.MainPage.DisplayAlert("Xác nhận", $"Bạn có muốn gửi {CartItems.Count} món không?", "OK", "Hủy");
-            if (confirmed)
-            {
-                // Gửi đơn lên API (tạm thời log ra console)
-                Console.WriteLine("Đơn hàng đã gửi:");
-                foreach (var c in CartItems)
-                    Console.WriteLine($"{c.FoodItem.Name} x{c.Quantity} ({c.Note})");
+            // 2. Xác nhận gửi đơn
+            bool confirmed = await Application.Current.MainPage.DisplayAlert("Xác nhận", $"Bạn có muốn gửi {CartItems.Count} món xuống bếp không?", "Gửi ngay", "Hủy");
+            if (!confirmed) return;
 
-                await Application.Current.MainPage.DisplayAlert("Thành công", "Đơn hàng đã gửi", "OK");
-                CancelOrder(); // Xóa giỏ sau khi gửi
+            // 3. Chuẩn bị dữ liệu gửi đi (DTO)
+            // Lưu ý: FoodItem.Id chính là MaMA trong database
+            var orderDto = new CreateHoaDonDto
+            {
+                // SỬA DÒNG NÀY: Không dùng "B01" nữa, mà dùng biến RealTableId
+                MaBan = RealTableId,
+
+                MaNV = "NV001",
+                ChiTietHoaDons = CartItems.Select(c => new ChiTietHoaDonDto
+                {
+                    MaMA = c.FoodItem.Id,
+                    SoLuong = c.Quantity
+                }).ToList()
+            };
+
+            // 4. CẤU HÌNH HTTP CLIENT (BẮT BUỘC PHẢI CÓ ĐOẠN NÀY ĐỂ CHẠY LOCALHOST)
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+            using var client = new HttpClient(handler);
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+
+            try
+            {
+                // 5. Gọi API
+                var response = await client.PostAsJsonAsync(ApiConfig.SubmitOrder, orderDto);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Thành công", "Đơn hàng đã được gửi xuống bếp! 👨‍🍳", "OK");
+
+                    // 6. Xóa giỏ hàng sau khi gửi thành công
+                    CancelOrder();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Lỗi Server", $"Không gửi được đơn.\nChi tiết: {error}", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Lỗi Kết Nối", $"Không gọi được API.\n{ex.Message}", "OK");
             }
         }
 
