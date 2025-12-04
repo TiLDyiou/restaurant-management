@@ -45,7 +45,7 @@
         <CollectionView Grid.Row="1" ItemsSource="{Binding ActiveOrders}" Margin="10">
             <CollectionView.EmptyView>
                 <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                    <Label Text="Hiện chưa có đơn nào..." TextColor="Gray" FontSize="18"/>
+                    <Label Text="Hiện tại không có đơn nào!" TextColor="Gray" FontSize="18"/>
                 </StackLayout>
             </CollectionView.EmptyView>
 
@@ -60,10 +60,8 @@
 
                             <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,10">
                                 <Border BackgroundColor="#D32F2F" StrokeShape="RoundRectangle 8" Padding="15,5">
-
                                     <Label Text="{Binding MaBan, Converter={StaticResource TableIdConverter}}" 
                                            TextColor="White" FontAttributes="Bold" FontSize="20"/>
-
                                 </Border>
                                 <Label Grid.Column="1" Text="{Binding NgayLap, StringFormat='{0:HH:mm}'}" 
                                        TextColor="Gray" FontSize="16" HorizontalOptions="End" VerticalOptions="Center"/>
@@ -77,14 +75,31 @@
                                                 <Label Text="{Binding SoLuong}" TextColor="#D32F2F" FontAttributes="Bold" FontSize="20" VerticalOptions="Center"/>
 
                                                 <StackLayout Grid.Column="1" VerticalOptions="Center">
-                                                    <Label Text="{Binding TenMA}" TextColor="#263238" FontAttributes="Bold" FontSize="18"/>
+
+                                                    <Label Text="{Binding TenMA}" TextColor="#263238" FontAttributes="Bold" FontSize="18">
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding IsDone}" Value="True">
+                                                                <Setter Property="TextDecorations" Value="Strikethrough" />
+                                                                <Setter Property="TextColor" Value="Gray" />
+                                                                <Setter Property="Opacity" Value="0.6" />
+                                                            </DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
+
                                                     <Label Text="{Binding TrangThai}" TextColor="Gray" FontSize="12" FontAttributes="Italic"/>
                                                 </StackLayout>
 
                                                 <Button Grid.Column="2" Text="✔" Padding="0" HeightRequest="40" WidthRequest="40" CornerRadius="20"
-                                                        BackgroundColor="#2E7D32" 
+                                                        BackgroundColor="{Binding IsDone, Converter={converters:StatusColorConverter}, FallbackValue=#2E7D32}" 
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChefOrdersViewModel}}, Path=CompleteDishCommand}"
-                                                        CommandParameter="{Binding .}"/>
+                                                        CommandParameter="{Binding .}">
+                                                    <Button.Triggers>
+                                                        <DataTrigger TargetType="Button" Binding="{Binding IsDone}" Value="True">
+                                                            <Setter Property="BackgroundColor" Value="Gray"/>
+                                                            <Setter Property="IsEnabled" Value="False"/>
+                                                        </DataTrigger>
+                                                    </Button.Triggers>
+                                                </Button>
                                             </Grid>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>

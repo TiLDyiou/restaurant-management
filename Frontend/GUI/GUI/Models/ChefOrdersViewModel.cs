@@ -67,7 +67,7 @@ namespace RestaurantManagementGUI.ViewModels
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         // Tải lại danh sách trước
-                        LoadInitialOrders();
+                        await LoadInitialOrders();
                         NewOrderCount++;
 
                         // Hiện thông báo có 2 nút: "Xem ngay" (true) và "Đóng" (false)
@@ -79,6 +79,7 @@ namespace RestaurantManagementGUI.ViewModels
 
                         if (viewNow)
                         {
+                            NewOrderCount = 0;
                             try
                             {
                                 // KIỂM TRA: Nếu đang dùng Shell thì đi đường Shell
@@ -174,19 +175,47 @@ namespace RestaurantManagementGUI.ViewModels
         async Task CompleteDish(ChiTietHoaDonModel item)
         {
             if (item == null) return;
-            var parent = ActiveOrders.FirstOrDefault(o => o.ChiTietHoaDons.Contains(item));
-            if (parent == null) return;
 
-            var res = await _httpClient.PutAsJsonAsync($"orders/update-dishes-status?maHD={parent.MaHD}&maMA={item.MaMA}", new UpdateOrderItemStatusDto { NewStatus = "Đã xong" });
-            if (res.IsSuccessStatusCode) { item.TrangThai = "Đã xong"; int i = parent.ChiTietHoaDons.IndexOf(item); parent.ChiTietHoaDons[i] = item; }
+            // Tìm hóa đơn cha
+            var parentOrder = ActiveOrders.FirstOrDefault(o => o.ChiTietHoaDons.Contains(item));
+
+            // Gọi API (giả sử API chạy ok)
+            var res = await _httpClient.PutAsJsonAsync(
+                 $"orders/update-dishes-status?maHD={parentOrder?.MaHD}&maMA={item.MaMA}",
+                 new UpdateOrderItemStatusDto { NewStatus = "Đã xong" });
+
+            if (res.IsSuccessStatusCode)
+            {
+                // CHỈ CẦN DÒNG NÀY LÀ ĐỦ (Vì đã sửa Model ở Bước 1)
+                item.TrangThai = "Đã xong";
+
+                // Báo cho nút to check lại điều kiện
+                CompleteOrderCommand.NotifyCanExecuteChanged();
+            }
         }
 
-        [RelayCommand]
+        // --- Command 2: Xử lý xong cả bàn (Có điều kiện CanExecute) ---
+        [RelayCommand(CanExecute = nameof(CanCompleteOrder))]
         async Task CompleteOrder(HoaDonModel order)
         {
             if (order == null) return;
-            var res = await _httpClient.PutAsJsonAsync($"orders/update-all-dishes-in-{order.MaHD}-order-status", new UpdateOrderItemStatusDto { NewStatus = "Đã hoàn thành" });
-            if (res.IsSuccessStatusCode) ActiveOrders.Remove(order);
+
+            var res = await _httpClient.PutAsJsonAsync(
+                $"orders/update-all-dishes-in-{order.MaHD}-order-status",
+                new UpdateOrderItemStatusDto { NewStatus = "Đã hoàn thành" });
+
+            if (res.IsSuccessStatusCode)
+            {
+                ActiveOrders.Remove(order);
+            }
+        }
+
+        // Điều kiện để nút sáng lên
+        private bool CanCompleteOrder(HoaDonModel order)
+        {
+            if (order == null || order.ChiTietHoaDons == null) return false;
+            // Kiểm tra xem tất cả món đã xong chưa
+            return order.ChiTietHoaDons.All(x => x.IsDone);
         }
     }
 }

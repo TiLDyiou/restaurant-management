@@ -1,11 +1,12 @@
 ﻿// File: Models/OrderModel.cs
-using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
     // DTO này khớp với ChiTietHoaDonViewDto của API
-    public class ChiTietHoaDonModel
+    public partial class ChiTietHoaDonModel : ObservableObject
     {
         [JsonPropertyName("maMA")]
         public string MaMA { get; set; }
@@ -22,8 +23,12 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("thanhTien")]
         public decimal ThanhTien { get; set; }
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsDone))]
         [JsonPropertyName("trangThai")]
-        public string TrangThai { get; set; }
+        private string trangThai;
+
+        public bool IsDone => TrangThai == "Đã xong";
 
         // Property để hiển thị
         public string DisplayText => $"{SoLuong} x {TenMA}";
