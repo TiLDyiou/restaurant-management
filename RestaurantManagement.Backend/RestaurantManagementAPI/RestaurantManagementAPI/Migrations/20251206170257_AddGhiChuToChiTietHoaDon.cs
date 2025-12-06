@@ -5,25 +5,25 @@
 namespace RestaurantManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Online : Migration
+    public partial class AddGhiChuToChiTietHoaDon : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "Online",
-                table: "TAIKHOAN",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+            migrationBuilder.AddColumn<string>(
+                name: "GhiChu",
+                table: "CHITIETHOADON",
+                type: "nvarchar(200)",
+                maxLength: 200,
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Online",
-                table: "TAIKHOAN");
+                name: "GhiChu",
+                table: "CHITIETHOADON");
         }
     }
 }

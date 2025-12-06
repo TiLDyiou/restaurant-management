@@ -179,7 +179,8 @@ namespace RestaurentManagementAPI.Controllers
                         SoLuong = itemDto.SoLuong,
                         DonGia = monAn.DonGia, // Lấy đơn giá từ DB
                         // ThanhTien sẽ được DB tự tính (như trong OnModelCreating)
-                        TrangThai = "Chờ làm"
+                        TrangThai = "Chờ làm",
+                        GhiChu = itemDto.GhiChu
                     };
 
                     chiTietEntities.Add(chiTiet);
@@ -232,7 +233,8 @@ namespace RestaurentManagementAPI.Controllers
                         ThanhTien = ct.SoLuong * ct.DonGia,
 
                         // GỬI TRẠNG THÁI MÓN ĂN:
-                        TrangThai = ct.TrangThai
+                        TrangThai = ct.TrangThai,
+                        GhiChu = ct.GhiChu
                     }).ToList()
                 };
 

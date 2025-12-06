@@ -187,26 +187,72 @@ namespace RestaurantManagementGUI
         }
 
         private async void Checkout()
+{
+    if (CartItems.Count == 0)
+    {
+        await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống", "OK");
+        return;
+    }
+
+    bool confirmed = await Application.Current.MainPage.DisplayAlert(
+        "Xác nhận", 
+        $"Bạn có muốn gửi {CartItems.Count} món không?", 
+        "Gửi đơn", 
+        "Hủy"
+    );
+    
+    if (!confirmed) return;
+
+    try
+    {
+        // Tạo payload theo format API
+        var orderRequest = new
         {
-            if (CartItems.Count == 0)
+            maBan = "TD001", // Hoặc lấy từ property TenBan sau khi map với mã bàn
+            maNV = "NV001",  // Lấy từ thông tin đăng nhập
+            chiTietHoaDons = CartItems.Select(item => new
             {
-                await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống", "OK");
-                return;
-            }
+                maMA = item.FoodItem.Id,
+                soLuong = item.Quantity,
+                ghiChu = item.Note // Gửi ghi chú lên API
+            }).ToList()
+        };
 
-            // TODO: Gọi API SubmitOrder
-            bool confirmed = await Application.Current.MainPage.DisplayAlert("Xác nhận", $"Bạn có muốn gửi {CartItems.Count} món không?", "OK", "Hủy");
-            if (confirmed)
-            {
-                // Gửi đơn lên API (tạm thời log ra console)
-                Console.WriteLine("Đơn hàng đã gửi:");
-                foreach (var c in CartItems)
-                    Console.WriteLine($"{c.FoodItem.Name} x{c.Quantity} ({c.Note})");
+        var response = await _httpClient.PostAsJsonAsync(
+            "https://your-api-url/api/orders/api/create-and-send-orders", 
+            orderRequest
+        );
 
-                await Application.Current.MainPage.DisplayAlert("Thành công", "Đơn hàng đã gửi", "OK");
-                CancelOrder(); // Xóa giỏ sau khi gửi
-            }
+        if (response.IsSuccessStatusCode)
+        {
+            await Application.Current.MainPage.DisplayAlert(
+                "Thành công", 
+                "Đơn hàng đã được gửi xuống bếp!", 
+                "OK"
+            );
+            
+            // Xóa giỏ hàng sau khi gửi thành công
+            CancelOrder();
         }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            await Application.Current.MainPage.DisplayAlert(
+                "Lỗi", 
+                $"Không thể gửi đơn hàng: {error}", 
+                "OK"
+            );
+        }
+    }
+    catch (Exception ex)
+    {
+        await Application.Current.MainPage.DisplayAlert(
+            "Lỗi", 
+            $"Có lỗi xảy ra: {ex.Message}", 
+            "OK"
+        );
+    }
+}
 
         private void CancelOrder()
         {

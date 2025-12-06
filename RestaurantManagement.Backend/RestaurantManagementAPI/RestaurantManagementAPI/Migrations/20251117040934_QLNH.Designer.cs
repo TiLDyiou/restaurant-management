@@ -12,8 +12,8 @@ using RestaurentManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    [Migration("20251108024453_AddDatBanEntity")]
-    partial class AddDatBanEntity
+    [Migration("20251117040934_QLNH")]
+    partial class QLNH
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,6 +105,11 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("ThanhTien")
                         .HasComputedColumnSql("[SoLuong] * [DonGia]", true);
+
+                    b.Property<string>("TrangThai")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("TrangThai");
 
                     b.HasKey("MaHD", "MaMA");
 
@@ -350,9 +355,18 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnType("nvarchar(30)")
                         .HasColumnName("TenDangNhap");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Email");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("HoatDong");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsVerified");
 
                     b.Property<string>("MaNV")
                         .IsRequired()
@@ -364,6 +378,18 @@ namespace RestaurantManagementAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("MatKhau");
+
+                    b.Property<string>("OTP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OTP");
+
+                    b.Property<DateTime?>("OTPExpireTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("OTPExpireTime");
+
+                    b.Property<bool>("Online")
+                        .HasColumnType("bit")
+                        .HasColumnName("Online");
 
                     b.Property<string>("Quyen")
                         .HasColumnType("nvarchar(max)")

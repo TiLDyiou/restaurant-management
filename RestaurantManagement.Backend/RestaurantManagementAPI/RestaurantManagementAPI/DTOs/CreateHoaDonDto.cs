@@ -10,6 +10,7 @@ namespace RestaurentManagementAPI.DTOs.MonAnDtos
 
         [Range(1, int.MaxValue)]
         public int SoLuong { get; set; }
+        public string? GhiChu { get; set; }
     }
 
     

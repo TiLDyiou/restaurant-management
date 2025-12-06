@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RestaurantManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class QLNH : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,7 @@ namespace RestaurantManagementAPI.Migrations
                 {
                     MaMA = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     TenMA = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DonGia = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DonGia = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Loai = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     HinhAnh = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TrangThai = table.Column<bool>(type: "bit", nullable: false)
@@ -87,6 +87,29 @@ namespace RestaurantManagementAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DATBAN",
+                columns: table => new
+                {
+                    MaDatBan = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    MaBan = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    TenKhachHang = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    SoDienThoai = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    ThoiGianDat = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SoNguoi = table.Column<int>(type: "int", nullable: false),
+                    TrangThai = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DATBAN", x => x.MaDatBan);
+                    table.ForeignKey(
+                        name: "FK_DATBAN_BAN_MaBan",
+                        column: x => x.MaBan,
+                        principalTable: "BAN",
+                        principalColumn: "MaBan",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "HOADON",
                 columns: table => new
                 {
@@ -94,7 +117,7 @@ namespace RestaurantManagementAPI.Migrations
                     MaBan = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     MaNV = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     NgayLap = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TongTien = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TongTien = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TrangThai = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -142,7 +165,13 @@ namespace RestaurantManagementAPI.Migrations
                     TenDangNhap = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     MatKhau = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MaNV = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
-                    Quyen = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Quyen = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HoatDong = table.Column<bool>(type: "bit", nullable: false),
+                    Online = table.Column<bool>(type: "bit", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    OTP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OTPExpireTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -162,8 +191,9 @@ namespace RestaurantManagementAPI.Migrations
                     MaHD = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     MaMA = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     SoLuong = table.Column<int>(type: "int", nullable: false),
-                    DonGia = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ThanhTien = table.Column<decimal>(type: "decimal(18,2)", nullable: false, computedColumnSql: "[SoLuong] * [DonGia]", stored: true)
+                    DonGia = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ThanhTien = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, computedColumnSql: "[SoLuong] * [DonGia]", stored: true),
+                    TrangThai = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -218,6 +248,11 @@ namespace RestaurantManagementAPI.Migrations
                 column: "MaNL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DATBAN_MaBan",
+                table: "DATBAN",
+                column: "MaBan");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HOADON_MaBan",
                 table: "HOADON",
                 column: "MaBan");
@@ -247,6 +282,9 @@ namespace RestaurantManagementAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "CHITIETPHIEUNHAP");
+
+            migrationBuilder.DropTable(
+                name: "DATBAN");
 
             migrationBuilder.DropTable(
                 name: "DONHANG_ONLINE");

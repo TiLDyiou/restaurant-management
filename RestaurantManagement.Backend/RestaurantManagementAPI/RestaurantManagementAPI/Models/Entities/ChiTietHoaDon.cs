@@ -26,6 +26,12 @@ namespace RestaurentManagementAPI.Models.Entities
         [Column("TrangThai")]
         [StringLength(50)]
         public string? TrangThai { get; set; }
+
+     
+        [Column("GhiChu")]
+        [StringLength(200)]
+        public string? GhiChu { get; set; }
+
         public HoaDon? HoaDon { get; set; }
         public MonAn? MonAn { get; set; }
     }

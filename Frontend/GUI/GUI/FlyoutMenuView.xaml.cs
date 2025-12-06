@@ -126,10 +126,7 @@ namespace RestaurantManagementGUI
             }
         }
 
-        private void OnRefreshTapped(object sender, EventArgs e)
-        {
-            RefreshRequested?.Invoke(this, EventArgs.Empty);
-        }
+       
 
         private void OnStatusFilterChanged(object sender, EventArgs e)
         {

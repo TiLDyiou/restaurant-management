@@ -92,6 +92,11 @@ namespace RestaurantManagementAPI.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("DonGia");
 
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("GhiChu");
+
                     b.Property<int>("SoLuong")
                         .HasColumnType("int")
                         .HasColumnName("SoLuong");

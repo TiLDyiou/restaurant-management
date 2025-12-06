@@ -9,6 +9,7 @@
         public decimal DonGia { get; set; }
         public decimal ThanhTien { get; set; }
         public string? TrangThai { get; set; }
+        public string? GhiChu { get; set; }
     }
 
     // DTO hiển thị thông tin đầy đủ của 1 hoá đơn
