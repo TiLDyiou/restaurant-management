@@ -58,6 +58,29 @@ public partial class QuanLyMonAnPage : ContentPage
         await LoadDishesAsync();
     }
 
+    // --- MỚI THÊM: Xử lý nút chọn ảnh ---
+    private async void PickImage_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var result = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "Chọn ảnh món ăn",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (result != null)
+            {
+                NewHinhAnh.Text = result.FullPath;
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", "Không thể chọn ảnh: " + ex.Message, "OK");
+        }
+    }
+    // ------------------------------------
+
     private async Task LoadDishesAsync()
     {
         try
@@ -197,7 +220,7 @@ public partial class QuanLyMonAnPage : ContentPage
             if (sender is HttpRequestMessage request)
             {
                 return request.RequestUri.IsLoopback ||
-                       (DeviceInfo.Platform == DevicePlatform.Android && request.RequestUri.Host == "10.0.2.2");
+                        (DeviceInfo.Platform == DevicePlatform.Android && request.RequestUri.Host == "10.0.2.2");
             }
             return errors == System.Net.Security.SslPolicyErrors.None;
         };

@@ -1,5 +1,4 @@
-﻿// File: EditMonAnPage.xaml.cs
-using RestaurantManagementGUI.Models;
+﻿using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Helpers;
 using System.Net.Http.Json;
 using System.Text;
@@ -11,7 +10,6 @@ using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI;
 
-// DTO để khớp với API /api/update_dish
 public class UpdateMonAnDto_Full
 {
     [JsonPropertyName("tenMA")]
@@ -26,11 +24,10 @@ public class UpdateMonAnDto_Full
     public bool? TrangThai { get; set; }
 }
 
-
 public partial class EditMonAnPage : ContentPage
 {
     private readonly HttpClient _httpClient;
-    private FoodModel _foodItem; // Biến để lưu món ăn được gửi qua
+    private FoodModel _foodItem;
 
     public EditMonAnPage(FoodModel foodItemToEdit)
     {
@@ -38,7 +35,6 @@ public partial class EditMonAnPage : ContentPage
 
         _foodItem = foodItemToEdit;
 
-        // Khởi tạo HttpClient (giống LoginPage)
 #if DEBUG
         _httpClient = new HttpClient(GetInsecureHandler());
 #else
@@ -51,12 +47,62 @@ public partial class EditMonAnPage : ContentPage
         EntryLoai.Text = _foodItem.Category;
         EntryHinhAnh.Text = _foodItem.ImageUrl;
         SwitchTrangThai.IsToggled = _foodItem.TrangThai;
+
+        // MỚI: Hiển thị ảnh cũ ngay khi mở trang
+        if (!string.IsNullOrEmpty(_foodItem.ImageUrl))
+        {
+            ImgPreview.Source = _foodItem.ImageUrl;
+        }
+    }
+
+    // XỬ LÝ CHỌN FILE ẢNH
+    private async void PickImage_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var result = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "Chọn ảnh món ăn",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (result != null)
+            {
+                // Điền đường dẫn vào ô Entry
+                EntryHinhAnh.Text = result.FullPath;
+
+                // MỚI: Cập nhật ngay ảnh hiển thị bên dưới
+                ImgPreview.Source = result.FullPath;
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", "Không thể chọn ảnh: " + ex.Message, "OK");
+        }
+    }
+
+    // MỚI: Xử lý khi người dùng dán link thủ công rồi bấm ra ngoài (Unfocused) hoặc Enter (Completed)
+    private void EntryHinhAnh_Unfocused(object sender, FocusEventArgs e)
+    {
+        UpdateImagePreview();
+    }
+
+    private void EntryHinhAnh_Completed(object sender, EventArgs e)
+    {
+        UpdateImagePreview();
+    }
+
+    private void UpdateImagePreview()
+    {
+        if (!string.IsNullOrWhiteSpace(EntryHinhAnh.Text))
+        {
+            ImgPreview.Source = EntryHinhAnh.Text;
+        }
     }
 
     // NÚT LƯU THAY ĐỔI
     private async void Save_Clicked(object sender, EventArgs e)
     {
-        // 1. Kiểm tra dữ liệu
         if (string.IsNullOrWhiteSpace(EntryTenMA.Text) ||
             !decimal.TryParse(EntryDonGia.Text, out decimal newPrice))
         {
@@ -64,7 +110,6 @@ public partial class EditMonAnPage : ContentPage
             return;
         }
 
-        // 2. Tạo DTO
         var updateDto = new UpdateMonAnDto_Full
         {
             TenMA = EntryTenMA.Text,
@@ -78,7 +123,6 @@ public partial class EditMonAnPage : ContentPage
         {
             var content = new StringContent(JsonSerializer.Serialize(updateDto), Encoding.UTF8, "application/json");
 
-            // 3. Thêm Token
             var token = await SecureStorage.Default.GetAsync("auth_token");
             if (string.IsNullOrEmpty(token))
             {
@@ -87,13 +131,12 @@ public partial class EditMonAnPage : ContentPage
             }
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            // 4. Gọi API PUT /api/update_dish/{maMA}
             var response = await _httpClient.PutAsync(ApiConfig.UpdateDish(_foodItem.Id), content);
 
             if (response.IsSuccessStatusCode)
             {
                 await DisplayAlert("Thành công", "Đã cập nhật món ăn.", "OK");
-                await Navigation.PopAsync(); // Quay lại trang Quản lý
+                await Navigation.PopAsync();
             }
             else
             {
@@ -106,13 +149,11 @@ public partial class EditMonAnPage : ContentPage
         }
     }
 
-    // NÚT HỦY
     private async void Cancel_Clicked(object sender, EventArgs e)
     {
-        await Navigation.PopAsync(); // Quay lại
+        await Navigation.PopAsync();
     }
 
-    // (Hàm GetInsecureHandler giữ nguyên từ LoginPage)
     private HttpClientHandler GetInsecureHandler()
     {
         var handler = new HttpClientHandler();

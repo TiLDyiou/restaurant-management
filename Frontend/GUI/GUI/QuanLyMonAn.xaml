@@ -26,7 +26,20 @@
                     <Entry x:Name="NewTenMA" Grid.Row="0" Grid.Column="0" Placeholder="Tên món ăn (vd: Phở bò)" />
                     <Entry x:Name="NewDonGia" Grid.Row="0" Grid.Column="1" Placeholder="Giá (vd: 50000)" Keyboard="Numeric"/>
                     <Entry x:Name="NewLoai" Grid.Row="1" Grid.Column="0" Placeholder="Loại (vd: Món chính)" />
-                    <Entry x:Name="NewHinhAnh" Grid.Row="1" Grid.Column="1" Placeholder="Tên ảnh (vd: pho.jpg)" />
+
+                    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                        <Entry Grid.Column="0" 
+                               x:Name="NewHinhAnh" 
+                               Placeholder="Ảnh (Chèn link ảnh hoặc chọn file)" />
+
+                        <Button Grid.Column="1" 
+                                Text="..." 
+                                Clicked="PickImage_Clicked"
+                                HeightRequest="45"
+                                WidthRequest="50"
+                                VerticalOptions="Center"
+                                Padding="0"/>
+                    </Grid>
                 </Grid>
 
                 <Button Text="THÊM MÓN MỚI" 
