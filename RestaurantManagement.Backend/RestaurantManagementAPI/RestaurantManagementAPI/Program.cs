@@ -81,6 +81,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<RestaurentManagementAPI.Services.IOrderService, RestaurentManagementAPI.Services.OrderService>();
 var app = builder.Build();
 
 // Seed dữ liệu admin và bàn

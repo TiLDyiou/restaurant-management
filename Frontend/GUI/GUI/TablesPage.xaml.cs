@@ -20,8 +20,8 @@ namespace RestaurantManagementGUI
             _viewModel = viewModel;
             _apiService = apiService;
             BindingContext = _viewModel;
-
             _viewModel.TableSelected += OnTableSelected;
+            _viewModel.DataUpdated += (s, e) => FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
         }
 
         protected override async void OnAppearing()
@@ -29,13 +29,17 @@ namespace RestaurantManagementGUI
             base.OnAppearing();
             try
             {
+                // 1. Load dữ liệu mới nhất từ API
                 await _viewModel.LoadTablesAsync();
 
-                // Dùng 'FilteredTables' (property được tạo bởi [ObservableProperty])
+                // 2. Cập nhật thống kê ban đầu
                 FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
 
-                // Đăng ký CollectionChanged với 'FilteredTables'
+                // 3. Đăng ký lắng nghe thay đổi danh sách (để cập nhật thống kê)
                 _viewModel.FilteredTables.CollectionChanged += OnFilteredTablesChanged;
+
+                // 4. Đăng ký lại lắng nghe sự kiện từ SignalR
+                _viewModel.SubscribeToSignalR();
             }
             catch (Exception ex)
             {
@@ -47,12 +51,14 @@ namespace RestaurantManagementGUI
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-            _viewModel.Cleanup();
 
+            // 1. Hủy đăng ký thống kê
             if (_viewModel.FilteredTables != null)
             {
                 _viewModel.FilteredTables.CollectionChanged -= OnFilteredTablesChanged;
             }
+            // 2. Gọi hàm hủy đăng ký SignalR
+            _viewModel.UnsubscribeFromSignalR();
         }
 
         private void OnFilteredTablesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -74,8 +80,6 @@ namespace RestaurantManagementGUI
             FlyoutMenu.SelectedTable = selectedTable;
             await FlyoutMenu.OpenAsync();
         }
-
-        // ===== FLYOUT MENU EVENT HANDLERS =====
 
         private async void OnFlyoutChangeStatusRequested(object sender, Ban table)
         {

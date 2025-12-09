@@ -8,10 +8,9 @@
             BindingContext = new ViewModels.BillGenerationViewModel();
         }
 
-        // Xử lý sự kiện khi chọn RadioButton để ẩn hiện khung Tiền mặt/QR
         private void OnPaymentMethodChanged(object sender, CheckedChangedEventArgs e)
         {
-            if (e.Value) // Nếu được chọn
+            if (e.Value)
             {
                 var radio = sender as RadioButton;
                 if (radio.Value.ToString() == "Cash")

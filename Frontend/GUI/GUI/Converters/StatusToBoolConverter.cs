@@ -1,5 +1,4 @@
-﻿// File: Converters/StatusToBoolConverter.cs
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace RestaurantManagementGUI.Converters
 {

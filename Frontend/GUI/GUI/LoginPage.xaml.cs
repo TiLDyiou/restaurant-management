@@ -72,6 +72,7 @@ namespace RestaurantManagementGUI
                         await SecureStorage.Default.SetAsync("user_role", loginResponse.Role);
                         await SecureStorage.Default.SetAsync("user_chucvu", loginResponse.ChucVu ?? "");
 
+                        UserState.CurrentMaNV = loginResponse.MaNV;
                         string chucVu = loginResponse.ChucVu?.Trim().ToLower() ?? "";
                         if (chucVu == "đầu bếp" || chucVu == "dau bep")
                             Application.Current.MainPage = new NavigationPage(new ChefDashboardPage());

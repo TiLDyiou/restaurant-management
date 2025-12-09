@@ -11,7 +11,8 @@ namespace RestaurantManagementGUI
         public OrdersPage(string tenBan)
         {
             InitializeComponent();
-            _viewModel = (FoodMenuViewModel)BindingContext;
+            _viewModel = new FoodMenuViewModel();
+            BindingContext = _viewModel;
             _viewModel.TenBan = tenBan;
             _viewModel.RealTableId = ConvertToTableId(tenBan);
         }

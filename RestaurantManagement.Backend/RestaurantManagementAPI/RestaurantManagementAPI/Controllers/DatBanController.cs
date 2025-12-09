@@ -5,6 +5,8 @@ using RestaurentManagementAPI.DTOs;
 using RestaurentManagementAPI.DTOs.BanDtos;
 using RestaurentManagementAPI.Models.Entities;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using RestaurentManagementAPI.Hubs;
 
 namespace RestaurentManagementAPI.Controllers
 {
@@ -13,10 +15,11 @@ namespace RestaurentManagementAPI.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly QLNHDbContext _context;
-
-        public ReservationsController(QLNHDbContext context)
+        private readonly IHubContext<BanHub> _banHubContext;
+        public ReservationsController(QLNHDbContext context, IHubContext<BanHub> banHubContext)
         {
             _context = context;
+            _banHubContext = banHubContext;
         }
 
         // HÀM TẠO MÃ ĐẶT BÀN TỰ ĐỘNG
@@ -77,16 +80,23 @@ namespace RestaurentManagementAPI.Controllers
                 };
 
                 // Cập nhật trạng thái Bàn
-                // Nếu đặt bàn cho tương lai gần, có thể set là "Đã đặt trước"
+                // Nếu đặt bàn cho tương lai gần, có thể set là "Bàn đã đặt"
                 if (datBan.ThoiGianDat > DateTime.UtcNow && datBan.ThoiGianDat < DateTime.UtcNow.AddHours(3))
                 {
-                    ban.TrangThai = "Đã đặt trước";
+                    ban.TrangThai = "Bàn đã đặt";
                 }
 
                 await _context.DATBAN.AddAsync(datBan);
                 await _context.SaveChangesAsync();
-
                 await transaction.CommitAsync();
+                if (ban.TrangThai == "Bàn đã đặt")
+                {
+                    await _banHubContext.Clients.All.SendAsync("BanUpdated", new
+                    {
+                        MaBan = createDto.MaBan,
+                        TrangThai = "Bàn đã đặt"
+                    });
+                }
                 var datBanDto = new DatBanDto
                 {
                     MaDatBan = datBan.MaDatBan,

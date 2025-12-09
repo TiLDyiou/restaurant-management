@@ -1,5 +1,6 @@
 ﻿using RestaurantManagementGUI.Models;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace RestaurantManagementGUI
 {
@@ -58,20 +59,63 @@ namespace RestaurantManagementGUI
         private static void OnSelectedTableChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = (FlyoutMenuView)bindable;
-            var table = (Ban)newValue;
+            var oldTable = oldValue as Ban;
+            var newTable = newValue as Ban;
 
-            if (table != null)
+            // 1. Hủy đăng ký sự kiện ở bàn cũ (tránh lỗi bộ nhớ)
+            if (oldTable != null)
             {
+                oldTable.PropertyChanged -= control.OnTablePropertyChanged;
+            }
+
+            // 2. Đăng ký lắng nghe sự kiện ở bàn mới
+            if (newTable != null)
+            {
+                newTable.PropertyChanged += control.OnTablePropertyChanged;
+
+                // Cập nhật giao diện ngay lập tức
+                control.UpdateFlyoutUI(newTable);
+
                 control.SelectedTableInfo.IsVisible = true;
                 control.QuickActionsSection.IsVisible = true;
-                control.SelectedTableName.Text = table.TenBan;
-                control.SelectedTableStatus.Text = GetStatusEmoji(table.TrangThai) + " " + table.TrangThai;
             }
             else
             {
                 control.SelectedTableInfo.IsVisible = false;
                 control.QuickActionsSection.IsVisible = false;
             }
+        }
+
+        // 3. HÀM MỚI: Xử lý khi thuộc tính của Bàn thay đổi (do SignalR cập nhật)
+        private void OnTablePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // Chỉ cập nhật nếu cái thay đổi là Trạng Thái hoặc Tên Bàn
+            if (e.PropertyName == nameof(Ban.TrangThai) || e.PropertyName == nameof(Ban.TenBan))
+            {
+                // Bắt buộc chạy trên UI Thread
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (SelectedTable != null)
+                    {
+                        UpdateFlyoutUI(SelectedTable);
+                    }
+                });
+            }
+        }
+
+        // 4. HÀM MỚI: Gom logic vẽ UI vào một chỗ
+        private void UpdateFlyoutUI(Ban table)
+        {
+            SelectedTableName.Text = table.TenBan;
+            SelectedTableStatus.Text = GetStatusEmoji(table.TrangThai) + " " + table.TrangThai;
+
+            // (Tùy chọn) Đổi màu chữ dựa theo trạng thái cho đẹp
+            if (table.TrangThai == "Bàn trống")
+                SelectedTableStatus.TextColor = Colors.Green;
+            else if (table.TrangThai == "Bàn bận")
+                SelectedTableStatus.TextColor = Colors.Red;
+            else
+                SelectedTableStatus.TextColor = Color.FromArgb("#ffbd59"); // Màu vàng cũ
         }
 
         private static string GetStatusEmoji(string status)

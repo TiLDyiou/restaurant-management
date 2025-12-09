@@ -1,17 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:RestaurantManagementGUI.ViewModels"
              xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
-             
              xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
-             
              x:Class="RestaurantManagementGUI.ChefOrdersPage"
              Title="BẾP - NHẬN ĐƠN"
              BackgroundColor="#1E2630">
 
+    <ContentPage.BindingContext>
+        <vm:ChefOrdersViewModel />
+    </ContentPage.BindingContext>
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:TableIdConverter x:Key="TableIdConverter" />
+            <converters:StatusColorConverter x:Key="StatusColorConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -75,7 +79,6 @@
                                                 <Label Text="{Binding SoLuong}" TextColor="#D32F2F" FontAttributes="Bold" FontSize="20" VerticalOptions="Center"/>
 
                                                 <StackLayout Grid.Column="1" VerticalOptions="Center">
-
                                                     <Label Text="{Binding TenMA}" TextColor="#263238" FontAttributes="Bold" FontSize="18">
                                                         <Label.Triggers>
                                                             <DataTrigger TargetType="Label" Binding="{Binding IsDone}" Value="True">
@@ -90,7 +93,7 @@
                                                 </StackLayout>
 
                                                 <Button Grid.Column="2" Text="✔" Padding="0" HeightRequest="40" WidthRequest="40" CornerRadius="20"
-                                                        BackgroundColor="{Binding IsDone, Converter={converters:StatusColorConverter}, FallbackValue=#2E7D32}" 
+                                                        BackgroundColor="{Binding IsDone, Converter={StaticResource StatusColorConverter}}" 
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChefOrdersViewModel}}, Path=CompleteDishCommand}"
                                                         CommandParameter="{Binding .}">
                                                     <Button.Triggers>

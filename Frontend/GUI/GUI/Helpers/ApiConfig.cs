@@ -68,5 +68,11 @@ namespace RestaurantManagementGUI.Helpers
 
         // POST /api/add_dish
         public static string AddDish => $"{BaseUrl}add_dish";
+
+        // GET: Lấy danh sách tất cả hóa đơn (bao gồm cả trạng thái chờ và đã xong)
+        public static string GetAllOrders => $"{BaseUrl}orders/get-all-orders-info";
+
+        // PUT: Thanh toán hóa đơn
+        public static string Checkout(string maHD) => $"{BaseUrl}orders/checkout/{maHD}";
     }
 }

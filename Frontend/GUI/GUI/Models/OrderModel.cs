@@ -1,11 +1,9 @@
-﻿// File: Models/OrderModel.cs
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
-    // DTO này khớp với ChiTietHoaDonViewDto của API
+    // Class chi tiết món ăn (tương ứng với ChiTietHoaDonViewDto của API)
     public partial class ChiTietHoaDonModel : ObservableObject
     {
         [JsonPropertyName("maMA")]
@@ -23,25 +21,28 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("thanhTien")]
         public decimal ThanhTien { get; set; }
 
+        // Quan trọng: Dùng ObservableProperty để UI tự cập nhật khi đổi trạng thái
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsDone))]
+        [NotifyPropertyChangedFor(nameof(IsDone))] // Khi TrangThai đổi -> IsDone tự đổi theo
         [JsonPropertyName("trangThai")]
         private string trangThai;
 
+        // --- Thuộc tính hỗ trợ Logic & UI ---
+
+        // Thuộc tính này để ViewModel kiểm tra món đã xong chưa
         public bool IsDone => TrangThai == "Đã xong";
 
-        // Property để hiển thị
-        public string DisplayText => $"{SoLuong} x {TenMA}";
+        public string FormattedTotal => $"{ThanhTien:N0} đ";
     }
 
-    // DTO này khớp với HoaDonDto của API
-    public class HoaDonModel
+    // Class hóa đơn chính
+    public partial class HoaDonModel : ObservableObject
     {
         [JsonPropertyName("maHD")]
         public string MaHD { get; set; }
 
         [JsonPropertyName("maBan")]
-        public object MaBan { get; set; } // Giả sử MaBan là int
+        public object MaBan { get; set; }
 
         [JsonPropertyName("maNV")]
         public string MaNV { get; set; }
@@ -58,8 +59,9 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("chiTietHoaDons")]
         public List<ChiTietHoaDonModel> ChiTietHoaDons { get; set; } = new();
 
-        // Property để hiển thị
-        public string DisplayText => $"{MaHD} (Bàn {MaBan})";
+        // --- Helpers ---
+        public string TableName => $"Bàn {MaBan}";
+        public string FormattedTotal => $"{TongTien:N0} đ";
     }
 
     // DTO để gửi đi khi cập nhật trạng thái món

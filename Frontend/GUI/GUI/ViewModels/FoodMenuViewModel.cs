@@ -195,19 +195,30 @@ namespace RestaurantManagementGUI
                 await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống, vui lòng chọn món!", "OK");
                 return;
             }
-
+            if (string.IsNullOrEmpty(UserState.CurrentMaNV))
+            {
+                // Nếu biến static bị rỗng (do app bị kill background), thử lấy lại từ SecureStorage
+                var savedMaNV = await SecureStorage.Default.GetAsync("user_manv");
+                if (!string.IsNullOrEmpty(savedMaNV))
+                {
+                    UserState.CurrentMaNV = savedMaNV;
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.", "OK");
+                    return;
+                }
+            }
             // 2. Xác nhận gửi đơn
             bool confirmed = await Application.Current.MainPage.DisplayAlert("Xác nhận", $"Bạn có muốn gửi {CartItems.Count} món xuống bếp không?", "Gửi ngay", "Hủy");
             if (!confirmed) return;
 
             // 3. Chuẩn bị dữ liệu gửi đi (DTO)
-            // Lưu ý: FoodItem.Id chính là MaMA trong database
             var orderDto = new CreateHoaDonDto
             {
-                // SỬA DÒNG NÀY: Không dùng "B01" nữa, mà dùng biến RealTableId
                 MaBan = RealTableId,
 
-                MaNV = "NV001",
+                MaNV = UserState.CurrentMaNV,
                 ChiTietHoaDons = CartItems.Select(c => new ChiTietHoaDonDto
                 {
                     MaMA = c.FoodItem.Id,

@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel; // vẫn dùng ObservableObject cho INotifyPropertyChanged tiện lợi
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.ApplicationModel; // cho MainThread (nếu bạn dùng MAUI)
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
 using System;
@@ -7,11 +9,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Microsoft.Maui.ApplicationModel; // cho MainThread (nếu bạn dùng MAUI)
 
 namespace RestaurantManagementGUI.ViewModels
 {
-    // partial vẫn được, nhưng giờ chúng ta khai báo property/command rõ ràng
     public partial class TablesViewModel : ObservableObject
     {
         private readonly ApiService _apiService;
@@ -22,6 +22,7 @@ namespace RestaurantManagementGUI.ViewModels
 
         // Explicit public property (thay vì [ObservableProperty])
         private ObservableCollection<Ban> _filteredTables;
+        public event EventHandler DataUpdated;
         public ObservableCollection<Ban> FilteredTables
         {
             get => _filteredTables;
@@ -98,6 +99,7 @@ namespace RestaurantManagementGUI.ViewModels
                 {
                     tableInFilteredList.TrangThai = update.TrangThai;
                 }
+                DataUpdated?.Invoke(this, EventArgs.Empty);
             });
         }
 
@@ -135,10 +137,18 @@ namespace RestaurantManagementGUI.ViewModels
             TableSelected?.Invoke(this, selectedTable);
         }
 
-        public void Cleanup()
+        public void SubscribeToSignalR()
+        {
+            // Đảm bảo không đăng ký trùng lặp
+            _tableHubService.OnTableStatusChanged -= HandleTableStatusUpdate;
+            _tableHubService.OnTableStatusChanged += HandleTableStatusUpdate;
+            Debug.WriteLine("TablesViewModel: Đã ĐĂNG KÝ lắng nghe SignalR");
+        }
+
+        public void UnsubscribeFromSignalR()
         {
             _tableHubService.OnTableStatusChanged -= HandleTableStatusUpdate;
-            Debug.WriteLine("TablesViewModel đã dọn dẹp.");
+            Debug.WriteLine("TablesViewModel: Đã HỦY đăng ký SignalR");
         }
 
         // Simple RelayCommand implementation (không phụ thuộc toolkit source-gen)
