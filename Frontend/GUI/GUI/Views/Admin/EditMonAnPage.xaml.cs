@@ -7,22 +7,7 @@ using Microsoft.Maui.Controls;
 using System.Net.Http.Headers;
 using Microsoft.Maui.Storage;
 using System.Text.Json.Serialization;
-
 namespace RestaurantManagementGUI;
-
-public class UpdateMonAnDto_Full
-{
-    [JsonPropertyName("tenMA")]
-    public string? TenMA { get; set; }
-    [JsonPropertyName("donGia")]
-    public decimal? DonGia { get; set; }
-    [JsonPropertyName("loai")]
-    public string? Loai { get; set; }
-    [JsonPropertyName("hinhAnh")]
-    public string? HinhAnh { get; set; }
-    [JsonPropertyName("trangThai")]
-    public bool? TrangThai { get; set; }
-}
 
 public partial class EditMonAnPage : ContentPage
 {
@@ -41,14 +26,12 @@ public partial class EditMonAnPage : ContentPage
         _httpClient = new HttpClient();
 #endif
 
-        // Đổ dữ liệu cũ vào các ô Entry
         EntryTenMA.Text = _foodItem.Name;
         EntryDonGia.Text = _foodItem.Price.ToString();
         EntryLoai.Text = _foodItem.Category;
         EntryHinhAnh.Text = _foodItem.ImageUrl;
         SwitchTrangThai.IsToggled = _foodItem.TrangThai;
 
-        // MỚI: Hiển thị ảnh cũ ngay khi mở trang
         if (!string.IsNullOrEmpty(_foodItem.ImageUrl))
         {
             ImgPreview.Source = _foodItem.ImageUrl;
@@ -71,7 +54,7 @@ public partial class EditMonAnPage : ContentPage
                 // Điền đường dẫn vào ô Entry
                 EntryHinhAnh.Text = result.FullPath;
 
-                // MỚI: Cập nhật ngay ảnh hiển thị bên dưới
+                // Cập nhật ngay ảnh hiển thị bên dưới
                 ImgPreview.Source = result.FullPath;
             }
         }
@@ -81,7 +64,7 @@ public partial class EditMonAnPage : ContentPage
         }
     }
 
-    // MỚI: Xử lý khi người dùng dán link thủ công rồi bấm ra ngoài (Unfocused) hoặc Enter (Completed)
+    // Xử lý khi người dùng dán link thủ công rồi bấm ra ngoài (Unfocused) hoặc Enter (Completed)
     private void EntryHinhAnh_Unfocused(object sender, FocusEventArgs e)
     {
         UpdateImagePreview();

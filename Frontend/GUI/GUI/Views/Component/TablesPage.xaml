@@ -41,7 +41,7 @@
     </ContentPage.Resources>
     <Grid>
         <Grid RowDefinitions="Auto, *" Padding="0" Margin="0,-50,0,0">
-            <Image Source="amthuc.jpg" Aspect="AspectFill" Opacity="0.55" Grid.Row="0" Grid.RowSpan="2" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" />
+            <Image Source="background.jpg" Aspect="AspectFill" Opacity="0.55" Grid.Row="0" Grid.RowSpan="2" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" />
             <Grid Grid.Row="0" Grid.RowSpan="2" Padding="0">
                 <Grid Padding="10,20,10,10">
                     <Grid.RowDefinitions>

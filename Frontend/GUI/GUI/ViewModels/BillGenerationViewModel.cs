@@ -11,21 +11,15 @@ namespace RestaurantManagementGUI.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        // ==========================================
-        // 👇 CẤU HÌNH THÔNG TIN NGÂN HÀNG CỦA BẠN 👇
-        // ==========================================
-        private const string MY_BANK_ID = "TCB";       // Mã ngân hàng (VD: MB, VCB, TCB, ACB...)
-        private const string MY_ACCOUNT_NO = "93245230306"; // Số tài khoản của bạn
-        private const string QR_TEMPLATE = "compact2"; // Kiểu giao diện QR (compact2 là gọn đẹp nhất)
-        // ==========================================
-
-        // --- PROPERTIES ---
+        private const string MY_BANK_ID = "VCB";
+        private const string MY_ACCOUNT_NO = "9969390384";
+        private const string QR_TEMPLATE = "compact2";
 
         [ObservableProperty]
         private ObservableCollection<HoaDonModel> pendingBills;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange), nameof(QrCodeUrl))] // Thêm update QrCodeUrl
+        [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange), nameof(QrCodeUrl))]
         private HoaDonModel selectedBill;
 
         // Logic tự động cập nhật QR và Reset form khi đổi bàn
@@ -44,8 +38,7 @@ namespace RestaurantManagementGUI.ViewModels
                 if (SelectedBill == null) return "";
 
                 // Tạo nội dung chuyển khoản: "TT HD {Mã Hóa Đơn}"
-                // Lưu ý: TongTien phải là số (decimal/int)
-                return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo=TT HD {SelectedBill.MaHD}";
+                return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo=Thanh toán HD {SelectedBill.MaHD}";
             }
         }
 
@@ -79,8 +72,6 @@ namespace RestaurantManagementGUI.ViewModels
             SelectedBill != null &&
             !string.IsNullOrWhiteSpace(CustomerPayAmount) &&
             decimal.TryParse(CustomerPayAmount, out _);
-
-        // --- CONSTRUCTOR ---
         public BillGenerationViewModel()
         {
             var handler = new HttpClientHandler();
@@ -91,37 +82,38 @@ namespace RestaurantManagementGUI.ViewModels
             LoadPendingBills();
         }
 
-        // --- METHODS ---
-
         public async void LoadPendingBills()
         {
             try
             {
-                var response = await _httpClient.GetAsync(ApiConfig.GetAllOrders);
-                if (response.IsSuccessStatusCode)
-                {
-                    var allBills = await response.Content.ReadFromJsonAsync<List<HoaDonModel>>();
+                // Đọc chuỗi JSON thô trước để tránh lỗi convert ngầm
+                var json = await _httpClient.GetStringAsync(ApiConfig.GetAllOrders);
 
+                // Cấu hình chấp nhận mọi định dạng chữ hoa/thường
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var allBills = System.Text.Json.JsonSerializer.Deserialize<List<HoaDonModel>>(json, options);
+
+                if (allBills != null)
+                {
                     var pending = allBills
                         .Where(b => b.TrangThai != "Đã thanh toán")
                         .OrderByDescending(b => b.NgayLap)
                         .ToList();
 
                     PendingBills.Clear();
-                    foreach (var bill in pending)
-                    {
-                        PendingBills.Add(bill);
-                    }
+                    foreach (var bill in pending) PendingBills.Add(bill);
 
                     if (SelectedBill == null && PendingBills.Any())
-                    {
                         SelectedBill = PendingBills[0];
-                    }
                 }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Không tải được danh sách: {ex.Message}", "OK");
+                Console.WriteLine($"Lỗi tải hóa đơn: {ex.Message}");
             }
         }
 
@@ -203,10 +195,5 @@ namespace RestaurantManagementGUI.ViewModels
             OnPropertyChanged(nameof(ChangeAmount));
             OnPropertyChanged(nameof(ShowChange));
         }
-    }
-
-    public class CheckoutRequestDto
-    {
-        public string PaymentMethod { get; set; }
     }
 }

@@ -25,6 +25,7 @@ namespace RestaurentManagementAPI.DTOs.MonAnDtos
         public ICollection<ChiTietHoaDonViewDto> ChiTietHoaDons { get; set; } = new List<ChiTietHoaDonViewDto>();
     }
 
+    // Kiểm tra phương thức thanh toán
     public class CheckoutRequestDto
     {
         [Required(ErrorMessage = "Vui lòng chọn phương thức thanh toán")]

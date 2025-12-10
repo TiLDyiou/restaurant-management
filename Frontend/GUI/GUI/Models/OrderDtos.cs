@@ -6,7 +6,6 @@ namespace RestaurantManagementGUI.Models
     // DTO dùng để gửi yêu cầu tạo hóa đơn lên Server
     public class CreateHoaDonDto
     {
-        // Tên biến phải khớp y chang bên API
         [JsonPropertyName("maBan")]
         public string? MaBan { get; set; }
 

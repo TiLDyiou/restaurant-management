@@ -254,29 +254,6 @@
                         </Picker>
                     </VerticalStackLayout>
 
-                    <!-- Button: Làm mới -->
-                    <Border BackgroundColor="{StaticResource ColorDarkBrown}"
-                            StrokeShape="RoundRectangle 16"
-                            Padding="16,14"
-                            StrokeThickness="0">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnRefreshTapped" />
-                        </Border.GestureRecognizers>
-                        <HorizontalStackLayout Spacing="14" HorizontalOptions="Center">
-                            <Label Text="&#xe5d5;"
-                                   FontFamily="MaterialIcons"
-                                   FontSize="24"
-                                   TextColor="{StaticResource ColorLightTan}"
-                                   VerticalOptions="Center" />
-                            <Label Text="Làm mới danh sách"
-                                   FontFamily="RobotoMono"
-                                   FontSize="15"
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource ColorLightTan}"
-                                   VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                    </Border>
-
                 </VerticalStackLayout>
             </ScrollView>
         </Border>

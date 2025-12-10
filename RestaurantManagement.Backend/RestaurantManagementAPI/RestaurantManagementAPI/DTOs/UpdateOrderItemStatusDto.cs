@@ -6,6 +6,5 @@ namespace RestaurentManagementAPI.DTOs.MonAnDtos
     {
         [Required]
         public string NewStatus { get; set; } = string.Empty;
-        // Ví dụ: "Đang làm", "Đã xong"
     }
 }

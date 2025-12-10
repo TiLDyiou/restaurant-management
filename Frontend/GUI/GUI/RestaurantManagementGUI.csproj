@@ -3,15 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
-
-		<!-- Note for MacCatalyst:
-		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>RestaurantManagementGUI</RootNamespace>
@@ -20,17 +11,11 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<!-- Display name -->
 		<ApplicationTitle>RestaurantManagementGUI</ApplicationTitle>
-
-		<!-- App Identifier -->
 		<ApplicationId>com.companyname.restaurantmanagementgui</ApplicationId>
-
-		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
@@ -42,20 +27,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-
-		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
-		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
 		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
-		
-		<!-- Custom Fonts -->
+
 		<MauiFont Include="Resources\Fonts\*" />
 
-		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
@@ -68,73 +47,76 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="ChefAndUserProfilePage.xaml.cs">
+	  <Compile Update="Views\Component\ChefAndUserProfilePage.xaml.cs">
 	    <DependentUpon>ChefAndUserProfilePage.xaml</DependentUpon>
 	  </Compile>
-		<Compile Update="EditChefAndUserProfilePage.xaml.cs">
+		<Compile Update="Views\Component\EditChefAndUserProfilePage.xaml.cs">
 			<DependentUpon>EditChefAndUserProfilePage.xaml</DependentUpon>
 		</Compile>
-	  <Compile Update="QuanLyMonAn.xaml.cs">
+	  <Compile Update="Views\Admin\QuanLyMonAn.xaml.cs">
 	    <DependentUpon>QuanLyMonAn.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Staff\StaffDashboardPage.xaml.cs">
+	    <DependentUpon>StaffDashboardPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="AddUserPage.xaml">
+	  <MauiXaml Update="Views\Authentication\AddUserPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="BillGenerationPage.xaml">
+	  <MauiXaml Update="Views\Component\BillGenerationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="ChefDashboardPage.xaml">
+	  <MauiXaml Update="Views\Chef\ChefDashboardPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="ChefAndUserProfilePage.xaml">
+	  <MauiXaml Update="Views\Component\ChefAndUserProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="ChefOrdersPage.xaml">
+	  <MauiXaml Update="Views\Chef\ChefOrdersPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="DashboardPage.xaml">
+	  <MauiXaml Update="Views\Admin\DashboardPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-		<MauiXaml Update="EditChefAndUserProfilePage.xaml">
+		<MauiXaml Update="Views\Component\EditChefAndUserProfilePage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-	  <MauiXaml Update="EditMonAnPage.xaml">
+	  <MauiXaml Update="Views\Admin\EditMonAnPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="EditUserPage.xaml">
+	  <MauiXaml Update="Views\Admin\EditUserPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="FlyoutMenuView.xaml">
+	  <MauiXaml Update="Views\Component\FlyoutMenuView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="QuanLyMonAn.xaml">
+	  <MauiXaml Update="Views\Admin\QuanLyMonAn.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="FoodMenuPage.xaml">
+	  <MauiXaml Update="Views\Component\FoodMenuPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="ForgotPasswordPage.xaml">
+	  <MauiXaml Update="Views\Authentication\ForgotPasswordPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="LoginPage.xaml">
+	  <MauiXaml Update="Views\Authentication\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="OrderModificationsPage.xaml">
+	  <MauiXaml Update="Views\Component\OrdersPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="OrdersPage.xaml">
+	  <MauiXaml Update="Views\Component\TablesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="TablesPage.xaml">
+	  <MauiXaml Update="Views\Admin\UsersPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="UsersPage.xaml">
+	  <MauiXaml Update="Views\Component\ChatPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="ChatPage.xaml">
+	  <MauiXaml Update="Views\Staff\StaffDashboardPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

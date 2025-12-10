@@ -6,15 +6,7 @@
              x:Class="RestaurantManagementGUI.App">
     <Application.Resources>
         <ResourceDictionary>
-
-            <!-- ========================================= -->
-            <!-- CONVERTERS                                 -->
-            <!-- ========================================= -->
             <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
-
-            <!-- ========================================= -->
-            <!-- PHẦN CŨ: TABLE STYLES (GIỮ NGUYÊN)       -->
-            <!-- ========================================= -->
             <Style TargetType="Border" x:Key="BaseTableStyle">
                 <Setter Property="StrokeShape" Value="RoundRectangle 15"/>
                 <Setter Property="StrokeThickness" Value="1"/>
@@ -56,13 +48,6 @@
                 <Setter Property="HorizontalOptions" Value="Center"/>
                 <Setter Property="Opacity" Value="0.7"/>
             </Style>
-
-
-            <!-- ========================================= -->
-            <!-- PHẦN MỚI: ORDERPAGE COLORS & STYLES       -->
-            <!-- ========================================= -->
-
-            <!-- Colors -->
             <Color x:Key="PrimaryBrandColor">#263238</Color>
             <Color x:Key="SecondaryTextColor">#737373</Color>
             <Color x:Key="ButtonBackground">#FFBD59</Color>
@@ -159,11 +144,6 @@
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="BorderWidth" Value="0" />
             </Style>
-
-
-            <!-- ========================================= -->
-            <!-- MERGED DICTIONARIES (GIỮ NGUYÊN)         -->
-            <!-- ========================================= -->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />

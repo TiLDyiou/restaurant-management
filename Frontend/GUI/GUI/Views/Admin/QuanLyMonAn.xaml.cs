@@ -1,5 +1,4 @@
-﻿// File: QuanLyMonAnPage.xaml.cs
-using RestaurantManagementGUI.Models;
+﻿using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Helpers;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
@@ -58,7 +57,7 @@ public partial class QuanLyMonAnPage : ContentPage
         await LoadDishesAsync();
     }
 
-    // --- MỚI THÊM: Xử lý nút chọn ảnh ---
+    // Xử lý nút chọn ảnh
     private async void PickImage_Clicked(object sender, EventArgs e)
     {
         try
@@ -79,8 +78,6 @@ public partial class QuanLyMonAnPage : ContentPage
             await DisplayAlert("Lỗi", "Không thể chọn ảnh: " + ex.Message, "OK");
         }
     }
-    // ------------------------------------
-
     private async Task LoadDishesAsync()
     {
         try
@@ -105,7 +102,7 @@ public partial class QuanLyMonAnPage : ContentPage
         }
     }
 
-    // HÀM THÊM MÓN MỚI (POST /api/add_dish - [Authorize])
+    // HÀM THÊM MÓN MỚI
     private async void AddDish_Clicked(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(NewTenMA.Text) ||
@@ -127,8 +124,6 @@ public partial class QuanLyMonAnPage : ContentPage
         try
         {
             var content = new StringContent(JsonSerializer.Serialize(newDishDto), Encoding.UTF8, "application/json");
-
-            // --- THÊM TOKEN VÀO ĐÂY ---
             var token = await SecureStorage.Default.GetAsync("auth_token");
             if (string.IsNullOrEmpty(token))
             {
@@ -162,7 +157,7 @@ public partial class QuanLyMonAnPage : ContentPage
         }
     }
 
-    // HÀM XÓA MÓN (DELETE /api/softdelete_dish - [Authorize])
+    // HÀM XÓA MÓN
     private async void DeleteDish_Clicked(object sender, EventArgs e)
     {
         var button = sender as Button;
@@ -200,7 +195,7 @@ public partial class QuanLyMonAnPage : ContentPage
         }
     }
 
-    // HÀM SỬA (PUT /api/update_dish - [Authorize])
+    // HÀM SỬA
     private async void EditDish_Clicked(object sender, EventArgs e)
     {
         var button = sender as Button;
@@ -210,8 +205,6 @@ public partial class QuanLyMonAnPage : ContentPage
         // Điều hướng đến trang Edit mới, gửi kèm món ăn
         await Navigation.PushAsync(new EditMonAnPage(foodItem));
     }
-
-    // (Hàm GetInsecureHandler giữ nguyên từ LoginPage)
     private HttpClientHandler GetInsecureHandler()
     {
         var handler = new HttpClientHandler();

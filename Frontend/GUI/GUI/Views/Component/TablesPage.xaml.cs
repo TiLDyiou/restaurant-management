@@ -16,10 +16,23 @@ namespace RestaurantManagementGUI
         public TablesPage(TablesViewModel viewModel, ApiService apiService)
         {
             InitializeComponent();
-
             _viewModel = viewModel;
             _apiService = apiService;
             BindingContext = _viewModel;
+            SetupEvents();
+        }
+
+        public TablesPage()
+        {
+            InitializeComponent();
+            _apiService = new ApiService();
+            _viewModel = new TablesViewModel(_apiService);
+            BindingContext = _viewModel;
+            SetupEvents();
+        }
+
+        private void SetupEvents()
+        {
             _viewModel.TableSelected += OnTableSelected;
             _viewModel.DataUpdated += (s, e) => FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
         }
@@ -27,38 +40,14 @@ namespace RestaurantManagementGUI
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            try
-            {
-                // 1. Load dữ liệu mới nhất từ API
-                await _viewModel.LoadTablesAsync();
-
-                // 2. Cập nhật thống kê ban đầu
-                FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
-
-                // 3. Đăng ký lắng nghe thay đổi danh sách (để cập nhật thống kê)
-                _viewModel.FilteredTables.CollectionChanged += OnFilteredTablesChanged;
-
-                // 4. Đăng ký lại lắng nghe sự kiện từ SignalR
-                _viewModel.SubscribeToSignalR();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Không thể tải dữ liệu bàn: {ex.Message}");
-                await DisplayAlert("Lỗi", "Không thể tải sơ đồ bàn ăn. Vui lòng thử lại.", "OK");
-            }
+            await _viewModel.LoadTablesAsync();
+            _viewModel.SubscribeToSocket(); // Kích hoạt Socket
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
-            // 1. Hủy đăng ký thống kê
-            if (_viewModel.FilteredTables != null)
-            {
-                _viewModel.FilteredTables.CollectionChanged -= OnFilteredTablesChanged;
-            }
-            // 2. Gọi hàm hủy đăng ký SignalR
-            _viewModel.UnsubscribeFromSignalR();
+            _viewModel.UnsubscribeFromSocket();
         }
 
         private void OnFilteredTablesChanged(object sender, NotifyCollectionChangedEventArgs e)

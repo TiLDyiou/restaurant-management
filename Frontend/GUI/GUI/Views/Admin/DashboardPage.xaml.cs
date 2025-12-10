@@ -1,10 +1,11 @@
-﻿using Microsoft.Maui.Devices;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui;
+using Microsoft.Maui.Devices;
 using Microsoft.Maui.Storage;
-using RestaurantManagementGUI.Views;
+using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.ViewModels;
-using Microsoft.Maui;
-using Microsoft.Extensions.DependencyInjection;
+using RestaurantManagementGUI.Views;
 
 
 namespace RestaurantManagementGUI
@@ -34,7 +35,11 @@ namespace RestaurantManagementGUI
         {
             try
             {
+                bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
+                if (!confirm) return;
                 SecureStorage.RemoveAll();
+                // Ngắt kết nối Socket
+                SocketListener.Instance.Disconnect();
                 Application.Current.MainPage = new NavigationPage(new LoginPage());
             }
             catch (Exception ex)
@@ -65,33 +70,8 @@ namespace RestaurantManagementGUI
         private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrdersPage());
         private async void OnTablesClicked(object sender, EventArgs e)
         {
-            try
-            {
-                // Lấy DI container chính xác trong MAUI
-                var services = App.Current?.Handler?.MauiContext?.Services;
-
-                TablesPage page = null;
-
-                if (services != null)
-                {
-                    page = services.GetService<TablesPage>();
-                }
-
-                if (page == null)
-                {
-                    // fallback nếu DI không đăng ký
-                    var apiService = new ApiService();
-                    var tableHubService = new TableHubService();
-                    var vm = new TablesViewModel(apiService, tableHubService);
-                    page = new TablesPage(vm, apiService);
-                }
-
-                await Navigation.PushAsync(page);
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Lỗi", $"Không thể mở trang bàn: {ex.Message}", "OK");
-            }
+            var page = Handler?.MauiContext?.Services.GetService<TablesPage>() ?? new TablesPage();
+            await Navigation.PushAsync(page);
         }
 
 
@@ -107,7 +87,7 @@ namespace RestaurantManagementGUI
         private void AdjustButtonSizes()
         {
             var screenWidth = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
-            double availableWidth = screenWidth - 160 - 60; // trừ cột trái + margin/padding
+            double availableWidth = screenWidth - 160 - 60;
             double buttonWidth = screenWidth >= 1000 ? availableWidth / 4 : availableWidth / 2;
 
             foreach (var child in ButtonsLayout.Children)

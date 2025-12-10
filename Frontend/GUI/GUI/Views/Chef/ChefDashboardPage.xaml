@@ -75,7 +75,7 @@
                        HeightRequest="120">
                     <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
                         <Image Source="orders.png" HeightRequest="50"/>
-                        <Button Text="Orders"
+                        <Button Text="Nhận đơn"
                                 TextColor="{StaticResource PrimaryColor}"
                                 FontAttributes="Bold"
                                 BackgroundColor="Transparent"
@@ -89,11 +89,11 @@
                        Padding="15"
                        HasShadow="True"
                        Margin="0,0,20,20"
-                       WidthRequest="160"
+                       WidthRequest="190"
                        HeightRequest="120">
                     <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
                         <Image Source="users.png" HeightRequest="50"/>
-                        <Button Text="Users"
+                        <Button Text="Thông tin cá nhân"
                                 TextColor="{StaticResource PrimaryColor}"
                                 FontAttributes="Bold"
                                 BackgroundColor="Transparent"

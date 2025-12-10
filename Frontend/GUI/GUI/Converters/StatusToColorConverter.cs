@@ -15,9 +15,9 @@ namespace RestaurantManagementGUI.Converters
             return status switch
             {
                 "Bàn trống" => Colors.Green,
-                "Bàn bận" => Color.FromArgb("#503106"), // KHÔNG ĐƯỢC DÙNG "Có người" ở đây nữa
+                "Bàn bận" => Color.FromArgb("#503106"), 
                 "Bàn đã đặt" => Colors.Orange,
-                _ => Colors.Transparent // Nếu chuỗi không khớp 3 cái trên, nó sẽ ra màu trắng/trong suốt
+                _ => Colors.Transparent 
             };
         }
     }

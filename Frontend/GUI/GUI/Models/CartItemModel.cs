@@ -1,5 +1,4 @@
-﻿// File: Models/CartItemModel.cs
-using System;
+﻿using System;
 using Microsoft.Maui.Graphics;
 
 namespace RestaurantManagementGUI.Models

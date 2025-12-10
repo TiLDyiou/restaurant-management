@@ -9,7 +9,7 @@ public class CanEditConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null) return false;
-        return value.ToString() == "Đang làm"; // chỉ Enable khi đang làm
+        return value.ToString() == "Đang làm";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

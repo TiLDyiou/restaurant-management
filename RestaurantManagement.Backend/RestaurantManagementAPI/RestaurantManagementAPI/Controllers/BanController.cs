@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.Models.Entities;
-using RestaurentManagementAPI.Hubs;
+using RestaurentManagementAPI.Services;
+using System.Text.Json;
 
 namespace RestaurentManagementAPI.Controllers
 {
@@ -12,37 +11,34 @@ namespace RestaurentManagementAPI.Controllers
     public class BanController : ControllerBase
     {
         private readonly QLNHDbContext _context;
-        private readonly IHubContext<BanHub> _hubContext;
 
-        public BanController(QLNHDbContext context, IHubContext<BanHub> hubContext)
+        public BanController(QLNHDbContext context)
         {
             _context = context;
-            _hubContext = hubContext;
         }
 
-        // GET: api/ban
         [HttpGet]
         public async Task<IActionResult> GetBan()
         {
-            var bans = await _context.BAN
-                .Select(b => new { b.MaBan, b.TenBan, b.TrangThai })
-                .ToListAsync();
-
-            return Ok(bans);
+            return Ok(await _context.BAN.ToListAsync());
         }
 
-        // PUT: api/ban/{maBan}/trangthai
         [HttpPut("{maBan}/trangthai")]
-        public async Task<IActionResult> CapNhatTrangThaiBan(string maBan, [FromBody] string trangThai)
+        public async Task<IActionResult> UpdateStatus(string maBan, [FromBody] string trangThai)
         {
             var ban = await _context.BAN.FindAsync(maBan);
-            if (ban == null) return NotFound("Bàn không tồn tại");
+            if (ban == null) return NotFound();
 
             ban.TrangThai = trangThai;
             await _context.SaveChangesAsync();
 
-            // Gửi realtime cho frontend
-            await _hubContext.Clients.All.SendAsync("BanUpdated", new { MaBan = maBan, TrangThai = trangThai });
+            // GỬI SOCKET
+            if (TcpSocketServer.Instance != null)
+            {
+                var payload = new { MaBan = maBan, TrangThai = trangThai };
+                string jsonTable = JsonSerializer.Serialize(payload);
+                await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{jsonTable}");
+            }
 
             return Ok(ban);
         }
