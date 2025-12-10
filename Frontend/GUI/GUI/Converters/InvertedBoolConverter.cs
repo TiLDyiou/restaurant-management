@@ -7,8 +7,6 @@ namespace RestaurantManagementGUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // Trả về 'true' nếu giá trị là 'false'
-            // (Dùng để hiển thị chữ "ĐANG ẨN" khi TrangThai = false)
             return !(bool)value;
         }
 

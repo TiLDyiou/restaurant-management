@@ -27,8 +27,7 @@ namespace RestaurantManagementGUI.Views
                 _httpClient = new HttpClient();
 #endif
 
-                // ?? ??M B?O B?N ?Ã S?A C?NG VÀ GIAO TH?C (http/https) CHÍNH XÁC
-                _httpClient.BaseAddress = new Uri("https://localhost:7004/"); // Ho?c http://localhost:5276/
+                _httpClient.BaseAddress = new Uri("https://localhost:7004/");
 
                 BindingContext = this;
             }
@@ -57,18 +56,13 @@ namespace RestaurantManagementGUI.Views
 
                 if (dishes != null && dishes.Any())
                 {
-                    // ?? ?Ã S?A L?I TRÙNG DANH M?C (Case-Insensitive Grouping)
                     var groupedData = dishes
-                        // 1. G?p nhóm d?a trên TÊN ?Ã VI?T HOA (và c?t kho?ng tr?ng)
-                        .GroupBy(d => d.Loai.Trim().ToUpperInvariant())
+                       .GroupBy(d => d.Loai.Trim().ToUpperInvariant())
                         .Select(group => new DishGroup(
-                            // 2. L?y tên g?c (ví d?: "Món Chính") làm tiêu ?? c?t
                             group.First().Loai.Trim(),
                             group.ToList()
                         ))
                         .OrderBy(g => g.Category);
-
-                    // 3. C?p nh?t UI
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         GroupedDishes.Clear();

@@ -34,8 +34,6 @@ namespace RestaurantManagementGUI
         {
             FlyoutContainer.IsVisible = true;
             FlyoutContainer.InputTransparent = false;
-
-            // Animation: Fade in overlay + Slide in panel
             await Task.WhenAll(
                 Overlay.FadeTo(1, 250, Easing.CubicOut),
                 FlyoutPanel.TranslateTo(0, 0, 300, Easing.CubicOut)
@@ -45,7 +43,6 @@ namespace RestaurantManagementGUI
         // Phương thức để đóng Flyout
         public async Task CloseAsync()
         {
-            // Animation: Slide out panel + Fade out overlay
             await Task.WhenAll(
                 FlyoutPanel.TranslateTo(-320, 0, 250, Easing.CubicIn),
                 Overlay.FadeTo(0, 250, Easing.CubicIn)
@@ -62,13 +59,13 @@ namespace RestaurantManagementGUI
             var oldTable = oldValue as Ban;
             var newTable = newValue as Ban;
 
-            // 1. Hủy đăng ký sự kiện ở bàn cũ (tránh lỗi bộ nhớ)
+            // Hủy đăng ký sự kiện ở bàn cũ (tránh lỗi bộ nhớ)
             if (oldTable != null)
             {
                 oldTable.PropertyChanged -= control.OnTablePropertyChanged;
             }
 
-            // 2. Đăng ký lắng nghe sự kiện ở bàn mới
+            // Đăng ký lắng nghe sự kiện ở bàn mới
             if (newTable != null)
             {
                 newTable.PropertyChanged += control.OnTablePropertyChanged;
@@ -86,7 +83,7 @@ namespace RestaurantManagementGUI
             }
         }
 
-        // 3. HÀM MỚI: Xử lý khi thuộc tính của Bàn thay đổi (do SignalR cập nhật)
+        // Xử lý khi thuộc tính của Bàn thay đổi
         private void OnTablePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // Chỉ cập nhật nếu cái thay đổi là Trạng Thái hoặc Tên Bàn
@@ -103,19 +100,19 @@ namespace RestaurantManagementGUI
             }
         }
 
-        // 4. HÀM MỚI: Gom logic vẽ UI vào một chỗ
+        // Gom logic vẽ UI vào một chỗ
         private void UpdateFlyoutUI(Ban table)
         {
             SelectedTableName.Text = table.TenBan;
             SelectedTableStatus.Text = GetStatusEmoji(table.TrangThai) + " " + table.TrangThai;
 
-            // (Tùy chọn) Đổi màu chữ dựa theo trạng thái cho đẹp
+            // Đổi màu chữ dựa theo trạng thái cho đẹp
             if (table.TrangThai == "Bàn trống")
                 SelectedTableStatus.TextColor = Colors.Green;
             else if (table.TrangThai == "Bàn bận")
                 SelectedTableStatus.TextColor = Colors.Red;
             else
-                SelectedTableStatus.TextColor = Color.FromArgb("#ffbd59"); // Màu vàng cũ
+                SelectedTableStatus.TextColor = Color.FromArgb("#ffbd59");
         }
 
         private static string GetStatusEmoji(string status)
@@ -168,11 +165,6 @@ namespace RestaurantManagementGUI
             {
                 PaymentRequested?.Invoke(this, SelectedTable);
             }
-        }
-
-        private void OnRefreshTapped(object sender, EventArgs e)
-        {
-            RefreshRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnStatusFilterChanged(object sender, EventArgs e)

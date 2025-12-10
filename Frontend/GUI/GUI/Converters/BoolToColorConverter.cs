@@ -2,11 +2,6 @@
 
 namespace RestaurantManagementGUI.Converters
 {
-    /// <summary>
-    /// Converter để chuyển Bool thành Color
-    /// Parameter format: "ColorWhenTrue|ColorWhenFalse"
-    /// Ví dụ: "#4CAF50|#E0E0E0"
-    /// </summary>
     public class BoolToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -19,8 +14,6 @@ namespace RestaurantManagementGUI.Converters
                     return Color.FromArgb(isSelected ? colorArray[0] : colorArray[1]);
                 }
             }
-
-            // Mặc định trả về transparent nếu không hợp lệ
             return Colors.Transparent;
         }
 

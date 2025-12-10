@@ -3,6 +3,9 @@ using System.Text.Json;
 using Microsoft.Maui.Storage;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Services;
+using RestaurantManagementGUI.Views;
+using RestaurantManagementGUI.Views.Staff;
 
 namespace RestaurantManagementGUI
 {
@@ -73,16 +76,18 @@ namespace RestaurantManagementGUI
                         await SecureStorage.Default.SetAsync("user_chucvu", loginResponse.ChucVu ?? "");
 
                         UserState.CurrentMaNV = loginResponse.MaNV;
+                        _ = SocketListener.Instance.ConnectAsync();
                         string chucVu = loginResponse.ChucVu?.Trim().ToLower() ?? "";
                         if (chucVu == "đầu bếp" || chucVu == "dau bep")
                             Application.Current.MainPage = new NavigationPage(new ChefDashboardPage());
-                        else
+                        else if (chucVu == "Admin" || chucVu == "admin")
                             Application.Current.MainPage = new NavigationPage(new DashboardPage());
+                        else
+                            Application.Current.MainPage = new NavigationPage(new StaffDashboardPage());
                     }
                 }
                 else
                 {
-                    // API trả lỗi chi tiết (chưa kích hoạt, chưa xác thực, sai mật khẩu)
                     await DisplayAlert("Lỗi", responseBody, "OK");
                 }
             }

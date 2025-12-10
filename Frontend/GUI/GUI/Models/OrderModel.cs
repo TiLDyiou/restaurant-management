@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
-    // Class chi tiết món ăn (tương ứng với ChiTietHoaDonViewDto của API)
     public partial class ChiTietHoaDonModel : ObservableObject
     {
         [JsonPropertyName("maMA")]
@@ -21,13 +20,11 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("thanhTien")]
         public decimal ThanhTien { get; set; }
 
-        // Quan trọng: Dùng ObservableProperty để UI tự cập nhật khi đổi trạng thái
+        // Dùng ObservableProperty để UI tự cập nhật khi đổi trạng thái
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsDone))]
         [JsonPropertyName("trangThai")]
         private string trangThai;
-
-        // --- Thuộc tính hỗ trợ Logic & UI ---
         public bool IsDone => TrangThai == "Đã xong";
         public string FormattedTotal => $"{ThanhTien:N0} đ";
     }
@@ -45,7 +42,7 @@ namespace RestaurantManagementGUI.Models
         public string MaNV { get; set; }
 
         [JsonPropertyName("ngayLap")]
-        public DateTime NgayLap { get; set; }
+        public DateTime? NgayLap { get; set; }
 
         [JsonPropertyName("tongTien")]
         public decimal TongTien { get; set; }
@@ -56,19 +53,9 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("chiTietHoaDons")]
         public List<ChiTietHoaDonModel> ChiTietHoaDons { get; set; } = new();
 
-        // --- THÊM PROPERTY MỚI ĐỂ TRACK SELECTION TRONG UI ---
         [ObservableProperty]
         private bool isSelected;
-
-        // --- Helpers ---
         public string TableName => $"Bàn {MaBan}";
         public string FormattedTotal => $"{TongTien:N0} đ";
-    }
-
-    // DTO để gửi đi khi cập nhật trạng thái món
-    public class UpdateOrderItemStatusDto
-    {
-        [JsonPropertyName("newStatus")]
-        public string NewStatus { get; set; }
     }
 }

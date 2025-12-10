@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.DTOs;
 using RestaurentManagementAPI.DTOs.BanDtos;
 using RestaurentManagementAPI.Models.Entities;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using RestaurentManagementAPI.Hubs;
+using RestaurentManagementAPI.Services;
+using System.Text.Json;
 
 namespace RestaurentManagementAPI.Controllers
 {
@@ -15,104 +13,69 @@ namespace RestaurentManagementAPI.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly QLNHDbContext _context;
-        private readonly IHubContext<BanHub> _banHubContext;
-        public ReservationsController(QLNHDbContext context, IHubContext<BanHub> banHubContext)
+
+        public ReservationsController(QLNHDbContext context)
         {
             _context = context;
-            _banHubContext = banHubContext;
         }
 
-        // HÀM TẠO MÃ ĐẶT BÀN TỰ ĐỘNG
-        private async Task<string> GenerateNewDatBanIdAsync()
+        private async Task<string> GenerateId()
         {
-            var lastDatBan = await _context.DATBAN
-                                .OrderByDescending(db => db.MaDatBan)
-                                .FirstOrDefaultAsync();
-
-            if (lastDatBan == null)
-            {
-                return "DB00001"; // Bắt đầu
-            }
-
-            string numberPart = lastDatBan.MaDatBan.Substring(2); // Bỏ "DB"
-            if (int.TryParse(numberPart, out int lastNumber))
-            {
-                int newNumber = lastNumber + 1;
-                return $"DB{newNumber:D5}"; // Format thành 5 chữ số
-            }
-
-            throw new Exception("Không thể tạo mã đặt bàn mới.");
+            var last = await _context.DATBAN.OrderByDescending(db => db.MaDatBan).FirstOrDefaultAsync();
+            if (last == null) return "DB00001";
+            string num = last.MaDatBan.Substring(2);
+            if (int.TryParse(num, out int n)) return $"DB{n + 1:D5}";
+            return "DB00001";
         }
 
-        // API: POST /api/reservations 
-        // Ghi nhận thông tin đặt bàn mới
         [HttpPost]
-        public async Task<ActionResult<DatBanDto>> CreateReservation([FromBody] CreateDatBanDto createDto)
+        public async Task<IActionResult> Create([FromBody] CreateDatBanDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // Kiểm tra xem bàn có tồn tại không
-            var ban = await _context.BAN.FindAsync(createDto.MaBan);
-            if (ban == null)
-            {
-                return BadRequest($"Bàn với mã {createDto.MaBan} không tồn tại.");
-            }
+            var ban = await _context.BAN.FindAsync(dto.MaBan);
+            if (ban == null) return BadRequest("Bàn không tồn tại");
 
-           
-
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var trans = await _context.Database.BeginTransactionAsync();
             try
             {
-                var newMaDatBan = await GenerateNewDatBanIdAsync();
-
                 var datBan = new DatBan
                 {
-                    MaDatBan = newMaDatBan,
-                    MaBan = createDto.MaBan,
-                    TenKhachHang = createDto.TenKhachHang,
-                    SoDienThoai = createDto.SoDienThoai,
-                    ThoiGianDat = createDto.ThoiGianDat,
-                    SoNguoi = createDto.SoNguoi,
-                    TrangThai = "Đã xác nhận" // Trạng thái mặc định
+                    MaDatBan = await GenerateId(),
+                    MaBan = dto.MaBan,
+                    TenKhachHang = dto.TenKhachHang,
+                    SoDienThoai = dto.SoDienThoai,
+                    ThoiGianDat = dto.ThoiGianDat,
+                    SoNguoi = dto.SoNguoi,
+                    TrangThai = "Đã xác nhận"
                 };
 
-                // Cập nhật trạng thái Bàn
-                // Nếu đặt bàn cho tương lai gần, có thể set là "Bàn đã đặt"
+                bool isUpdated = false;
+                // Nếu đặt bàn trong vòng 3 tiếng tới thì đổi màu bàn luôn
                 if (datBan.ThoiGianDat > DateTime.UtcNow && datBan.ThoiGianDat < DateTime.UtcNow.AddHours(3))
                 {
                     ban.TrangThai = "Bàn đã đặt";
+                    isUpdated = true;
                 }
 
-                await _context.DATBAN.AddAsync(datBan);
+                _context.DATBAN.Add(datBan);
                 await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                if (ban.TrangThai == "Bàn đã đặt")
+                await trans.CommitAsync();
+
+                // GỬI SOCKET
+                if (isUpdated && TcpSocketServer.Instance != null)
                 {
-                    await _banHubContext.Clients.All.SendAsync("BanUpdated", new
-                    {
-                        MaBan = createDto.MaBan,
-                        TrangThai = "Bàn đã đặt"
-                    });
+                    var payload = new { MaBan = dto.MaBan, TrangThai = "Bàn đã đặt" };
+                    string jsonTable = JsonSerializer.Serialize(payload);
+                    await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{jsonTable}");
                 }
-                var datBanDto = new DatBanDto
-                {
-                    MaDatBan = datBan.MaDatBan,
-                    MaBan = datBan.MaBan,
-                    TenKhachHang = datBan.TenKhachHang,
-                    SoDienThoai = datBan.SoDienThoai,
-                    ThoiGianDat = datBan.ThoiGianDat,
-                    SoNguoi = datBan.SoNguoi,
-                    TrangThai = datBan.TrangThai
-                };
-                return Ok(datBanDto); // Trả về đối tượng vừa tạo
+
+                return Ok(datBan);
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                return StatusCode(500, $"Lỗi nội bộ server: {ex.Message}");
+                await trans.RollbackAsync();
+                return StatusCode(500, ex.Message);
             }
         }
     }

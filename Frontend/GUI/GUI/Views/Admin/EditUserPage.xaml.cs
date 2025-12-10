@@ -76,7 +76,7 @@ namespace RestaurantManagementGUI
                     ChucVu = ChucVuEntry.Text?.Trim(),
                     SDT = SDTEntry.Text?.Trim(),
                     Email = email,
-                    MatKhau = password,  // OK
+                    MatKhau = password,
                     Quyen = QuyenPicker.SelectedItem?.ToString()?.Trim()
                 };
 

@@ -1,3 +1,6 @@
+﻿using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Services;
+
 namespace RestaurantManagementGUI
 {
     public partial class ChefDashboardPage : ContentPage
@@ -25,14 +28,17 @@ namespace RestaurantManagementGUI
         {
             try
             {
-                // X�a SecureStorage
+                bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
+                if (!confirm) return;
                 SecureStorage.RemoveAll();
+                // Ngắt kết nối Socket
+                SocketListener.Instance.Disconnect();
 
                 Application.Current.MainPage = new NavigationPage(new LoginPage());
             }
             catch (Exception ex)
             {
-                await DisplayAlert("L?i", $"??ng xu?t th?t b?i: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi", $"Đăng xuất thất bại: {ex.Message}", "OK");
             }
         }
 

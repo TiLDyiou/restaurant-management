@@ -1,5 +1,4 @@
-﻿// File: ViewModels/FoodMenuViewModel.cs
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -25,7 +24,6 @@ namespace RestaurantManagementGUI
             AllFoodItems = new ObservableCollection<FoodModel>();
             CartItems = new ObservableCollection<CartItemModel>();
 
-            // Commands
             AddToCartCommand = new Command<FoodModel>(AddToCart);
             IncreaseQuantityCommand = new Command<CartItemModel>(IncreaseQuantity);
             DecreaseQuantityCommand = new Command<CartItemModel>(DecreaseQuantity);
@@ -189,7 +187,7 @@ namespace RestaurantManagementGUI
         public string RealTableId { get; set; } = "B01";
         private async void Checkout()
         {
-            // 1. Kiểm tra giỏ hàng
+            // Kiểm tra giỏ hàng
             if (CartItems == null || CartItems.Count == 0)
             {
                 await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống, vui lòng chọn món!", "OK");
@@ -197,7 +195,6 @@ namespace RestaurantManagementGUI
             }
             if (string.IsNullOrEmpty(UserState.CurrentMaNV))
             {
-                // Nếu biến static bị rỗng (do app bị kill background), thử lấy lại từ SecureStorage
                 var savedMaNV = await SecureStorage.Default.GetAsync("user_manv");
                 if (!string.IsNullOrEmpty(savedMaNV))
                 {
@@ -209,11 +206,11 @@ namespace RestaurantManagementGUI
                     return;
                 }
             }
-            // 2. Xác nhận gửi đơn
+            // Xác nhận gửi đơn
             bool confirmed = await Application.Current.MainPage.DisplayAlert("Xác nhận", $"Bạn có muốn gửi {CartItems.Count} món xuống bếp không?", "Gửi ngay", "Hủy");
             if (!confirmed) return;
 
-            // 3. Chuẩn bị dữ liệu gửi đi (DTO)
+            // Chuẩn bị dữ liệu gửi đi (DTO)
             var orderDto = new CreateHoaDonDto
             {
                 MaBan = RealTableId,
@@ -226,7 +223,6 @@ namespace RestaurantManagementGUI
                 }).ToList()
             };
 
-            // 4. CẤU HÌNH HTTP CLIENT (BẮT BUỘC PHẢI CÓ ĐOẠN NÀY ĐỂ CHẠY LOCALHOST)
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 
@@ -235,14 +231,12 @@ namespace RestaurantManagementGUI
 
             try
             {
-                // 5. Gọi API
+                // Gọi API
                 var response = await client.PostAsJsonAsync(ApiConfig.SubmitOrder, orderDto);
 
                 if (response.IsSuccessStatusCode)
                 {
                     await Application.Current.MainPage.DisplayAlert("Thành công", "Đơn hàng đã được gửi xuống bếp! 👨‍🍳", "OK");
-
-                    // 6. Xóa giỏ hàng sau khi gửi thành công
                     CancelOrder();
                 }
                 else

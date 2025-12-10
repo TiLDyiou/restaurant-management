@@ -1,107 +1,83 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.AspNetCore.SignalR.Client;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
+using RestaurantManagementGUI.Services;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace RestaurantManagementGUI.ViewModels
 {
     public partial class ChefOrdersViewModel : ObservableObject
     {
-        private HubConnection? _hubConnection;
         private readonly HttpClient _httpClient;
 
         [ObservableProperty]
         private ObservableCollection<HoaDonModel> activeOrders = new();
 
         [ObservableProperty]
-        private bool isConnected;
-
-        [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasNewOrders))]
         private int newOrderCount = 0;
-
         public bool HasNewOrders => NewOrderCount > 0;
+
+        [ObservableProperty]
+        private ObservableCollection<string> notificationList = new();
+
+        [ObservableProperty]
+        private bool showNotificationPopup;
 
         public ChefOrdersViewModel()
         {
             var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+            handler.ServerCertificateCustomValidationCallback = (m, c, ch, e) => true;
             _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
 
-            // Khởi tạo danh sách trước
-            LoadInitialOrders();
+            _ = LoadInitialOrders();
 
-            // Sau đó khởi tạo SignalR (chạy ngầm)
-            _ = InitializeSignalR();
+            // Đăng ký Socket
+            InitializeSocket();
         }
 
-        private async Task InitializeSignalR()
+        private void InitializeSocket()
         {
-            if (_hubConnection != null) return; // Chỉ khởi tạo 1 lần duy nhất
+            _ = SocketListener.Instance.ConnectAsync();
 
+            //Hủy đăng ký cũ trước khi đăng ký mới để tránh trùng lặp
+            SocketListener.Instance.OnNewOrderReceived -= HandleNewOrder;
+            SocketListener.Instance.OnNewOrderReceived += HandleNewOrder;
+        }
+        private void HandleNewOrder(string jsonPayload)
+        {
             try
             {
-                // Logic URL chuẩn xác hơn
-                string hubUrl = ApiConfig.BaseUrl.Replace("/api/", "/kitchenHub");
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var newOrder = JsonSerializer.Deserialize<HoaDonModel>(jsonPayload, options);
 
-                _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(hubUrl, conf => {
-                        conf.HttpMessageHandlerFactory = (x) => new HttpClientHandler
-                        {
-                            ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-                        };
-                    })
-                    .WithAutomaticReconnect()
-                    .Build();
-
-                // --- ĐĂNG KÝ SỰ KIỆN (Chỉ làm 1 lần tại đây) ---
-
-                _hubConnection.On<object>("ReceiveOrder", (data) =>
+                if (newOrder != null)
                 {
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
+                        // Tăng số đếm -> Chấm đỏ tự hiện
                         NewOrderCount++;
-                        // Tải lại để đồng bộ dữ liệu mới nhất
-                        await LoadInitialOrders();
 
-                        // Logic hiển thị thông báo (như cũ)
-                        bool viewNow = await Application.Current.MainPage.DisplayAlert(
-                            "BẾP - CÓ ĐƠN MỚI",
-                            $"🔔 Bạn có đơn mới! (Mới: {NewOrderCount})",
-                            "Xem ngay", "Để sau");
+                        // Thêm vào danh sách hiển thị
+                        ActiveOrders.Insert(0, newOrder);
 
-                        if (viewNow)
-                        {
-                            NewOrderCount = 0;
-                            // Reset count khi xem
-                        }
+                        string time = DateTime.Now.ToString("HH:mm");
+                        NotificationList.Insert(0, $"Bàn {newOrder.MaBan} vừa gửi đơn mới ({time})");
+
+                        // Giới hạn chỉ giữ 10 thông báo gần nhất cho nhẹ
+                        if (NotificationList.Count > 10) NotificationList.RemoveAt(NotificationList.Count - 1);
+
+                        // Hiển thị Popup (DUY NHẤT TẠI ĐÂY)
+                        await Application.Current.MainPage.DisplayAlert("👨‍🍳 BẾP", $"Có đơn mới bàn {newOrder.MaBan}", "OK");
                     });
-                });
-
-                _hubConnection.Closed += (error) =>
-                {
-                    IsConnected = false;
-                    return Task.CompletedTask;
-                };
-
-                _hubConnection.Reconnected += (connectionId) =>
-                {
-                    IsConnected = true;
-                    return Task.CompletedTask;
-                };
-
-                // Bắt đầu kết nối
-                await _hubConnection.StartAsync();
-                await _hubConnection.InvokeAsync("JoinKitchenGroup");
-                IsConnected = true;
+                }
             }
             catch (Exception ex)
             {
-                IsConnected = false;
-                Console.WriteLine($"Lỗi SignalR: {ex.Message}");
+                Console.WriteLine($"Lỗi Socket Bếp: {ex.Message}");
             }
         }
 
@@ -114,10 +90,9 @@ namespace RestaurantManagementGUI.ViewModels
 
                 if (orders != null)
                 {
-                    // Lọc đơn chưa hoàn thành
                     var pendingOrders = orders
                         .Where(x => x.TrangThai != "Đã hoàn thành" && x.TrangThai != "Đã thanh toán")
-                        .OrderByDescending(x => x.NgayLap) // Đơn mới nhất lên đầu
+                        .OrderByDescending(x => x.NgayLap)
                         .ToList();
 
                     MainThread.BeginInvokeOnMainThread(() => {
@@ -136,46 +111,49 @@ namespace RestaurantManagementGUI.ViewModels
         }
 
         [RelayCommand]
-        void ResetNotificationCount() => NewOrderCount = 0;
+        void ResetNotificationCount()
+        {
+            NewOrderCount = 0;
+        }
 
-        // --- XỬ LÝ MÓN ĂN (Đã sửa logic tìm cha) ---
+        [RelayCommand]
+        void ToggleNotifications()
+        {
+            // Bật/Tắt popup
+            ShowNotificationPopup = !ShowNotificationPopup;
+
+            // Nếu đang mở popup thì reset số đếm (mất chấm đỏ)
+            if (ShowNotificationPopup)
+            {
+                NewOrderCount = 0;
+            }
+        }
+
+        [RelayCommand]
+        void ClearAllNotifications()
+        {
+            NotificationList.Clear();
+            ShowNotificationPopup = false;
+        }
+
         [RelayCommand]
         async Task CompleteDish(ChiTietHoaDonModel item)
         {
             if (item == null) return;
-
-            // SỬA LỖI: Tìm cha dựa trên ID món ăn và Logic logic (thay vì Contains object)
-            // Vì item này có thể là object cũ, ta phải tìm order nào chứa món có MaMA tương ứng
             var parentOrder = ActiveOrders.FirstOrDefault(o => o.ChiTietHoaDons.Any(ct => ct.MaMA == item.MaMA));
+            if (parentOrder == null) return;
 
-            if (parentOrder == null)
-            {
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không tìm thấy đơn hàng chứa món này (có thể danh sách đã thay đổi).", "OK");
-                await LoadInitialOrders(); // Tải lại cho chắc
-                return;
-            }
-
-            // Gọi API
             var res = await _httpClient.PutAsJsonAsync(
                  $"orders/update-dishes-status?maHD={parentOrder.MaHD}&maMA={item.MaMA}",
                  new UpdateOrderItemStatusDto { NewStatus = "Đã xong" });
 
             if (res.IsSuccessStatusCode)
             {
-                // Cập nhật UI
                 item.TrangThai = "Đã xong";
-
-                // QUAN TRỌNG: Báo cho Command "Hoàn tất đơn" kiểm tra lại điều kiện
-                // Vì CompleteOrderCommand phụ thuộc vào parentOrder, ta phải báo hiệu thay đổi
                 CompleteOrderCommand.NotifyCanExecuteChanged();
-            }
-            else
-            {
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Cập nhật thất bại", "OK");
             }
         }
 
-        // --- XỬ LÝ CẢ ĐƠN ---
         [RelayCommand(CanExecute = nameof(CanCompleteOrder))]
         async Task CompleteOrder(HoaDonModel order)
         {
@@ -183,7 +161,7 @@ namespace RestaurantManagementGUI.ViewModels
 
             var res = await _httpClient.PutAsJsonAsync(
                 $"orders/update-all-dishes-in-{order.MaHD}-order-status",
-                new UpdateOrderItemStatusDto { NewStatus = "Đã hoàn thành" });
+                new UpdateOrderStatusDto { NewStatus = "Đã hoàn thành" });
 
             if (res.IsSuccessStatusCode)
             {
@@ -191,7 +169,6 @@ namespace RestaurantManagementGUI.ViewModels
             }
         }
 
-        // Điều kiện: Tất cả món phải là "Đã xong" thì mới cho bấm nút này
         private bool CanCompleteOrder(HoaDonModel order)
         {
             if (order == null || order.ChiTietHoaDons == null) return false;
