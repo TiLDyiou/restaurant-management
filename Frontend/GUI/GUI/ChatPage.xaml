@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RestaurantManagementGUI.ViewModels"
+             xmlns:model="clr-namespace:RestaurantManagementGUI.Models"
+             xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
+             x:Class="RestaurantManagementGUI.ChatPage"
+             x:DataType="vm:ChatViewModel"
+             Title="Tin nhắn"
+             BackgroundColor="White">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ChatBoolToColorConverter x:Key="ChatBoolToColorConverter"/>
+            <converters:ChatBoolToOpacityConverter x:Key="ChatBoolToOpacityConverter"/>
+            <converters:ChatInvertedBoolConverter x:Key="ChatInvertedBoolConverter"/>
+
+            <PathGeometry x:Key="IconSend" Figures="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            <PathGeometry x:Key="IconImage" Figures="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+            <PathGeometry x:Key="IconMic" Figures="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            <PathGeometry x:Key="IconSmile" Figures="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+            <PathGeometry x:Key="IconCall" Figures="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-2.2 2.2c-3.23-1.61-5.81-4.19-7.41-7.42l2.2-2.2c.27-.27.35-.66.24-1.01-.36-1.11-.56-2.3-.56-3.53 0-.54-.45-1-1-1H4.39c-.55 0-1 .45-1 1 0 8.85 7.16 16 16 16 .55 0 1-.45 1-1v-3.26c-.01-.55-.46-1-1.01-1z"/>
+            <PathGeometry x:Key="IconVideo" Figures="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid ColumnDefinitions="320, *" RowDefinitions="*" BackgroundColor="White">
+
+            <Grid Grid.Column="0" RowDefinitions="Auto, Auto, Auto, *, Auto" Padding="16" BackgroundColor="#FAFAFA">
+                <Grid Grid.Row="0" ColumnDefinitions="*, Auto, Auto" Margin="0,0,0,16">
+                    <Label Text="Tin nhắn" FontSize="24" FontAttributes="Bold" TextColor="#333" VerticalOptions="Center"/>
+                    <Button Grid.Column="1" Text="👤+" Command="{Binding OpenAddFriendCommand}" BackgroundColor="Transparent" TextColor="#666" FontSize="18" WidthRequest="40" HeightRequest="40"/>
+                    <Grid Grid.Column="2">
+                        <Button Text="🔔" Command="{Binding OpenFriendRequestsCommand}" BackgroundColor="Transparent" TextColor="#666" FontSize="18" WidthRequest="40" HeightRequest="40"/>
+                        <Border IsVisible="True" BackgroundColor="Red" HeightRequest="8" WidthRequest="8" StrokeShape="RoundRectangle 4" HorizontalOptions="End" VerticalOptions="Start" Margin="0,8,8,0" StrokeThickness="0"/>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*, *" ColumnSpacing="10" Margin="0,0,0,16">
+                    <Border StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="0" BackgroundColor="{Binding IsDirectTab, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='#0084FF|#E0E0E0'}">
+                        <Button Text="Bạn bè" BackgroundColor="Transparent" FontAttributes="Bold" TextColor="{Binding IsDirectTab, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='White|#666'}" Command="{Binding SwitchToDirectCommand}"/>
+                    </Border>
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="0" BackgroundColor="{Binding IsDirectTab, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='#E0E0E0|#0084FF'}">
+                        <Button Text="Nhóm chung" BackgroundColor="Transparent" FontAttributes="Bold" TextColor="{Binding IsDirectTab, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='#666|White'}" Command="{Binding SwitchToGroupCommand}"/>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="2" StrokeShape="RoundRectangle 10" BackgroundColor="#F0F0F0" StrokeThickness="0" HeightRequest="40" Padding="12,0" Margin="0,0,0,16">
+                    <Entry Placeholder="🔍 Tìm kiếm..." BackgroundColor="Transparent" TextColor="#333" VerticalOptions="Center"/>
+                </Border>
+
+                <CollectionView Grid.Row="3" ItemsSource="{Binding FilteredConversations}" SelectedItem="{Binding SelectedConversation}" SelectionMode="Single">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:ChatConversation">
+                            <Border StrokeThickness="0" BackgroundColor="{Binding IsSelected, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='#EBF5FF|Transparent'}" Padding="10" StrokeShape="RoundRectangle 10" Margin="0,4">
+                                <Grid ColumnDefinitions="44, *">
+                                    <Border StrokeShape="RoundRectangle 22" BackgroundColor="{Binding Avatar}" HeightRequest="44" WidthRequest="44" StrokeThickness="0">
+                                        <Label Text="{Binding Name, StringFormat='{0:F1}'}" TextColor="White" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold" TextColor="#333" LineBreakMode="TailTruncation"/>
+                                        <Label Text="{Binding LastMessage}" FontSize="13" TextColor="#777" LineBreakMode="TailTruncation"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Grid Grid.Row="4" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                    <Button Text="👤+ Tạo nhóm" FontSize="12" BackgroundColor="White" TextColor="#333" BorderColor="#DDD" BorderWidth="1" CornerRadius="8" Command="{Binding OpenCreateGroupCommand}"/>
+                    <Button Grid.Column="1" Text="✏️ Quản lý" FontSize="12" BackgroundColor="White" TextColor="#333" BorderColor="#DDD" BorderWidth="1" CornerRadius="8" Command="{Binding OpenManageGroupCommand}"/>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto, Auto" BackgroundColor="White">
+
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="20,15" BackgroundColor="White">
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                        <Border StrokeShape="RoundRectangle 20" HeightRequest="40" WidthRequest="40" BackgroundColor="{Binding SelectedConversation.Avatar}" StrokeThickness="0">
+                            <Label Text="{Binding SelectedConversation.Name, StringFormat='{0:F1}'}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                        <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                            <Label Text="{Binding CurrentChatName}" FontAttributes="Bold" FontSize="16" TextColor="#333"/>
+                            <Label Text="• Đang hoạt động" FontSize="12" TextColor="#22C55E"/>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="2" Spacing="15">
+                        <Border StrokeShape="RoundRectangle 20" HeightRequest="40" WidthRequest="40" BackgroundColor="#F5F5F5" StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CallAudioCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Path Aspect="Uniform" Data="{StaticResource IconCall}" Fill="#0084FF" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                        <Border StrokeShape="RoundRectangle 20" HeightRequest="40" WidthRequest="40" BackgroundColor="#F5F5F5" StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CallVideoCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Path Aspect="Uniform" Data="{StaticResource IconVideo}" Fill="#0084FF" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                    </HorizontalStackLayout>
+                    <BoxView Grid.ColumnSpan="3" VerticalOptions="End" HeightRequest="1" Color="#EEE" Margin="-20,0"/>
+                </Grid>
+
+                <CollectionView Grid.Row="1" x:Name="MessagesList" ItemsSource="{Binding CurrentMessages}" Margin="0,0,0,10" BackgroundColor="White">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:ChatMessage">
+                            <Grid Padding="20,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <VerticalStackLayout HorizontalOptions="{Binding IsSentMessage, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='End|Start'}" Spacing="2">
+                                    <Label Text="{Binding SenderName}" FontSize="11" TextColor="#999" IsVisible="{Binding IsSentMessage, Converter={StaticResource ChatInvertedBoolConverter}}" Margin="5,0,0,0"/>
+                                    <Border BackgroundColor="{Binding IsSentMessage, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='#0084FF|#F2F2F7'}" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="15,10" MaximumWidthRequest="450">
+                                        <StackLayout>
+                                            <Label Text="{Binding Content}" TextColor="{Binding IsSentMessage, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='White|Black'}" FontSize="15">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsImage}" Value="True">
+                                                        <Setter Property="IsVisible" Value="False"/>
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                            <Image Source="{Binding Content}" Aspect="AspectFill" WidthRequest="200" HeightRequest="200">
+                                                <Image.Clip>
+                                                    <RoundRectangleGeometry CornerRadius="12"/>
+                                                </Image.Clip>
+                                                <Image.Triggers>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsImage}" Value="False">
+                                                        <Setter Property="IsVisible" Value="False"/>
+                                                    </DataTrigger>
+                                                </Image.Triggers>
+                                            </Image>
+                                        </StackLayout>
+                                    </Border>
+                                    <Label Text="{Binding Timestamp, StringFormat='{0:HH:mm}'}" FontSize="10" TextColor="#CCC" HorizontalOptions="{Binding IsSentMessage, Converter={StaticResource ChatBoolToColorConverter}, ConverterParameter='End|Start'}" Margin="5,0"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Grid Grid.Row="2" HeightRequest="40" BackgroundColor="White" IsVisible="{Binding ShowEmojiPicker}" Padding="15,0">
+                    <ScrollView Orientation="Horizontal">
+                        <HorizontalStackLayout Spacing="10">
+                            <Button Text="👍" Command="{Binding AddEmojiCommand}" CommandParameter="👍" BackgroundColor="Transparent" FontSize="20"/>
+                            <Button Text="❤️" Command="{Binding AddEmojiCommand}" CommandParameter="❤️" BackgroundColor="Transparent" FontSize="20"/>
+                            <Button Text="😂" Command="{Binding AddEmojiCommand}" CommandParameter="😂" BackgroundColor="Transparent" FontSize="20"/>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </Grid>
+
+                <Grid Grid.Row="3" ColumnDefinitions="Auto, *, Auto" Padding="15,10" ColumnSpacing="12" BackgroundColor="White">
+                    <BoxView Grid.ColumnSpan="3" VerticalOptions="Start" HeightRequest="1" Color="#EEE" Margin="-15,-10,-15,10"/>
+                    <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                        <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SendImageCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Path Aspect="Uniform" Data="{StaticResource IconImage}" Fill="#999" HeightRequest="22" WidthRequest="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                        <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40">
+                            <Path Aspect="Uniform" Data="{StaticResource IconMic}" Fill="#999" HeightRequest="22" WidthRequest="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                        <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleEmojiCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Path Aspect="Uniform" Data="{StaticResource IconSmile}" Fill="#999" HeightRequest="22" WidthRequest="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                    </HorizontalStackLayout>
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 20" BackgroundColor="#F5F5F5" StrokeThickness="0" HeightRequest="40">
+                        <Entry Text="{Binding MessageInput}" Placeholder="Nhập tin nhắn..." TextColor="#333" BackgroundColor="Transparent" VerticalOptions="Center" Margin="15,0" ReturnCommand="{Binding SendMessageCommand}"/>
+                    </Border>
+                    <Border Grid.Column="2" StrokeShape="RoundRectangle 22" BackgroundColor="#0084FF" HeightRequest="44" WidthRequest="44" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SendMessageCommand}"/>
+                        </Border.GestureRecognizers>
+                        <Path Aspect="Uniform" Data="{StaticResource IconSend}" Fill="White" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <BoxView BackgroundColor="#000" Opacity="0.4" IsVisible="{Binding ShowAddFriendModal}" InputTransparent="False"/>
+        <Border IsVisible="{Binding ShowAddFriendModal}" WidthRequest="400" HeightRequest="400" BackgroundColor="White" StrokeShape="RoundRectangle 15" VerticalOptions="Center" HorizontalOptions="Center" Padding="20">
+            <Grid RowDefinitions="Auto, Auto, *">
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Thêm Bạn Mới" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <Button Grid.Column="1" Text="✕" Command="{Binding CloseAddFriendCommand}" BackgroundColor="Transparent" TextColor="#999" WidthRequest="40" HeightRequest="40"/>
+                </Grid>
+                <Border Grid.Row="1" BackgroundColor="#F5F5F5" StrokeShape="RoundRectangle 8" StrokeThickness="0" HeightRequest="40" Margin="0,15">
+                    <Entry Placeholder="Nhập tên..." Margin="10,0" TextColor="#333"/>
+                </Border>
+                <CollectionView Grid.Row="2" ItemsSource="{Binding AvailableUsersToAdd}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Employee">
+                            <Grid ColumnDefinitions="40, *, Auto" Padding="0,8">
+                                <Border StrokeShape="RoundRectangle 20" BackgroundColor="#EEE" HeightRequest="40" WidthRequest="40">
+                                    <Label Text="{Binding Name, StringFormat='{0:F1}'}" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" TextColor="#333"/>
+                                    <Label Text="{Binding Username}" FontSize="12" TextColor="#888"/>
+                                </VerticalStackLayout>
+                                <Button Grid.Column="2" Text="Kết bạn" FontSize="12" BackgroundColor="#E6F2FF" TextColor="#0084FF" HeightRequest="30" Padding="10,0" CornerRadius="5"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+        <BoxView BackgroundColor="#000" Opacity="0.4" IsVisible="{Binding ShowManageGroupModal}" InputTransparent="False"/>
+        <Border IsVisible="{Binding ShowManageGroupModal}" WidthRequest="350" HeightRequest="400" BackgroundColor="White" StrokeShape="RoundRectangle 15" VerticalOptions="Center" HorizontalOptions="Center" Padding="20">
+            <VerticalStackLayout Spacing="15">
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Quản lý nhóm" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <Button Grid.Column="1" Text="✕" Command="{Binding CloseManageGroupCommand}" BackgroundColor="Transparent" TextColor="#999" WidthRequest="40" HeightRequest="40"/>
+                </Grid>
+                <Label Text="{Binding GroupCountText}" TextColor="#0084FF" FontAttributes="Bold"/>
+                <Label Text="Danh sách các nhóm tham gia:" TextColor="#666"/>
+                <CollectionView ItemsSource="{Binding GroupList}" HeightRequest="200">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Stroke="#EEE" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="10" Margin="0,5">
+                                <Grid ColumnDefinitions="40, *">
+                                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{Binding Avatar}" HeightRequest="40" WidthRequest="40">
+                                        <Label Text="{Binding Name, StringFormat='{0:F1}'}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold"/>
+                                    </Border>
+                                    <Label Grid.Column="1" Text="{Binding Name}" TextColor="#333" FontAttributes="Bold" VerticalOptions="Center" Margin="10,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Border>
+
+        <BoxView BackgroundColor="#000" Opacity="0.4" IsVisible="{Binding ShowCreateGroupModal}" InputTransparent="False"/>
+        <Border IsVisible="{Binding ShowCreateGroupModal}" WidthRequest="400" HeightRequest="500" BackgroundColor="White" StrokeShape="RoundRectangle 15" VerticalOptions="Center" HorizontalOptions="Center" Padding="20">
+            <Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Tạo Nhóm Mới" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <Button Grid.Column="1" Text="✕" Command="{Binding CloseCreateGroupCommand}" BackgroundColor="Transparent" TextColor="#999" WidthRequest="40" HeightRequest="40"/>
+                </Grid>
+                <Label Grid.Row="1" Text="TÊN NHÓM" FontSize="11" FontAttributes="Bold" TextColor="#888" Margin="0,15,0,5"/>
+                <Border Grid.Row="2" Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 6" HeightRequest="40" Padding="10,0">
+                    <Entry Text="{Binding NewGroupName}" Placeholder="VD: Team Bếp..." TextColor="#333"/>
+                </Border>
+                <CollectionView Grid.Row="3" ItemsSource="{Binding UsersForNewGroup}" Margin="0,20,0,0">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Employee">
+                            <Grid ColumnDefinitions="30, *, Auto" Padding="0,8">
+                                <CheckBox IsChecked="{Binding IsSelectedForGroup}" Color="#0084FF"/>
+                                <Label Grid.Column="1" Text="{Binding Name}" FontAttributes="Bold" TextColor="#333" VerticalOptions="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <Button Grid.Row="4" Text="Tạo Nhóm" Command="{Binding ConfirmCreateGroupCommand}" BackgroundColor="#0084FF" TextColor="White" Margin="0,15,0,0"/>
+            </Grid>
+        </Border>
+
+        <BoxView BackgroundColor="#000" Opacity="0.4" IsVisible="{Binding ShowFriendRequestModal}" InputTransparent="False"/>
+        <Border IsVisible="{Binding ShowFriendRequestModal}" WidthRequest="400" HeightRequest="200" BackgroundColor="White" StrokeShape="RoundRectangle 15" VerticalOptions="Center" HorizontalOptions="Center" Padding="20">
+            <Grid RowDefinitions="Auto, *">
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Lời mời kết bạn" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <Button Grid.Column="1" Text="✕" Command="{Binding CloseFriendRequestsCommand}" BackgroundColor="Transparent" TextColor="#999" WidthRequest="40" HeightRequest="40"/>
+                </Grid>
+                <CollectionView Grid.Row="1" ItemsSource="{Binding PendingRequests}" Margin="0,10,0,0">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:FriendRequest">
+                            <Grid ColumnDefinitions="40, *, Auto" ColumnSpacing="10">
+                                <Border StrokeShape="RoundRectangle 20" BackgroundColor="#EEE" HeightRequest="40" WidthRequest="40">
+                                    <Label Text="{Binding FromUserName, StringFormat='{0:F1}'}" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding FromUserName}" FontAttributes="Bold" TextColor="#333"/>
+                                    <Label Text="Muốn kết bạn" FontSize="12" TextColor="#888"/>
+                                </VerticalStackLayout>
+                                <HorizontalStackLayout Grid.Column="2" Spacing="5">
+                                    <Button Text="✔" BackgroundColor="#E6FFFA" TextColor="#00C851" HeightRequest="35" WidthRequest="35" CornerRadius="10" Padding="0"/>
+                                    <Button Text="✕" BackgroundColor="#FFEBEE" TextColor="#FF4444" HeightRequest="35" WidthRequest="35" CornerRadius="10" Padding="0"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>
