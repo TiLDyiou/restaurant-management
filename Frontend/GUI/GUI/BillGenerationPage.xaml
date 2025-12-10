@@ -2,111 +2,157 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:RestaurantManagementGUI.ViewModels"
+             xmlns:model="clr-namespace:RestaurantManagementGUI.Models"
+             xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
              x:Class="RestaurantManagementGUI.BillGenerationPage"
-             Title="THANH TOÁN"
-             BackgroundColor="#1E2630">
+             x:DataType="vm:BillGenerationViewModel"
+             Title="Thu Ngân"
+             BackgroundColor="#F2F2F7">
 
-    <Grid ColumnDefinitions="400, *">
-        <Grid Grid.Column="0" RowDefinitions="Auto, *" Padding="20" BackgroundColor="#263238">
-            <Label Text="DANH SÁCH HÓA ĐƠN" TextColor="#FFC107" FontSize="20" FontAttributes="Bold" Margin="0,0,0,20"/>
+    <Grid ColumnDefinitions="280, 460, *" Padding="20" ColumnSpacing="20">
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding PendingBills}" SelectionMode="None">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border StrokeShape="RoundRectangle 10" StrokeThickness="0" BackgroundColor="#37474F" Margin="0,0,0,15" Padding="15">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BillGenerationViewModel}}, Path=SelectBillCommand}" CommandParameter="{Binding .}"/>
-                            </Border.GestureRecognizers>
-
-                            <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
-                                <Border Grid.RowSpan="2" HeightRequest="50" WidthRequest="50" StrokeShape="RoundRectangle 25" BackgroundColor="#FFC107" Margin="0,0,15,0">
-                                    <Label Text="{Binding TableName}" TextColor="#1E2630" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" FontSize="12"/>
-                                </Border>
-
-                                <Label Grid.Column="1" Text="{Binding MaHD}" TextColor="White" FontAttributes="Bold" FontSize="16"/>
-                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding NgayLap, StringFormat='{0:HH:mm}'}" TextColor="#B0BEC5" FontSize="12"/>
-                                <Label Grid.Column="1" Grid.RowSpan="2" Text="{Binding FormattedTotal}" 
-                                       TextColor="#4CAF50" FontAttributes="Bold" FontSize="18" 
-                                       HorizontalOptions="End" VerticalOptions="Center"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
-
-        <Grid Grid.Column="1" RowDefinitions="*, Auto" Padding="30">
-
-            <Border Grid.Row="0" StrokeShape="RoundRectangle 15" BackgroundColor="White" Padding="30" Margin="0,0,0,20" VerticalOptions="Fill">
-                <Grid RowDefinitions="Auto, Auto, *, Auto">
-                    <StackLayout HorizontalOptions="Center" Spacing="5">
-                        <Label Text="NHÀ HÀNG NHÓM II" FontSize="24" FontAttributes="Bold" TextColor="Black" HorizontalOptions="Center"/>
-                        <Label Text="--- Phiếu Thanh Toán ---" TextColor="Gray" HorizontalOptions="Center"/>
-                        <Label Text="{Binding SelectedBill.MaHD, StringFormat='Số phiếu: {0}'}" TextColor="Gray" HorizontalOptions="Center"/>
-                        <Label Text="{Binding SelectedBill.NgayLap, StringFormat='Ngày: {0:dd/MM/yyyy HH:mm}'}" TextColor="Gray" HorizontalOptions="Center"/>
-                    </StackLayout>
-
-                    <BoxView Grid.Row="1" HeightRequest="1" Color="Black" Margin="0,15"/>
-
-                    <CollectionView Grid.Row="2" ItemsSource="{Binding SelectedBill.ChiTietHoaDons}">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid ColumnDefinitions="*, 50, 100" Margin="0,5">
-                                    <Label Text="{Binding TenMA}" TextColor="#333" FontSize="16"/>
-                                    <Label Grid.Column="1" Text="{Binding SoLuong, StringFormat='x{0}'}" TextColor="#333" HorizontalOptions="Center"/>
-                                    <Label Grid.Column="2" Text="{Binding FormattedTotal}" TextColor="#333" FontAttributes="Bold" HorizontalOptions="End"/>
+        <Border Grid.Column="0" BackgroundColor="White" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="15">
+            <Border.Shadow>
+                <Shadow Brush="Black" Opacity="0.05" Radius="10" Offset="0,2"/>
+            </Border.Shadow>
+            <Grid RowDefinitions="Auto, *">
+                <Label Text="Danh sách chờ" FontSize="18" FontAttributes="Bold" TextColor="#333" Margin="0,0,0,15"/>
+                <CollectionView Grid.Row="1" ItemsSource="{Binding PendingBills}" SelectionMode="Single" SelectedItem="{Binding SelectedBill, Mode=TwoWay}" EmptyView="Không có đơn chờ">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:HoaDonModel">
+                            <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="12" BackgroundColor="#F8F9FA">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal" />
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="#E8F5E9" />
+                                                    <Setter Property="Stroke" Value="#4CAF50" />
+                                                    <Setter Property="StrokeThickness" Value="1" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+                                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
+                                    <Border Grid.RowSpan="2" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 8" BackgroundColor="#8B6B47" Margin="0,0,10,0">
+                                        <Label Text="{Binding TableName}" TextColor="White" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+                                    </Border>
+                                    <Label Grid.Column="1" Text="{Binding FormattedTotal}" FontSize="15" FontAttributes="Bold" TextColor="#333"/>
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding NgayLap, StringFormat='{0:HH:mm}'}" FontSize="12" TextColor="#888"/>
                                 </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
 
-                    <Grid Grid.Row="3" ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" Margin="0,20,0,0">
-                        <BoxView Grid.ColumnSpan="2" HeightRequest="1" Color="Black" Margin="0,0,0,10" VerticalOptions="Start"/>
-                        <Label Text="TỔNG CỘNG:" FontSize="20" FontAttributes="Bold" TextColor="Black" VerticalOptions="End"/>
-                        <Label Grid.Column="1" Text="{Binding SelectedBill.FormattedTotal}" 
-                               FontSize="28" FontAttributes="Bold" TextColor="#D32F2F" HorizontalOptions="End"/>
+        <ScrollView Grid.Column="1">
+            <Border StrokeShape="RoundRectangle 20" BackgroundColor="#8B6B47" StrokeThickness="0" Padding="0">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.15" Radius="15" Offset="0,5"/>
+                </Border.Shadow>
+                <Grid RowDefinitions="Auto, *">
+                    <Grid Grid.Row="0" BackgroundColor="#8B6B47" Padding="20">
+                        <Label Text="{Binding SelectedBill.TableName, StringFormat='HÓA ĐƠN - {0}'}" FontSize="18" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
                     </Grid>
-                </Grid>
-            </Border>
+                    <BoxView HeightRequest="15" BackgroundColor="#F5F5F5" VerticalOptions="End" Margin="0"/>
 
-            <Border Grid.Row="1" StrokeShape="RoundRectangle 15" BackgroundColor="#263238" Padding="20">
-                <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, *">
-
-                    <StackLayout Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalOptions="Center" Spacing="20" Margin="0,0,0,20">
-                        <RadioButton Content="Tiền mặt" TextColor="White" GroupName="PaymentMethod" 
-                                     IsChecked="{Binding IsCashPayment}"
-                                     CheckedChanged="OnPaymentMethodChanged" Value="Cash"/>
-                        <RadioButton Content="Chuyển khoản (QR)" TextColor="White" GroupName="PaymentMethod" 
-                                     CheckedChanged="OnPaymentMethodChanged" Value="Transfer"/>
-                    </StackLayout>
-
-                    <Grid x:Name="CashSection" Grid.Row="1" Grid.Column="0" RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" IsVisible="True">
-                        <Label Text="Khách đưa:" TextColor="White" VerticalOptions="Center" Margin="0,0,10,0"/>
-                        <Entry Grid.Column="1" Text="{Binding CustomerPayAmount}" Keyboard="Numeric" Placeholder="Nhập số tiền" 
-                               TextColor="Black" BackgroundColor="White" Margin="0,0,0,10"/>
-
-                        <Label Grid.Row="1" Text="Tiền thừa:" TextColor="#FFC107" FontAttributes="Bold" FontSize="18"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding ChangeAmount, StringFormat='{0:N0} đ'}" 
-                               TextColor="#FFC107" FontAttributes="Bold" FontSize="18" HorizontalOptions="End"/>
-                    </Grid>
-
-                    <Grid x:Name="TransferSection" Grid.Row="1" Grid.Column="0" IsVisible="False">
-                        <StackLayout Orientation="Horizontal" Spacing="15" VerticalOptions="Center">
-                            <Image Source="dotnet_bot.png" HeightRequest="100" WidthRequest="100" BackgroundColor="White"/>
-                            <StackLayout VerticalOptions="Center">
-                                <Label Text="Ngân hàng: MBBank" TextColor="White"/>
-                                <Label Text="STK: 0987654321" TextColor="White" FontAttributes="Bold" FontSize="18"/>
-                                <Label Text="Chủ TK: NHOM II" TextColor="White"/>
+                    <Border Grid.Row="1" BackgroundColor="#F5F5F5" Padding="25" StrokeThickness="0">
+                        <Grid RowDefinitions="Auto, Auto, *, Auto, Auto, Auto">
+                            <StackLayout Grid.Row="0" Margin="0,0,0,20">
+                                <Label Text="{Binding SelectedBill.MaHD, StringFormat='Mã HĐ: {0}'}" TextColor="#666"/>
+                                <Label Text="{Binding SelectedBill.NgayLap, StringFormat='Ngày: {0:dd/MM/yyyy HH:mm}'}" TextColor="#666"/>
                             </StackLayout>
-                        </StackLayout>
-                    </Grid>
+                            <CollectionView Grid.Row="2" ItemsSource="{Binding SelectedBill.ChiTietHoaDons}" Margin="0,0,0,20">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="model:ChiTietHoaDonModel">
+                                        <Grid ColumnDefinitions="30, *, Auto" Padding="0,5">
+                                            <Label Text="{Binding SoLuong}" FontAttributes="Bold" TextColor="#333"/>
+                                            <Label Grid.Column="1" Text="{Binding TenMA}" TextColor="#333"/>
+                                            <Label Grid.Column="2" Text="{Binding ThanhTien, StringFormat='{0:N0}'}" TextColor="#333"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                            <BoxView Grid.Row="3" HeightRequest="1" Color="#CCC" Margin="0,10"/>
+                            <Grid Grid.Row="4" ColumnDefinitions="*, Auto">
+                                <Label Text="TỔNG CỘNG" FontAttributes="Bold" FontSize="18" TextColor="#333"/>
+                                <Label Grid.Column="1" Text="{Binding SelectedBill.FormattedTotal}" FontAttributes="Bold" FontSize="22" TextColor="#8B6B47"/>
+                            </Grid>
 
-                    <Button Grid.Row="1" Grid.Column="1" Text="THANH TOÁN &amp; IN" 
-                            BackgroundColor="#FFC107" TextColor="#1E2630" FontAttributes="Bold" 
-                            HeightRequest="60" CornerRadius="10" Margin="20,0,0,0"
-                            Command="{Binding PayAndPrintCommand}"/>
+                            <Label Grid.Row="5" Text="Cảm ơn và hẹn gặp lại quý khách!" FontSize="14" FontAttributes="Italic" TextColor="#888" HorizontalOptions="Center" Margin="0,25,0,0"/>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Border>
-        </Grid>
+        </ScrollView>
+
+        <Border Grid.Column="2" BackgroundColor="White" StrokeShape="RoundRectangle 20" Padding="25">
+            <ScrollView>
+                <VerticalStackLayout Spacing="20">
+                    <Label Text="Thanh Toán" FontSize="22" FontAttributes="Bold" TextColor="#333"/>
+
+                    <Border StrokeShape="RoundRectangle 12" Padding="15" StrokeThickness="2" Stroke="{Binding IsCashPayment, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4CAF50|#EEEEEE'}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectCashPaymentCommand}"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="15">
+                            <Label Text="💵" FontSize="24" VerticalOptions="Center"/>
+                            <VerticalStackLayout>
+                                <Label Text="Tiền mặt" FontAttributes="Bold" TextColor="#333"/>
+                                <Label Text="Thanh toán tại quầy" FontSize="12" TextColor="#888"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <VerticalStackLayout IsVisible="{Binding IsCashPayment}" Spacing="5">
+                        <Label Text="Tiền khách đưa:" TextColor="#666"/>
+                        <Border Stroke="#DDD" StrokeShape="RoundRectangle 8" Padding="10,0">
+                            <Entry Text="{Binding CustomerPayAmount}" Placeholder="Nhập số tiền..." Keyboard="Numeric" FontSize="16"/>
+                        </Border>
+                        <Label Text="{Binding ChangeAmount, StringFormat='Tiền thừa: {0:N0} đ'}" TextColor="#4CAF50" FontAttributes="Bold" IsVisible="{Binding ShowChange}"/>
+                    </VerticalStackLayout>
+
+                    <Border StrokeShape="RoundRectangle 12" Padding="15" StrokeThickness="2" Stroke="{Binding IsTransferPayment, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#2196F3|#EEEEEE'}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectTransferPaymentCommand}"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="15">
+                            <Label Text="📱" FontSize="24" VerticalOptions="Center"/>
+                            <VerticalStackLayout>
+                                <Label Text="Chuyển khoản / QR" FontAttributes="Bold" TextColor="#333"/>
+                                <Label Text="Quét mã ngân hàng" FontSize="12" TextColor="#888"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border IsVisible="{Binding IsTransferPayment}" 
+                            HeightRequest="220" 
+                            WidthRequest="220" 
+                            HorizontalOptions="Center" 
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 10"
+                            Stroke="#E0E0E0"
+                            StrokeThickness="1">
+
+                        <Grid>
+                            <ActivityIndicator IsRunning="True" Color="#8B6B47" HorizontalOptions="Center" VerticalOptions="Center"/>
+
+                            <Image Source="{Binding QrCodeUrl}" 
+                                    Aspect="AspectFit"
+                                    HorizontalOptions="Fill"
+                                    VerticalOptions="Fill"/>
+                        </Grid>
+                    </Border>
+                    <Button Text="XÁC NHẬN THANH TOÁN" Command="{Binding PayAndPrintCommand}" BackgroundColor="#8B6B47" TextColor="White" FontAttributes="Bold" HeightRequest="50" CornerRadius="10" Margin="0,20,0,0"/>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
     </Grid>
 </ContentPage>

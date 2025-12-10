@@ -2,9 +2,15 @@
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:RestaurantManagementGUI"
+             xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
              x:Class="RestaurantManagementGUI.App">
     <Application.Resources>
         <ResourceDictionary>
+
+            <!-- ========================================= -->
+            <!-- CONVERTERS                                 -->
+            <!-- ========================================= -->
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
 
             <!-- ========================================= -->
             <!-- PHẦN CŨ: TABLE STYLES (GIỮ NGUYÊN)       -->

@@ -23,15 +23,12 @@ namespace RestaurantManagementGUI.Models
 
         // Quan trọng: Dùng ObservableProperty để UI tự cập nhật khi đổi trạng thái
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsDone))] // Khi TrangThai đổi -> IsDone tự đổi theo
+        [NotifyPropertyChangedFor(nameof(IsDone))]
         [JsonPropertyName("trangThai")]
         private string trangThai;
 
         // --- Thuộc tính hỗ trợ Logic & UI ---
-
-        // Thuộc tính này để ViewModel kiểm tra món đã xong chưa
         public bool IsDone => TrangThai == "Đã xong";
-
         public string FormattedTotal => $"{ThanhTien:N0} đ";
     }
 
@@ -58,6 +55,10 @@ namespace RestaurantManagementGUI.Models
 
         [JsonPropertyName("chiTietHoaDons")]
         public List<ChiTietHoaDonModel> ChiTietHoaDons { get; set; } = new();
+
+        // --- THÊM PROPERTY MỚI ĐỂ TRACK SELECTION TRONG UI ---
+        [ObservableProperty]
+        private bool isSelected;
 
         // --- Helpers ---
         public string TableName => $"Bàn {MaBan}";

@@ -121,11 +121,11 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Order Modifications -->
+                <!-- Chat -->
                 <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
                         <Image Source="modify.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
-                        <Button Text="Order Modifications" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrderModificationsClicked"/>
+                        <Button Text="Chat" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnChatClicked"/>
                     </VerticalStackLayout>
                 </Border>
 

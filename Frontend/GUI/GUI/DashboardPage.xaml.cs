@@ -3,8 +3,8 @@ using Microsoft.Maui.Storage;
 using RestaurantManagementGUI.Views;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.ViewModels;
-using Microsoft.Maui; 
-using Microsoft.Extensions.DependencyInjection; 
+using Microsoft.Maui;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace RestaurantManagementGUI
@@ -96,7 +96,7 @@ namespace RestaurantManagementGUI
 
 
         private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BillGenerationPage());
-        private async void OnOrderModificationsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrderModificationsPage());
+        private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
 
         protected override void OnAppearing()
         {
