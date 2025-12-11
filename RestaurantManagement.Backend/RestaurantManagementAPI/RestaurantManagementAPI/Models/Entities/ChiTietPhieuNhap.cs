@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RestaurentManagementAPI.Models.Entities
+namespace RestaurantManagementAPI.Models.Entities
 {
     [Table("CHITIETPHIEUNHAP")]
     public class ChiTietPhieuNhap

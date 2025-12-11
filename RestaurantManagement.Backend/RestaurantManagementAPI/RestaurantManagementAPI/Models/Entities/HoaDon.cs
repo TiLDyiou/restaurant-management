@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RestaurentManagementAPI.Models.Entities
+namespace RestaurantManagementAPI.Models.Entities
 {
     [Table("HOADON")]
     public class HoaDon

@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.Seeders;
-using RestaurentManagementAPI.Services;
+using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.Seeders;
+using RestaurantManagementAPI.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

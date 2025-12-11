@@ -76,7 +76,9 @@ namespace RestaurantManagementGUI
 
 
         private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BillGenerationPage());
+        private async void OnRevenueReportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new RevenueReportPage());
         private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
+
 
         protected override void OnAppearing()
         {

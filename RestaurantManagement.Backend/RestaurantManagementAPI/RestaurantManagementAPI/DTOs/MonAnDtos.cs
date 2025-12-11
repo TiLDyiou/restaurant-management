@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestaurentManagementAPI.DTOs
+namespace RestaurantManagementAPI.DTOs
 {
     // DTO để trả về (GET)
     public class MonAnDto

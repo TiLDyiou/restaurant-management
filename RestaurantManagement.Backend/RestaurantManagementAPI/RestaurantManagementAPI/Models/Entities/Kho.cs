@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RestaurentManagementAPI.Models.Entities
+namespace RestaurantManagementAPI.Models.Entities
 {
     [Table("KHO")]
     public class Kho

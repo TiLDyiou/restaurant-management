@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestaurentManagementAPI.DTOs.BanDtos
+namespace RestaurantManagementAPI.DTOs.BanDtos
 {
     public class CreateDatBanDto
     {
@@ -21,7 +21,7 @@ namespace RestaurentManagementAPI.DTOs.BanDtos
         public int SoNguoi { get; set; }
     }
 }
-namespace RestaurentManagementAPI.DTOs.BanDtos
+namespace RestaurantManagementAPI.DTOs.BanDtos
 {
     public class DatBanDto
     {

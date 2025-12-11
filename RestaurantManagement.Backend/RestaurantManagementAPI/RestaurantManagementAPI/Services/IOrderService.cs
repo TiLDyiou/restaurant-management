@@ -1,8 +1,8 @@
-﻿using RestaurentManagementAPI.DTOs.MonAnDtos;
+﻿using RestaurantManagementAPI.DTOs.MonAnDtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace RestaurentManagementAPI.Services
+namespace RestaurantManagementAPI.Services
 {
     public interface IOrderService
     {

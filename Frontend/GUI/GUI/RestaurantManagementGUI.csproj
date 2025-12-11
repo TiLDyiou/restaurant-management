@@ -107,6 +107,9 @@
 	  <MauiXaml Update="Views\Component\OrdersPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Component\RevenueReportPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Component\TablesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

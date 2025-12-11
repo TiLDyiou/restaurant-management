@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestaurentManagementAPI.DTOs.MonAnDtos
+namespace RestaurantManagementAPI.DTOs.MonAnDtos
 {
     // DTO hiển thị chi tiết món ăn trong hoá đơn
     public class ChiTietHoaDonViewDto

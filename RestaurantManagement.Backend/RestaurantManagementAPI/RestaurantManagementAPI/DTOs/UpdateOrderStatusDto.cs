@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestaurentManagementAPI.DTOs.MonAnDtos
+namespace RestaurantManagementAPI.DTOs.MonAnDtos
 {
     public class UpdateOrderStatusDto
     {

@@ -1,9 +1,9 @@
-﻿using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.Models.Entities;
+﻿using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 
-namespace RestaurentManagementAPI.Data
+namespace RestaurantManagementAPI.Data
 {
     public class DataSeeder
     {

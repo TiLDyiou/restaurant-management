@@ -104,6 +104,14 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Revenue Report -->
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="revenue.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Báo cáo doanh thu" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnRevenueReportClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
                 <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
                         <Image Source="chat_9374926.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>

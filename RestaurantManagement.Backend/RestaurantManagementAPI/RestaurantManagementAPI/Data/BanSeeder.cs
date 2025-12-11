@@ -1,10 +1,10 @@
-﻿using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.Models.Entities;
+﻿using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace RestaurentManagementAPI.Seeders
+namespace RestaurantManagementAPI.Seeders
 {
     public class BanSeeder
     {

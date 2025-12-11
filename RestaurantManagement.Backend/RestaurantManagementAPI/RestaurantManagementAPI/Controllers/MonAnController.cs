@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.DTOs;
-using RestaurentManagementAPI.Models.Entities;
+using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.DTOs;
+using RestaurantManagementAPI.Models.Entities;
 
 [ApiController]
 [Route("api/dishes")]

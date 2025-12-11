@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.DTOs.BanDtos;
-using RestaurentManagementAPI.Models.Entities;
-using RestaurentManagementAPI.Services;
+using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.DTOs.BanDtos;
+using RestaurantManagementAPI.Models.Entities;
+using RestaurantManagementAPI.Services;
 using System.Text.Json;
 
-namespace RestaurentManagementAPI.Controllers
+namespace RestaurantManagementAPI.Controllers
 {
     [Route("api/reservations")]
     [ApiController]

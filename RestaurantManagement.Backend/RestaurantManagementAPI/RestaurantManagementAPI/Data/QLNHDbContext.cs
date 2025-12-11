@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestaurentManagementAPI.Models.Entities;
+using RestaurantManagementAPI.Models.Entities;
 
-namespace RestaurentManagementAPI.Data
+namespace RestaurantManagementAPI.Data
 {
     public class QLNHDbContext : DbContext
     {

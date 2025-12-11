@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.DTOs.MonAnDtos;
-using RestaurentManagementAPI.Models.Entities;
+using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.DTOs.MonAnDtos;
+using RestaurantManagementAPI.Models.Entities;
 using System.Text.Json;
 
-namespace RestaurentManagementAPI.Services
+namespace RestaurantManagementAPI.Services
 {
     public class OrderService : IOrderService
     {
@@ -167,16 +167,27 @@ namespace RestaurentManagementAPI.Services
         public async Task<HoaDonDto> CheckoutAsync(string maHD, CheckoutRequestDto checkoutDto)
         {
             var hoaDon = await _context.HOADON.Include(h => h.Ban).FirstOrDefaultAsync(h => h.MaHD == maHD);
+
             if (hoaDon == null) throw new Exception("Không tìm thấy hóa đơn");
             if (hoaDon.TrangThai == "Đã thanh toán") throw new Exception("Đơn này đã thanh toán rồi");
 
+            // 1. CẬP NHẬT TRẠNG THÁI (Khớp với Controller)
             hoaDon.TrangThai = "Đã thanh toán";
+
+            // 2. CẬP NHẬT GIỜ THANH TOÁN (Khắc phục lỗi không hiện doanh thu hôm nay)
+            hoaDon.NgayLap = DateTime.Now;
+
             hoaDon.PaymentMethod = checkoutDto.PaymentMethod;
-            if (hoaDon.Ban != null) hoaDon.Ban.TrangThai = "Bàn trống";
+
+            // 3. Trả bàn
+            if (hoaDon.Ban != null)
+            {
+                hoaDon.Ban.TrangThai = "Bàn trống"; // Hoặc "Trống" tùy DB của bạn
+            }
 
             await _context.SaveChangesAsync();
 
-            // GỬI SOCKET TRẢ BÀN
+            // Gửi Socket (Giữ nguyên)
             if (TcpSocketServer.Instance != null)
             {
                 string jsonTable = JsonSerializer.Serialize(new { MaBan = hoaDon.MaBan, TrangThai = "Bàn trống" });

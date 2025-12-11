@@ -1,4 +1,4 @@
-﻿namespace RestaurentManagementAPI.DTOs
+﻿namespace RestaurantManagementAPI.DTOs
 {
     // DTO đăng ký tài khoản
     public class RegisterDto

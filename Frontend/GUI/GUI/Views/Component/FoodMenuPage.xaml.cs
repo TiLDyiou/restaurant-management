@@ -1,24 +1,25 @@
-using RestaurantManagementGUI.Models;
+﻿using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Helpers;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
-using System.Text.Json;
-using Microsoft.Maui.Controls;
-using System.Net.Http;
 using System.Linq;
 using System;
+using Microsoft.Maui.Controls;
 
 namespace RestaurantManagementGUI.Views
 {
     public partial class FoodMenuPage : ContentPage
     {
         private readonly HttpClient _httpClient;
+
+        // Sử dụng ObservableCollection để UI tự cập nhật khi thêm/xóa
         public ObservableCollection<DishGroup> GroupedDishes { get; set; } = new();
 
         public FoodMenuPage()
         {
             InitializeComponent();
 
+            // Khởi tạo HttpClient
             try
             {
 #if DEBUG
@@ -26,43 +27,47 @@ namespace RestaurantManagementGUI.Views
 #else
                 _httpClient = new HttpClient();
 #endif
-
+                // Đổi lại IP/Port cho đúng với server của bạn
                 _httpClient.BaseAddress = new Uri("https://localhost:7004/");
-
-                BindingContext = this;
             }
             catch (Exception ex)
             {
-                DisplayAlert("L?i Kh?i T?o (Constructor)",
-                             $"Kh�ng th? kh?i t?o HttpClient. H�y ki?m tra BaseAddress (URL/PORT).\nL?i: {ex.Message}",
-                             "?�ng");
+                DisplayAlert("Lỗi khởi tạo", ex.Message, "OK");
             }
+
+            // Quan trọng: Gán BindingContext là chính trang này để XAML nhận diện được GroupedDishes
+            BindingContext = this;
         }
 
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if (_httpClient != null)
-            {
-                await LoadDishesAsync();
-            }
+            // Load lại dữ liệu mỗi khi trang hiện lên
+            await LoadDishesAsync();
         }
 
         private async Task LoadDishesAsync()
         {
+            if (_httpClient == null) return;
+
             try
             {
+                // Gọi API lấy danh sách món ăn
                 var dishes = await _httpClient.GetFromJsonAsync<List<Dish>>("/api/dishes/get-dishes");
 
                 if (dishes != null && dishes.Any())
                 {
+                    // Group dữ liệu theo Loại (Category)
                     var groupedData = dishes
-                       .GroupBy(d => d.Loai.Trim().ToUpperInvariant())
+                        .GroupBy(d => d.Loai?.Trim().ToUpperInvariant() ?? "KHÁC") // Xử lý null safety
                         .Select(group => new DishGroup(
-                            group.First().Loai.Trim(),
+                            group.First().Loai?.Trim() ?? "KHÁC",
                             group.ToList()
                         ))
-                        .OrderBy(g => g.Category);
+                        .OrderBy(g => g.Category)
+                        .ToList();
+
+                    // Cập nhật UI trên MainThread
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         GroupedDishes.Clear();
@@ -74,16 +79,17 @@ namespace RestaurantManagementGUI.Views
                 }
                 else
                 {
-                    await DisplayAlert("Th�ng tin", "API kh�ng tr? v? m�n ?n n�o.", "OK");
+                    await DisplayAlert("Thông báo", "Không tìm thấy món ăn nào.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("L?i T?i Menu (LoadDishesAsync)", $"Kh�ng th? t?i API: {ex.Message}", "OK");
+                // Debug.WriteLine(ex.Message); // Tốt nhất nên dùng Debug
+                await DisplayAlert("Lỗi kết nối", $"Không thể tải thực đơn: {ex.Message}", "OK");
             }
         }
 
-        // (H�m GetInsecureHandler gi? nguy�n)
+        // Helper bỏ qua SSL cho localhost (Chỉ dùng khi Debug)
         private HttpClientHandler GetInsecureHandler()
         {
             var handler = new HttpClientHandler();

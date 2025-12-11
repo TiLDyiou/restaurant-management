@@ -3,15 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.DTOs;
-using RestaurentManagementAPI.Models.Entities;
-using RestaurentManagementAPI.Services;
+using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.DTOs;
+using RestaurantManagementAPI.Models.Entities;
+using RestaurantManagementAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace RestaurentManagementAPI.Controllers
+namespace RestaurantManagementAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
