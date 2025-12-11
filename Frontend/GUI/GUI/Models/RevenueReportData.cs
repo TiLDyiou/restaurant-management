@@ -1,37 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RestaurantManagementAPI.DTOs
+namespace RestaurantManagementGUI.Models
 {
-    public class RevenueReportResponse
+    public class RevenueReportData
     {
         public decimal TotalRevenue { get; set; }
         public int TotalOrders { get; set; }
         public decimal AverageOrderValue { get; set; }
         public decimal RevenueTrend { get; set; }
-        public List<DailyRevenueDto> DailyRevenues { get; set; }
-        public List<EmployeePerformanceDto> TopEmployees { get; set; }
-
-        // MỚI THÊM: Chứa danh sách giao dịch chi tiết (cho nhân viên xem)
-        public List<TransactionDetailDto> RecentTransactions { get; set; }
+        public List<DailyRevenue> DailyRevenues { get; set; } = new();
+        public List<EmployeePerformance> TopEmployees { get; set; } = new();
+        public List<TransactionDetail> RecentTransactions { get; set; } = new(); // List cho nhân viên
     }
 
-    public class DailyRevenueDto
+    public class DailyRevenue
     {
         public DateTime Date { get; set; }
         public decimal Revenue { get; set; }
         public int OrderCount { get; set; }
     }
 
-    public class EmployeePerformanceDto
+    public class EmployeePerformance
     {
         public string EmployeeName { get; set; }
         public int OrdersServed { get; set; }
         public decimal TotalRevenue { get; set; }
     }
 
-    // MỚI THÊM
-    public class TransactionDetailDto
+    public class TransactionDetail
     {
         public string MaHD { get; set; }
         public DateTime ThoiGian { get; set; }

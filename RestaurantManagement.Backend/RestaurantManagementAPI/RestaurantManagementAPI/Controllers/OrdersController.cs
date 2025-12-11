@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Cần cái này để dùng .ToListAsync, .SumAsync
-using RestaurantManagementAPI.Data; // Cần cái này để dùng QLNHDbContext
+using Microsoft.EntityFrameworkCore;
+using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs.MonAnDtos;
 using RestaurantManagementAPI.Services;
-using RestaurantManagementAPI.Models.Entities; // Cần cái này để dùng HoaDon, NhanVien
-using RestaurantManagementAPI.DTOs; // Namespace chứa các DTO báo cáo (RevenueReportResponse...)
+using RestaurantManagementAPI.Models.Entities;
+using RestaurantManagementAPI.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
-using System.Linq; // Cần cái này để dùng LINQ
+using System.Linq;
 
 namespace RestaurantManagementAPI.Controllers
 {
@@ -17,61 +17,71 @@ namespace RestaurantManagementAPI.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly QLNHDbContext _context; // 1. Khai báo thêm Context
+        private readonly QLNHDbContext _context;
 
-        // 2. Inject thêm QLNHDbContext vào Constructor
         public OrdersController(IOrderService orderService, QLNHDbContext context)
         {
             _orderService = orderService;
             _context = context;
         }
 
-        // ==========================================
-        // PHẦN BÁO CÁO DOANH THU (MỚI THÊM VÀO)
-        // ==========================================
+        // ============================================================
+        // PHẦN BÁO CÁO DOANH THU (ĐÃ SỬA HOÀN CHỈNH)
+        // ============================================================
 
         // GET: /api/orders/revenue-report
         [HttpGet("revenue-report")]
-        public async Task<IActionResult> GetRevenueReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<IActionResult> GetRevenueReport(
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate,
+            [FromQuery] string? maNV = null) // Tham số lọc theo nhân viên
         {
             try
             {
                 var start = startDate.Date;
                 var end = endDate.Date.AddDays(1).AddTicks(-1);
 
-                // Lấy dữ liệu từ DB (dùng _context)
-                var ordersInRange = await _context.HOADON
+                // 1. QUERY CƠ BẢN (Lấy danh sách hóa đơn đã thanh toán)
+                var query = _context.HOADON
                     .Where(o => o.NgayLap.HasValue &&
                                 o.NgayLap.Value >= start &&
                                 o.NgayLap.Value <= end &&
-                                o.TrangThai == "Đã thanh toán") // Chỉ lấy đơn đã thanh toán
+                                o.TrangThai == "Đã thanh toán")
                     .Include(o => o.NhanVien)
-                    .ToListAsync();
+                    .AsQueryable();
 
-                // Tính tổng quan
+                // 2. PHÂN QUYỀN: Nếu có mã NV -> Lọc theo người đó
+                if (!string.IsNullOrEmpty(maNV))
+                {
+                    query = query.Where(o => o.MaNV == maNV);
+                }
+
+                var ordersInRange = await query.ToListAsync();
+
+                // 3. TÍNH TOÁN TỔNG QUAN
                 var totalRevenue = ordersInRange.Sum(o => o.TongTien);
                 var totalOrders = ordersInRange.Count;
                 var avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-                // Tính Trend (So sánh kỳ trước)
+                // 4. TÍNH TREND (So sánh kỳ trước)
                 var daysDiff = (end - start).TotalDays;
                 var prevStart = start.AddDays(-daysDiff);
                 var prevEnd = start.AddTicks(-1);
 
-                var prevRevenue = await _context.HOADON
+                var prevQuery = _context.HOADON
                     .Where(o => o.NgayLap.HasValue &&
                                 o.NgayLap.Value >= prevStart &&
                                 o.NgayLap.Value <= prevEnd &&
-                                o.TrangThai == "Đã thanh toán")
-                    .SumAsync(o => o.TongTien);
+                                o.TrangThai == "Đã thanh toán");
 
+                if (!string.IsNullOrEmpty(maNV)) prevQuery = prevQuery.Where(o => o.MaNV == maNV);
+
+                var prevRevenue = await prevQuery.SumAsync(o => o.TongTien);
                 decimal trend = 0;
-                if (prevRevenue > 0)
-                    trend = ((totalRevenue - prevRevenue) / prevRevenue) * 100;
-                else if (totalRevenue > 0)
-                    trend = 100;
+                if (prevRevenue > 0) trend = ((totalRevenue - prevRevenue) / prevRevenue) * 100;
+                else if (totalRevenue > 0) trend = 100;
 
-                // Tính Daily Revenues
+                // 5. BIỂU ĐỒ DOANH THU (Daily Revenues)
                 var allDates = Enumerable.Range(0, 1 + end.Subtract(start).Days)
                                          .Select(offset => start.AddDays(offset))
                                          .ToList();
@@ -87,22 +97,36 @@ namespace RestaurantManagementAPI.Controllers
                             OrderCount = orders.Count()
                         }
                     )
-                    .OrderBy(d => d.Date)
-                    .ToList();
+                    .OrderBy(d => d.Date).ToList();
 
-                // Tính Top Employees
+                // 6. TOP EMPLOYEES (Dành cho Admin)
                 var topEmployees = ordersInRange
-                    .GroupBy(o => o.NhanVien != null ? o.NhanVien.HoTen : "Không xác định")
+                    .GroupBy(o => o.NhanVien != null ? o.NhanVien.HoTen : "Unknown")
                     .Select(g => new EmployeePerformanceDto
                     {
                         EmployeeName = g.Key,
                         OrdersServed = g.Count(),
                         TotalRevenue = g.Sum(o => o.TongTien)
                     })
-                    .OrderByDescending(e => e.TotalRevenue)
-                    .Take(5)
-                    .ToList();
+                    .OrderByDescending(e => e.TotalRevenue).Take(5).ToList();
 
+                // 7. RECENT TRANSACTIONS (Dành cho Nhân viên) -> MỚI THÊM
+                var recentTransactions = new List<TransactionDetailDto>();
+                if (!string.IsNullOrEmpty(maNV))
+                {
+                    recentTransactions = ordersInRange
+                        .OrderByDescending(o => o.NgayLap)
+                        .Take(10) // Lấy 10 đơn gần nhất
+                        .Select(o => new TransactionDetailDto
+                        {
+                            MaHD = o.MaHD,
+                            ThoiGian = o.NgayLap.Value,
+                            TongTien = o.TongTien,
+                            TrangThai = o.TrangThai
+                        }).ToList();
+                }
+
+                // Trả kết quả
                 var result = new RevenueReportResponse
                 {
                     TotalRevenue = totalRevenue,
@@ -110,7 +134,8 @@ namespace RestaurantManagementAPI.Controllers
                     AverageOrderValue = avgOrderValue,
                     RevenueTrend = trend,
                     DailyRevenues = dailyRevenues,
-                    TopEmployees = topEmployees
+                    TopEmployees = topEmployees,
+                    RecentTransactions = recentTransactions // List này sẽ có dữ liệu nếu là NV
                 };
 
                 return Ok(new { Success = true, Message = "Lấy dữ liệu thành công", Data = result });
@@ -122,10 +147,9 @@ namespace RestaurantManagementAPI.Controllers
         }
 
         // ==========================================
-        // PHẦN CODE CŨ CỦA BẠN (GIỮ NGUYÊN)
+        // CÁC HÀM CŨ (ORDER SERVICE) - GIỮ NGUYÊN
         // ==========================================
 
-        // GET: /api/orders/get-all-orders-info
         [HttpGet("get-all-orders-info")]
         public async Task<ActionResult<IEnumerable<HoaDonDto>>> GetOrders()
         {
@@ -133,7 +157,6 @@ namespace RestaurantManagementAPI.Controllers
             return Ok(result);
         }
 
-        // GET: /api/orders/get-{id}-order-info
         [HttpGet("get-{id}-order-info")]
         public async Task<ActionResult<HoaDonDto>> GetOrderById(string id)
         {
@@ -142,7 +165,6 @@ namespace RestaurantManagementAPI.Controllers
             return Ok(result);
         }
 
-        // POST: /api/orders/api/create-and-send-orders
         [HttpPost("api/create-and-send-orders")]
         public async Task<ActionResult<HoaDonDto>> CreateOrder([FromBody] CreateHoaDonDto createDto)
         {
@@ -158,7 +180,6 @@ namespace RestaurantManagementAPI.Controllers
             }
         }
 
-        // PUT: /api/orders/update-dishes-status
         [HttpPut("update-dishes-status")]
         public async Task<IActionResult> UpdateOrderItemStatus(string maHD, string maMA, [FromBody] UpdateOrderItemStatusDto updateDto)
         {
@@ -174,7 +195,6 @@ namespace RestaurantManagementAPI.Controllers
             }
         }
 
-        // PUT: /api/orders/update-all-dishes-in-{id}-order-status
         [HttpPut("update-all-dishes-in-{id}-order-status")]
         public async Task<IActionResult> UpdateOrderStatus(string id, [FromBody] UpdateOrderStatusDto updateDto)
         {
@@ -190,16 +210,12 @@ namespace RestaurantManagementAPI.Controllers
             }
         }
 
-        // PUT: /api/orders/checkout/{maHD}
         [HttpPut("checkout/{maHD}")]
         public async Task<IActionResult> Checkout(string maHD, [FromBody] CheckoutRequestDto checkoutDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
-                // LƯU Ý: Đảm bảo hàm CheckoutAsync trong Service của bạn 
-                // đã cập nhật TrangThai = "Đã thanh toán" và NgayLap = DateTime.Now 
-                // thì báo cáo mới hiện dữ liệu nhé!
                 var result = await _orderService.CheckoutAsync(maHD, checkoutDto);
                 return Ok(result);
             }

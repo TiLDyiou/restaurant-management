@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
+using RestaurantManagementGUI.Views; // Cần thiết để mở trang RevenueReportPage
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using System.Diagnostics;
@@ -12,6 +13,8 @@ namespace RestaurantManagementGUI.ViewModels
     public partial class BillGenerationViewModel : ObservableObject
     {
         private readonly HttpClient _httpClient;
+
+        // Thông tin ngân hàng (Thay đổi theo tài khoản của bạn)
         private const string MY_BANK_ID = "TCB";
         private const string MY_ACCOUNT_NO = "93245230306";
         private const string QR_TEMPLATE = "compact2";
@@ -23,22 +26,21 @@ namespace RestaurantManagementGUI.ViewModels
         [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange), nameof(QrCodeUrl))]
         private HoaDonModel selectedBill;
 
-        // Logic tự động cập nhật QR và Reset form khi đổi bàn
+        // Khi chọn hóa đơn khác -> Reset form và update QR
         partial void OnSelectedBillChanged(HoaDonModel value)
         {
             ResetPaymentForm();
-            // Kích hoạt cập nhật lại mã QR
             OnPropertyChanged(nameof(QrCodeUrl));
         }
 
-        // Property sinh Link ảnh QR Code động
+        // Link tạo mã QR VietQR động
         public string QrCodeUrl
         {
             get
             {
                 if (SelectedBill == null) return "";
-                // Tạo nội dung chuyển khoản: "TT HD {Mã Hóa Đơn}"
-                return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo=Thanh toán HD {SelectedBill.MaHD}";
+                // Cấu trúc: https://img.vietqr.io/image/{BANK}-{ACC}-{TEMPLATE}.png?amount={TIEN}&addInfo={NOIDUNG}
+                return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo=Thanh toan HD {SelectedBill.MaHD}";
             }
         }
 
@@ -52,12 +54,12 @@ namespace RestaurantManagementGUI.ViewModels
         [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange))]
         private string customerPayAmount;
 
+        // Tính tiền thối lại
         public decimal ChangeAmount
         {
             get
             {
-                if (SelectedBill == null || string.IsNullOrWhiteSpace(CustomerPayAmount))
-                    return 0;
+                if (SelectedBill == null || string.IsNullOrWhiteSpace(CustomerPayAmount)) return 0;
                 if (decimal.TryParse(CustomerPayAmount, out decimal payAmount))
                 {
                     var change = payAmount - SelectedBill.TongTien;
@@ -67,16 +69,15 @@ namespace RestaurantManagementGUI.ViewModels
             }
         }
 
-        public bool ShowChange =>
-            SelectedBill != null &&
-            !string.IsNullOrWhiteSpace(CustomerPayAmount) &&
-            decimal.TryParse(CustomerPayAmount, out _);
+        public bool ShowChange => SelectedBill != null && !string.IsNullOrWhiteSpace(CustomerPayAmount) && decimal.TryParse(CustomerPayAmount, out _);
 
         public BillGenerationViewModel()
         {
             var handler = new HttpClientHandler();
+            // Bỏ qua lỗi SSL (chỉ dùng cho môi trường dev/localhost)
             handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             _httpClient = new HttpClient(handler);
+
             PendingBills = new ObservableCollection<HoaDonModel>();
             LoadPendingBills();
         }
@@ -85,29 +86,27 @@ namespace RestaurantManagementGUI.ViewModels
         {
             try
             {
-                // Đọc chuỗi JSON thô trước để tránh lỗi convert ngầm
                 var json = await _httpClient.GetStringAsync(ApiConfig.GetAllOrders);
-                // Cấu hình chấp nhận mọi định dạng chữ hoa/thường
-                var options = new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var allBills = System.Text.Json.JsonSerializer.Deserialize<List<HoaDonModel>>(json, options);
+
                 if (allBills != null)
                 {
                     var pending = allBills
                         .Where(b => b.TrangThai != "Đã thanh toán")
                         .OrderByDescending(b => b.NgayLap)
                         .ToList();
+
                     PendingBills.Clear();
                     foreach (var bill in pending) PendingBills.Add(bill);
+
                     if (SelectedBill == null && PendingBills.Any())
                         SelectedBill = PendingBills[0];
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[BILL] Lỗi tải hóa đơn: {ex.Message}");
+                Debug.WriteLine($"[BILL ERROR] {ex.Message}");
             }
         }
 
@@ -146,55 +145,47 @@ namespace RestaurantManagementGUI.ViewModels
 
             try
             {
-                Debug.WriteLine($"[BILL] Đang thanh toán {SelectedBill.MaHD}...");
-
+                // Gọi API Backend để cập nhật trạng thái
                 var response = await _httpClient.PutAsJsonAsync(ApiConfig.Checkout(SelectedBill.MaHD), requestDto);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var finalBill = await response.Content.ReadFromJsonAsync<HoaDonModel>();
 
-                    Debug.WriteLine($"[BILL] ✅ Thanh toán thành công {finalBill.MaHD}");
+                    await Application.Current.MainPage.DisplayAlert("Thành công",
+                        $"Đã thanh toán xong đơn {finalBill.MaHD}!\nSố tiền: {finalBill.TongTien:N0} ₫", "OK");
 
-                    // ===== QUAN TRỌNG: BROADCAST EVENT ĐẾN TẤT CẢ LISTENERS =====
-                    PaymentEventService.NotifyPaymentCompleted(
-                        maHD: finalBill.MaHD,
-                        tongTien: finalBill.TongTien,
-                        tableName: finalBill.TableName,
-                        paymentMethod: method
-                    );
-                    Debug.WriteLine($"[BILL] 📢 Đã broadcast payment event cho {finalBill.MaHD}");
-                    // ============================================================
-
-                    // Thông báo ngắn gọn
-                    string message = $"Đã thanh toán thành công cho {finalBill.TableName}.\n" +
-                                     "Hệ thống đang in hóa đơn...";
-                    await Application.Current.MainPage.DisplayAlert("Thành công", message, "OK");
-
-                    // Xóa khỏi danh sách chờ thanh toán
+                    // Xử lý danh sách chờ (Xóa đơn vừa thanh toán)
                     var index = PendingBills.IndexOf(SelectedBill);
                     PendingBills.Remove(SelectedBill);
-
                     if (PendingBills.Any())
-                    {
                         SelectedBill = index < PendingBills.Count ? PendingBills[index] : PendingBills.FirstOrDefault();
-                    }
                     else
                     {
                         SelectedBill = null;
                         ResetPaymentForm();
                     }
+
+                    // ============================================================
+                    // 👇👇👇 CHUYỂN HƯỚNG SANG TRANG BÁO CÁO DOANH THU 👇👇👇
+                    // ============================================================
+
+                    // Cách 1: Dùng Navigation Push (Nếu đang trong NavigationPage)
+                    await Application.Current.MainPage.Navigation.PushAsync(new RevenueReportPage());
+
+                    // Cách 2 (Dự phòng): Nếu đang dùng AppShell
+                    // await Shell.Current.GoToAsync(nameof(RevenueReportPage));
+
+                    // ============================================================
                 }
                 else
                 {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[BILL] ❌ Lỗi API: {errorContent}");
-                    await Application.Current.MainPage.DisplayAlert("Lỗi API", errorContent, "OK");
+                    var err = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Lỗi API", err, "OK");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[BILL] ❌ Lỗi hệ thống: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Lỗi hệ thống", ex.Message, "OK");
             }
         }
