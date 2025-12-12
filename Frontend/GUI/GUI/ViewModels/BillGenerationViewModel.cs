@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
-using RestaurantManagementGUI.Views; // Cần thiết để mở trang RevenueReportPage
+using RestaurantManagementGUI.Views; // Để mở RevenueReportPage
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using System.Diagnostics;
@@ -14,7 +14,7 @@ namespace RestaurantManagementGUI.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        // Thông tin ngân hàng (Thay đổi theo tài khoản của bạn)
+        // Thông tin ngân hàng (Thay bằng của bạn)
         private const string MY_BANK_ID = "TCB";
         private const string MY_ACCOUNT_NO = "93245230306";
         private const string QR_TEMPLATE = "compact2";
@@ -26,20 +26,17 @@ namespace RestaurantManagementGUI.ViewModels
         [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange), nameof(QrCodeUrl))]
         private HoaDonModel selectedBill;
 
-        // Khi chọn hóa đơn khác -> Reset form và update QR
         partial void OnSelectedBillChanged(HoaDonModel value)
         {
             ResetPaymentForm();
             OnPropertyChanged(nameof(QrCodeUrl));
         }
 
-        // Link tạo mã QR VietQR động
         public string QrCodeUrl
         {
             get
             {
                 if (SelectedBill == null) return "";
-                // Cấu trúc: https://img.vietqr.io/image/{BANK}-{ACC}-{TEMPLATE}.png?amount={TIEN}&addInfo={NOIDUNG}
                 return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo=Thanh toan HD {SelectedBill.MaHD}";
             }
         }
@@ -54,7 +51,6 @@ namespace RestaurantManagementGUI.ViewModels
         [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange))]
         private string customerPayAmount;
 
-        // Tính tiền thối lại
         public decimal ChangeAmount
         {
             get
@@ -74,10 +70,8 @@ namespace RestaurantManagementGUI.ViewModels
         public BillGenerationViewModel()
         {
             var handler = new HttpClientHandler();
-            // Bỏ qua lỗi SSL (chỉ dùng cho môi trường dev/localhost)
             handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             _httpClient = new HttpClient(handler);
-
             PendingBills = new ObservableCollection<HoaDonModel>();
             LoadPendingBills();
         }
@@ -145,7 +139,7 @@ namespace RestaurantManagementGUI.ViewModels
 
             try
             {
-                // Gọi API Backend để cập nhật trạng thái
+                // 1. Gọi API Thanh Toán
                 var response = await _httpClient.PutAsJsonAsync(ApiConfig.Checkout(SelectedBill.MaHD), requestDto);
 
                 if (response.IsSuccessStatusCode)
@@ -155,7 +149,7 @@ namespace RestaurantManagementGUI.ViewModels
                     await Application.Current.MainPage.DisplayAlert("Thành công",
                         $"Đã thanh toán xong đơn {finalBill.MaHD}!\nSố tiền: {finalBill.TongTien:N0} ₫", "OK");
 
-                    // Xử lý danh sách chờ (Xóa đơn vừa thanh toán)
+                    // 2. Xóa đơn khỏi danh sách
                     var index = PendingBills.IndexOf(SelectedBill);
                     PendingBills.Remove(SelectedBill);
                     if (PendingBills.Any())
@@ -167,16 +161,9 @@ namespace RestaurantManagementGUI.ViewModels
                     }
 
                     // ============================================================
-                    // 👇👇👇 CHUYỂN HƯỚNG SANG TRANG BÁO CÁO DOANH THU 👇👇👇
+                    // 3. CHUYỂN HƯỚNG SANG TRANG BÁO CÁO DOANH THU
                     // ============================================================
-
-                    // Cách 1: Dùng Navigation Push (Nếu đang trong NavigationPage)
                     await Application.Current.MainPage.Navigation.PushAsync(new RevenueReportPage());
-
-                    // Cách 2 (Dự phòng): Nếu đang dùng AppShell
-                    // await Shell.Current.GoToAsync(nameof(RevenueReportPage));
-
-                    // ============================================================
                 }
                 else
                 {

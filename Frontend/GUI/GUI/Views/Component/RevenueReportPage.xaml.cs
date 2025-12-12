@@ -28,7 +28,6 @@ namespace RestaurantManagementGUI.Views
             Debug.WriteLine("[REVENUE] ✅ Đã đăng ký event PaymentCompleted");
 
             CheckUserRole();
-            Loaded += async (s, e) => await LoadRevenueData();
         }
 
         private async void OnPaymentCompleted(object sender, PaymentCompletedEventArgs e)
@@ -46,7 +45,16 @@ namespace RestaurantManagementGUI.Views
                 await LoadRevenueData();
             });
         }
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
 
+            // Delay 500ms: Chờ Database kịp lưu trạng thái "Đã thanh toán" của đơn vừa xong
+            // Nếu không có dòng này, báo cáo sẽ chạy quá nhanh và lấy phải dữ liệu cũ
+            await Task.Delay(500);
+
+            await LoadRevenueData();
+        }
         private void CheckUserRole()
         {
             _currentMaNV = UserState.CurrentMaNV ?? "";
