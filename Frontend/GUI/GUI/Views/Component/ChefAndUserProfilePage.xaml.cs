@@ -47,7 +47,7 @@ namespace RestaurantManagementGUI
                 }
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync(ApiConfig.Me);
+                var response = await _httpClient.GetAsync(ApiConfig.UserProfile);
 
                 if (response.IsSuccessStatusCode)
                 {

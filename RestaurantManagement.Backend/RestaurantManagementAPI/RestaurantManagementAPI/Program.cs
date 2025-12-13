@@ -4,7 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.Seeders;
-using RestaurantManagementAPI.Services;
+using RestaurantManagementAPI.Services.Implements;
+using RestaurantManagementAPI.Services.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,10 +65,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // Services
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITableService, TableService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-
-// Đăng ký Socket Server
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddHostedService<TcpSocketServer>();
 
 var app = builder.Build();
@@ -86,7 +91,6 @@ catch (Exception ex)
     Console.WriteLine("Seeding Error: " + ex.Message);
 }
 
-// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

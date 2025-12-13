@@ -1,10 +1,4 @@
-using System;
-using System.Runtime.CompilerServices;
 using Microsoft.Maui.Devices;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestaurantManagementGUI.Helpers
 {
@@ -15,64 +9,41 @@ namespace RestaurantManagementGUI.Helpers
                 ? "https://10.0.2.2:7004/api/"
                 : "https://localhost:7004/api/";
 
-        // Đăng ký tài khoản (chỉ dành cho admin)
-        public static string Register => $"{BaseUrl}Auth/register";
-        public static string SendRegisterOtp => $"{BaseUrl}Auth/send-register-otp";
-        public static string VerifyRegisterOtp => $"{BaseUrl}Auth/verify-register-otp";
+        public const string Register = "auth/register";
+        public const string Login = "auth/login";
+        public const string SendRegisterOtp = "auth/otp/register";
+        public const string VerifyRegisterOtp = "auth/verify/register";
+        public const string ForgotPassword = "auth/forgot-password";
+        public const string VerifyResetPasswordOtp = "auth/verify/reset-password";
+        public const string ResetPassword = "auth/reset-password";
 
-        // Đăng nhập
-        public static string Login => $"{BaseUrl}Auth/login";
 
-        // Lấy thông tin người dùng hiện tại
-        public static string Me => $"{BaseUrl}Auth/me";
+        public const string UserProfile = "users/me";
+        public const string Users = "users";
+        public const string VerifyEmailOtp = "users/email/verify";
+        public const string ResendEmailOtp = "users/email/resend-otp";
 
-        // Danh sách tất cả user (adnin chỉ xem)
-        public static string Users => $"{BaseUrl}Auth/users";
+        public static string UserById(string id) => $"users/{id}";
+        public static string ToggleUserStatus(string id) => $"users/{id}/status";
 
-        // Cho nhân viên nghỉ việc (soft delete)
-        public static string SoftDeleteUser(string maNV) => $"{BaseUrl}Auth/soft-delete/{maNV}";
 
-        // Xóa hoàn toàn user khỏi hệ thống (hard delete)
-        public static string HardDeleteUser(string maNV) => $"{BaseUrl}Auth/hard-delete/{maNV}";
-        // cập nhật thông tin user
-        public static string UpdateUser(string? maNV = null)
-            => string.IsNullOrWhiteSpace(maNV)
-                ? $"{BaseUrl}Auth/update-user"
-                : $"{BaseUrl}Auth/update-user/{maNV}";
-        public static string UpdateProfile => $"{BaseUrl}Auth/update-profile";
+        public const string Tables = "tables";
+        public static string UpdateTableStatus(string id) => $"tables/{id}/status";
 
-        // Quản lý bàn
-        public static string GetAllTables => $"{BaseUrl}Ban";
-        public static string UpdateTableStatus(string maBan) => $"{BaseUrl}Ban/{maBan}/trangthai";
 
-        // Quên mật khẩu, gửi mã OTP và đặt lại mật khẩu
-        public static string SendForgotOtp => $"{BaseUrl}Auth/forgot-password";
-        public static string VerifyForgotOtp => $"{BaseUrl}Auth/verify-forgot-otp";
-        public static string ResetPassword => $"{BaseUrl}Auth/reset-password";
-        // Xác thực Email OTP (khi cập nhật email)
-        public static string VerifyEmailOtp => $"{BaseUrl}Auth/verify-email-otp";
-        // Gửi lại Email OTP
-        public static string ResendEmailOtp => $"{BaseUrl}Auth/resend-email-otp";
+        public const string Dishes = "dishes";                                  
+        public static string DishById(string id) => $"dishes/{id}";
 
-        // POST /api/Orders/submit
-        public static string SubmitOrder => $"{BaseUrl}orders/api/create-and-send-orders";
+        public const string Orders = "orders";
 
-        // DELETE /api/softdelete_dish/{maMA}
-        public static string SoftDeleteDish(string maMA) => $"{BaseUrl}softdelete_dish/{maMA}";
+        public static string OrderById(string id) => $"orders/{id}";
+        public static string UpdateOrderItemStatus(string maHD, string maMA)
+            => $"orders/{maHD}/items/{maMA}/status";
+        public static string UpdateOrderStatus(string id) => $"orders/{id}/status";
+        public static string Checkout(string id) => $"orders/{id}/checkout";
 
-        // PUT /api/update_dish/{maMA}
-        public static string UpdateDish(string maMA) => $"{BaseUrl}update_dish/{maMA}";
+        public const string Reservations = "reservations";
 
-        // GET /api/dishes
-        public static string GetFoodMenu => $"{BaseUrl}dishes/get-dishes";
-
-        // POST /api/add_dish
-        public static string AddDish => $"{BaseUrl}add_dish";
-
-        // GET: Lấy danh sách tất cả hóa đơn (bao gồm cả trạng thái chờ và đã xong)
-        public static string GetAllOrders => $"{BaseUrl}orders/get-all-orders-info";
-
-        // PUT: Thanh toán hóa đơn
-        public static string Checkout(string maHD) => $"{BaseUrl}orders/checkout/{maHD}";
+        public const string RevenueReport = "reports/revenue";
     }
 }

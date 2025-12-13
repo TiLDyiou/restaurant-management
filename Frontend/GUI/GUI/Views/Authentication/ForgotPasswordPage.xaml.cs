@@ -40,7 +40,7 @@ namespace RestaurantManagementGUI
             SendOtpButton.Text = "Đang gửi mã...";
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.SendForgotOtp, new { email = _email });
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ForgotPassword, new { email = _email });
                 var result = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -79,7 +79,7 @@ namespace RestaurantManagementGUI
             VerifyOtpButton.Text = "Đang xác minh...";
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyForgotOtp, new { email = _email, otp = _otp });
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.UserById(), new { email = _email, otp = _otp });
                 var result = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -117,7 +117,7 @@ namespace RestaurantManagementGUI
             ResendOtpButton.Text = "Đang gửi lại...";
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.SendForgotOtp, new { email = _email });
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ForgotPassword, new { email = _email });
                 var result = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)

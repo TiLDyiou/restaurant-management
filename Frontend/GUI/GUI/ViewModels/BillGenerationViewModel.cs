@@ -1,188 +1,169 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
-using RestaurantManagementGUI.Views; // Để mở RevenueReportPage
-using System.Collections.ObjectModel;
-using System.Net.Http.Json;
-using System.Diagnostics;
+using RestaurantManagementGUI.Views; // Để điều hướng báo cáo
 
 namespace RestaurantManagementGUI.ViewModels
 {
-    public partial class BillGenerationViewModel : ObservableObject
+    public partial class BillGenerationViewModel : BaseViewModel
     {
-        private readonly HttpClient _httpClient;
+        private readonly ApiService _apiService;
 
-        // Thông tin ngân hàng (Thay bằng của bạn)
-        private const string MY_BANK_ID = "TCB";
-        private const string MY_ACCOUNT_NO = "93245230306";
-        private const string QR_TEMPLATE = "compact2";
+        // Cấu hình VietQR (Bạn có thể đưa vào file Config sau này)
+        private const string BANK_ID = "MB"; // Ví dụ: MB, VCB, TCB...
+        private const string ACCOUNT_NO = "0987654321"; // Số tài khoản nhận tiền
+        private const string TEMPLATE = "compact";
 
+        // Danh sách hóa đơn chờ
+        public ObservableCollection<HoaDonModel> PendingBills { get; } = new();
+
+        // Hóa đơn đang chọn
         [ObservableProperty]
-        private ObservableCollection<HoaDonModel> pendingBills;
+        [NotifyPropertyChangedFor(nameof(QrCodeUrl))]
+        [NotifyPropertyChangedFor(nameof(ChangeAmount))]
+        [NotifyPropertyChangedFor(nameof(CanPay))]
+        private HoaDonModel _selectedBill;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange), nameof(QrCodeUrl))]
-        private HoaDonModel selectedBill;
-
-        partial void OnSelectedBillChanged(HoaDonModel value)
-        {
-            ResetPaymentForm();
-            OnPropertyChanged(nameof(QrCodeUrl));
-        }
-
-        public string QrCodeUrl
-        {
-            get
-            {
-                if (SelectedBill == null) return "";
-                return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo=Thanh toan HD {SelectedBill.MaHD}";
-            }
-        }
-
+        // Logic thanh toán
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsTransferPayment))]
-        private bool isCashPayment = true;
+        private bool _isCashPayment = true;
 
         public bool IsTransferPayment => !IsCashPayment;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange))]
-        private string customerPayAmount;
+        [NotifyPropertyChangedFor(nameof(ChangeAmount))]
+        [NotifyPropertyChangedFor(nameof(CanPay))]
+        private string _customerPayAmount;
 
+        // Tính tiền thừa (Computed Property)
         public decimal ChangeAmount
         {
             get
             {
-                if (SelectedBill == null || string.IsNullOrWhiteSpace(CustomerPayAmount)) return 0;
-                if (decimal.TryParse(CustomerPayAmount, out decimal payAmount))
+                if (SelectedBill == null || string.IsNullOrEmpty(CustomerPayAmount)) return 0;
+                if (decimal.TryParse(CustomerPayAmount, out decimal pay))
                 {
-                    var change = payAmount - SelectedBill.TongTien;
-                    return change > 0 ? change : 0;
+                    return pay - SelectedBill.TongTien;
                 }
                 return 0;
             }
         }
 
-        public bool ShowChange => SelectedBill != null && !string.IsNullOrWhiteSpace(CustomerPayAmount) && decimal.TryParse(CustomerPayAmount, out _);
-
-        public BillGenerationViewModel()
+        // Link QR động
+        public string QrCodeUrl
         {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-            _httpClient = new HttpClient(handler);
-            PendingBills = new ObservableCollection<HoaDonModel>();
-            LoadPendingBills();
+            get
+            {
+                if (SelectedBill == null) return "";
+                // Tạo link VietQR QuickLink
+                var desc = $"Thanh toan HD {SelectedBill.MaHD}";
+                return $"https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NO}-{TEMPLATE}.png?amount={SelectedBill.TongTien}&addInfo={desc}";
+            }
         }
 
-        public async void LoadPendingBills()
+        // Điều kiện để nút Thanh toán sáng lên
+        public bool CanPay
         {
-            try
+            get
             {
-                var json = await _httpClient.GetStringAsync(ApiConfig.GetAllOrders);
-                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var allBills = System.Text.Json.JsonSerializer.Deserialize<List<HoaDonModel>>(json, options);
-
-                if (allBills != null)
+                if (SelectedBill == null) return false;
+                if (IsCashPayment)
                 {
-                    var pending = allBills
-                        .Where(b => b.TrangThai != "Đã thanh toán")
-                        .OrderByDescending(b => b.NgayLap)
-                        .ToList();
-
-                    PendingBills.Clear();
-                    foreach (var bill in pending) PendingBills.Add(bill);
-
-                    if (SelectedBill == null && PendingBills.Any())
-                        SelectedBill = PendingBills[0];
+                    // Nếu tiền mặt: Phải nhập đủ tiền
+                    if (decimal.TryParse(CustomerPayAmount, out decimal pay))
+                        return pay >= SelectedBill.TongTien;
+                    return false;
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[BILL ERROR] {ex.Message}");
+                // Nếu chuyển khoản: Luôn cho phép (giả định đã quét xong)
+                return true;
             }
         }
 
-        [RelayCommand]
-        void SelectCashPayment() => IsCashPayment = true;
-
-        [RelayCommand]
-        void SelectTransferPayment()
+        public BillGenerationViewModel(ApiService apiService)
         {
-            IsCashPayment = false;
-            CustomerPayAmount = "";
+            _apiService = apiService;
+            // Load dữ liệu ngay khi khởi tạo (hoặc gọi từ OnAppearing)
+            LoadPendingBillsCommand.Execute(null);
         }
 
         [RelayCommand]
-        async Task PayAndPrint()
+        public async Task LoadPendingBillsAsync()
         {
-            if (SelectedBill == null)
+            if (IsBusy) return;
+            IsBusy = true;
+
+            var response = await _apiService.GetAsync<List<HoaDonModel>>(ApiConfig.Orders);
+            if (response.Success && response.Data != null)
             {
-                await Application.Current.MainPage.DisplayAlert("Thông báo", "Vui lòng chọn bàn cần thanh toán", "OK");
+                PendingBills.Clear();
+                // Chỉ lấy các đơn chưa thanh toán
+                var pending = response.Data
+                    .Where(b => b.TrangThai != "Đã thanh toán")
+                    .OrderByDescending(b => b.NgayLap);
+
+                foreach (var bill in pending) PendingBills.Add(bill);
+
+                // Tự chọn đơn đầu tiên nếu có
+                if (SelectedBill == null && PendingBills.Any())
+                    SelectedBill = PendingBills.First();
+            }
+            IsBusy = false;
+        }
+
+        [RelayCommand]
+        public void SelectCash() => IsCashPayment = true;
+
+        [RelayCommand]
+        public void SelectTransfer() => IsCashPayment = false;
+
+        [RelayCommand]
+        public async Task PayAndPrintAsync()
+        {
+            if (SelectedBill == null) return;
+
+            // Kiểm tra kỹ lại lần cuối cho chắc
+            if (IsCashPayment && ChangeAmount < 0)
+            {
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Số tiền khách đưa chưa đủ!", "OK");
                 return;
             }
 
-            if (IsCashPayment)
+            IsBusy = true;
+
+            var payload = new CheckoutRequestDto
             {
-                if (string.IsNullOrWhiteSpace(CustomerPayAmount) ||
-                    !decimal.TryParse(CustomerPayAmount, out decimal payAmount) ||
-                    payAmount < SelectedBill.TongTien)
-                {
-                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Tiền khách đưa không đủ", "OK");
-                    return;
-                }
+                PaymentMethod = IsCashPayment ? "Tiền mặt" : "Chuyển khoản"
+            };
+
+            // Gọi API Checkout (Backend của bạn dùng POST)
+            var response = await _apiService.PostAsync<HoaDonModel>(ApiConfig.Checkout(SelectedBill.MaHD), payload);
+
+            if (response.Success)
+            {
+                await Application.Current.MainPage.DisplayAlert("Thành công",
+                    $"Thanh toán thành công đơn {SelectedBill.MaHD}\nSố tiền: {SelectedBill.FormattedTotal}", "OK");
+
+                // In hóa đơn (Giả lập)
+                // PrintService.Print(SelectedBill);
+
+                // Chuyển hướng sang Báo cáo doanh thu
+                await Application.Current.MainPage.Navigation.PushAsync(new RevenueReportPage());
+
+                // Refresh lại danh sách (xóa đơn đã xong)
+                await LoadPendingBillsAsync();
+                SelectedBill = null;
+                CustomerPayAmount = "";
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Lỗi thanh toán", response.Message, "OK");
             }
 
-            string method = IsCashPayment ? "Tiền mặt" : "Chuyển khoản (QR)";
-            var requestDto = new CheckoutRequestDto { PaymentMethod = method };
-
-            try
-            {
-                // 1. Gọi API Thanh Toán
-                var response = await _httpClient.PutAsJsonAsync(ApiConfig.Checkout(SelectedBill.MaHD), requestDto);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var finalBill = await response.Content.ReadFromJsonAsync<HoaDonModel>();
-
-                    await Application.Current.MainPage.DisplayAlert("Thành công",
-                        $"Đã thanh toán xong đơn {finalBill.MaHD}!\nSố tiền: {finalBill.TongTien:N0} ₫", "OK");
-
-                    // 2. Xóa đơn khỏi danh sách
-                    var index = PendingBills.IndexOf(SelectedBill);
-                    PendingBills.Remove(SelectedBill);
-                    if (PendingBills.Any())
-                        SelectedBill = index < PendingBills.Count ? PendingBills[index] : PendingBills.FirstOrDefault();
-                    else
-                    {
-                        SelectedBill = null;
-                        ResetPaymentForm();
-                    }
-
-                    // ============================================================
-                    // 3. CHUYỂN HƯỚNG SANG TRANG BÁO CÁO DOANH THU
-                    // ============================================================
-                    await Application.Current.MainPage.Navigation.PushAsync(new RevenueReportPage());
-                }
-                else
-                {
-                    var err = await response.Content.ReadAsStringAsync();
-                    await Application.Current.MainPage.DisplayAlert("Lỗi API", err, "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Application.Current.MainPage.DisplayAlert("Lỗi hệ thống", ex.Message, "OK");
-            }
-        }
-
-        private void ResetPaymentForm()
-        {
-            CustomerPayAmount = "";
-            IsCashPayment = true;
-            OnPropertyChanged(nameof(ChangeAmount));
-            OnPropertyChanged(nameof(ShowChange));
+            IsBusy = false;
         }
     }
 }

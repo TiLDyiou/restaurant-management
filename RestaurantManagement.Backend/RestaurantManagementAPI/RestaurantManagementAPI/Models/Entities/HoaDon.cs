@@ -10,7 +10,7 @@ namespace RestaurantManagementAPI.Models.Entities
     {
         [Key]
         [Column("MaHD")]
-        [StringLength(5)]
+        [StringLength(20)]
         public string MaHD { get; set; } = string.Empty;
 
         [Column("MaBan")]

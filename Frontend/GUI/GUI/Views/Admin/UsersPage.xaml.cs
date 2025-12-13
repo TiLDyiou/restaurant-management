@@ -114,7 +114,7 @@ namespace RestaurantManagementGUI
                 if (!string.IsNullOrEmpty(token))
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PutAsync(ApiConfig.SoftDeleteUser(user.MaNV), null);
+                var response = await _httpClient.PutAsync(ApiConfig.UserById(user.MaNV), null);
                 if (response.IsSuccessStatusCode)
                 {
                     var updated = await response.Content.ReadFromJsonAsync<UserModel>();
@@ -143,7 +143,7 @@ namespace RestaurantManagementGUI
                 if (!string.IsNullOrEmpty(token))
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.DeleteAsync(ApiConfig.HardDeleteUser(user.MaNV));
+                var response = await _httpClient.DeleteAsync(ApiConfig.UserById(user.MaNV));
                 if (response.IsSuccessStatusCode)
                 {
                     _users.Remove(user);

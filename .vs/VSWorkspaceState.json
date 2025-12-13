@@ -9,6 +9,6 @@
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services"
   ],
-  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI.sln",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\ReservationsController.cs",
   "PreviewInSolutionExplorer": false
 }

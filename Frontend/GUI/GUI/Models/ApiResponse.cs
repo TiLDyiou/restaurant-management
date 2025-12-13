@@ -1,6 +1,5 @@
 ﻿namespace RestaurantManagementGUI.Models
 {
-    // Response wrapper chung
     public class ApiResponse<T>
     {
         public bool Success { get; set; }

@@ -1,48 +1,55 @@
-﻿using Microsoft.Maui.Controls;
+﻿using RestaurantManagementGUI.ViewModels;
 
 namespace RestaurantManagementGUI
 {
     public partial class OrdersPage : ContentPage
     {
-        private readonly FoodMenuViewModel _viewModel;
+        private readonly OrderViewModel _viewModel;
 
         public OrdersPage() : this("Đơn tự do") { }
 
         public OrdersPage(string tenBan)
         {
             InitializeComponent();
-            _viewModel = new FoodMenuViewModel();
+
+            // Lấy ViewModel từ DI
+            _viewModel = IPlatformApplication.Current.Services.GetService<OrderViewModel>();
             BindingContext = _viewModel;
-            _viewModel.TenBan = tenBan;
-            _viewModel.RealTableId = ConvertToTableId(tenBan);
-        }
-        private string ConvertToTableId(string tenBan)
-        {
-            try
+
+            if (_viewModel != null)
             {
-                // Lấy phần số từ chuỗi (Ví dụ "Bàn 5" -> lấy số 5)
-                string numberPart = System.Text.RegularExpressions.Regex.Match(tenBan, @"\d+").Value;
-
-                if (int.TryParse(numberPart, out int number))
-                {
-                    // Format thành Bxx (Ví dụ số 5 -> "05", số 10 -> "10")
-                    return $"B{number:D2}";
-                }
+                _viewModel.TableName = tenBan;
+                _viewModel.TableId = ConvertToTableId(tenBan);
             }
-            catch { }
-
-            return "B01"; // Fallback nếu lỗi
         }
 
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            await _viewModel.InitializeAsync();
+            if (_viewModel != null)
+            {
+                await _viewModel.LoadMenuCommand.ExecuteAsync(null);
+            }
         }
 
         private async void OnBackButtonClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private string ConvertToTableId(string tenBan)
+        {
+            try
+            {
+                // Tách số từ chuỗi "Bàn 5" -> "B05"
+                string numberPart = System.Text.RegularExpressions.Regex.Match(tenBan, @"\d+").Value;
+                if (int.TryParse(numberPart, out int number))
+                {
+                    return $"B{number:D2}"; // B01, B02, ..., B10
+                }
+            }
+            catch { }
+            return "B01"; // Fallback
         }
     }
 }

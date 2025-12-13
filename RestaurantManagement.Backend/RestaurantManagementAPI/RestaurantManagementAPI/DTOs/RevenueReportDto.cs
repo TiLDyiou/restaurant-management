@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace RestaurantManagementAPI.DTOs
+﻿namespace RestaurantManagementAPI.DTOs.ReportDtos
 {
     public class RevenueReportResponse
     {
@@ -9,11 +6,9 @@ namespace RestaurantManagementAPI.DTOs
         public int TotalOrders { get; set; }
         public decimal AverageOrderValue { get; set; }
         public decimal RevenueTrend { get; set; }
-        public List<DailyRevenueDto> DailyRevenues { get; set; }
-        public List<EmployeePerformanceDto> TopEmployees { get; set; }
-
-        // MỚI THÊM: Chứa danh sách giao dịch chi tiết (cho nhân viên xem)
-        public List<TransactionDetailDto> RecentTransactions { get; set; }
+        public List<DailyRevenueDto> DailyRevenues { get; set; } = new();
+        public List<EmployeePerformanceDto> TopEmployees { get; set; } = new();
+        public List<TransactionDetailDto> RecentTransactions { get; set; } = new();
     }
 
     public class DailyRevenueDto
@@ -25,17 +20,16 @@ namespace RestaurantManagementAPI.DTOs
 
     public class EmployeePerformanceDto
     {
-        public string EmployeeName { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
         public int OrdersServed { get; set; }
         public decimal TotalRevenue { get; set; }
     }
 
-    // MỚI THÊM
     public class TransactionDetailDto
     {
-        public string MaHD { get; set; }
+        public string MaHD { get; set; } = string.Empty;
         public DateTime ThoiGian { get; set; }
         public decimal TongTien { get; set; }
-        public string TrangThai { get; set; }
+        public string? TrangThai { get; set; }
     }
 }

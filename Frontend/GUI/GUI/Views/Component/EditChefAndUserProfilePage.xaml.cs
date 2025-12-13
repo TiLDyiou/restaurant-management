@@ -77,7 +77,7 @@ namespace RestaurantManagementGUI
                     MatKhau = password 
                 };
 
-                var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateUser(), updateUser);
+                var response = await _httpClient.PutAsJsonAsync(ApiConfig.UserById(_user.MaNV), updateUser);
 
                 if (!response.IsSuccessStatusCode)
                 {

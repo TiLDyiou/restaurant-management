@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
-    // DTO dùng để gửi yêu cầu tạo hóa đơn lên Server
+    // DTO gửi xuống Backend khi tạo đơn
     public class CreateHoaDonDto
     {
         [JsonPropertyName("maBan")]
-        public string? MaBan { get; set; }
+        public string MaBan { get; set; }
 
         [JsonPropertyName("maNV")]
         public string MaNV { get; set; }
@@ -16,11 +15,10 @@ namespace RestaurantManagementGUI.Models
         public List<ChiTietHoaDonDto> ChiTietHoaDons { get; set; }
     }
 
-    // DTO chi tiết món ăn trong đơn
     public class ChiTietHoaDonDto
     {
         [JsonPropertyName("maMA")]
-        public string? MaMA { get; set; }
+        public string MaMA { get; set; }
 
         [JsonPropertyName("soLuong")]
         public int SoLuong { get; set; }

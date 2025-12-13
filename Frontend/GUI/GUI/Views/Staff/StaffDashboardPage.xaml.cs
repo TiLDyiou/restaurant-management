@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Views.Authentication;
 namespace RestaurantManagementGUI.Views.Staff
 {
     public partial class StaffDashboardPage : ContentPage

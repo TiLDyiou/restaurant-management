@@ -1,11 +1,14 @@
-﻿namespace RestaurantManagementGUI
+﻿using RestaurantManagementGUI.ViewModels;
+
+namespace RestaurantManagementGUI
 {
     public partial class BillGenerationPage : ContentPage
     {
         public BillGenerationPage()
         {
             InitializeComponent();
-            BindingContext = new ViewModels.BillGenerationViewModel();
+            // Lấy ViewModel từ DI
+            BindingContext = IPlatformApplication.Current.Services.GetService<BillGenerationViewModel>();
         }
     }
 }

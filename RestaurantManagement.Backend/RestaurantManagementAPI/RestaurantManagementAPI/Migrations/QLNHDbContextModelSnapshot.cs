@@ -78,8 +78,8 @@ namespace RestaurantManagementAPI.Migrations
             modelBuilder.Entity("RestaurantManagementAPI.Models.Entities.ChiTietHoaDon", b =>
                 {
                     b.Property<string>("MaHD")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
                         .HasColumnName("MaHD");
 
                     b.Property<string>("MaMA")
@@ -216,8 +216,8 @@ namespace RestaurantManagementAPI.Migrations
             modelBuilder.Entity("RestaurantManagementAPI.Models.Entities.HoaDon", b =>
                 {
                     b.Property<string>("MaHD")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
                         .HasColumnName("MaHD");
 
                     b.Property<string>("MaBan")
