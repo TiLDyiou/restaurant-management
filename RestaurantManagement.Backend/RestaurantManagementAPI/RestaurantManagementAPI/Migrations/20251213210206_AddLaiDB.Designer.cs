@@ -12,8 +12,8 @@ using RestaurentManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    [Migration("20251206170257_AddGhiChuToChiTietHoaDon")]
-    partial class AddGhiChuToChiTietHoaDon
+    [Migration("20251213210206_AddLaiDB")]
+    partial class AddLaiDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
