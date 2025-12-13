@@ -1,5 +1,4 @@
-﻿// File: ViewModels/FoodMenuViewModel.cs
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -25,7 +24,6 @@ namespace RestaurantManagementGUI
             AllFoodItems = new ObservableCollection<FoodModel>();
             CartItems = new ObservableCollection<CartItemModel>();
 
-            // Commands
             AddToCartCommand = new Command<FoodModel>(AddToCart);
             IncreaseQuantityCommand = new Command<CartItemModel>(IncreaseQuantity);
             DecreaseQuantityCommand = new Command<CartItemModel>(DecreaseQuantity);
@@ -186,73 +184,72 @@ namespace RestaurantManagementGUI
             OnPropertyChanged(nameof(CartItems));
         }
 
+        public string RealTableId { get; set; } = "B01";
         private async void Checkout()
-{
-    if (CartItems.Count == 0)
-    {
-        await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống", "OK");
-        return;
-    }
-
-    bool confirmed = await Application.Current.MainPage.DisplayAlert(
-        "Xác nhận", 
-        $"Bạn có muốn gửi {CartItems.Count} món không?", 
-        "Gửi đơn", 
-        "Hủy"
-    );
-    
-    if (!confirmed) return;
-
-    try
-    {
-        // Tạo payload theo format API
-        var orderRequest = new
         {
-            maBan = "TD001", // Hoặc lấy từ property TenBan sau khi map với mã bàn
-            maNV = "NV001",  // Lấy từ thông tin đăng nhập
-            chiTietHoaDons = CartItems.Select(item => new
+            // Kiểm tra giỏ hàng
+            if (CartItems == null || CartItems.Count == 0)
             {
-                maMA = item.FoodItem.Id,
-                soLuong = item.Quantity,
-                ghiChu = item.Note // Gửi ghi chú lên API
-            }).ToList()
-        };
+                await Application.Current.MainPage.DisplayAlert("Thông báo", "Giỏ hàng trống, vui lòng chọn món!", "OK");
+                return;
+            }
+            if (string.IsNullOrEmpty(UserState.CurrentMaNV))
+            {
+                var savedMaNV = await SecureStorage.Default.GetAsync("user_manv");
+                if (!string.IsNullOrEmpty(savedMaNV))
+                {
+                    UserState.CurrentMaNV = savedMaNV;
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.", "OK");
+                    return;
+                }
+            }
+            // Xác nhận gửi đơn
+            bool confirmed = await Application.Current.MainPage.DisplayAlert("Xác nhận", $"Bạn có muốn gửi {CartItems.Count} món xuống bếp không?", "Gửi ngay", "Hủy");
+            if (!confirmed) return;
 
-        var response = await _httpClient.PostAsJsonAsync(
-            "https://your-api-url/api/orders/api/create-and-send-orders", 
-            orderRequest
-        );
+            // Chuẩn bị dữ liệu gửi đi (DTO)
+            var orderDto = new CreateHoaDonDto
+            {
+                MaBan = RealTableId,
 
-        if (response.IsSuccessStatusCode)
-        {
-            await Application.Current.MainPage.DisplayAlert(
-                "Thành công", 
-                "Đơn hàng đã được gửi xuống bếp!", 
-                "OK"
-            );
-            
-            // Xóa giỏ hàng sau khi gửi thành công
-            CancelOrder();
+                MaNV = UserState.CurrentMaNV,
+                ChiTietHoaDons = CartItems.Select(c => new ChiTietHoaDonDto
+                {
+                    MaMA = c.FoodItem.Id,
+                    SoLuong = c.Quantity
+                }).ToList()
+            };
+
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+            using var client = new HttpClient(handler);
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+
+            try
+            {
+                // Gọi API
+                var response = await client.PostAsJsonAsync(ApiConfig.SubmitOrder, orderDto);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Thành công", "Đơn hàng đã được gửi xuống bếp! 👨‍🍳", "OK");
+                    CancelOrder();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Lỗi Server", $"Không gửi được đơn.\nChi tiết: {error}", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Lỗi Kết Nối", $"Không gọi được API.\n{ex.Message}", "OK");
+            }
         }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            await Application.Current.MainPage.DisplayAlert(
-                "Lỗi", 
-                $"Không thể gửi đơn hàng: {error}", 
-                "OK"
-            );
-        }
-    }
-    catch (Exception ex)
-    {
-        await Application.Current.MainPage.DisplayAlert(
-            "Lỗi", 
-            $"Có lỗi xảy ra: {ex.Message}", 
-            "OK"
-        );
-    }
-}
 
         private void CancelOrder()
         {

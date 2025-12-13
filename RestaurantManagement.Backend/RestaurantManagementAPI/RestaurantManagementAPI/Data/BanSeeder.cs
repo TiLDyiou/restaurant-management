@@ -8,7 +8,7 @@ namespace RestaurentManagementAPI.Seeders
 {
     public class BanSeeder
     {
-        public static async Task SeedTableAsync(IServiceProvider serviceProvider, int soBan = 10)
+        public static async Task SeedTableAsync(IServiceProvider serviceProvider, int soBan = 12)
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<QLNHDbContext>();

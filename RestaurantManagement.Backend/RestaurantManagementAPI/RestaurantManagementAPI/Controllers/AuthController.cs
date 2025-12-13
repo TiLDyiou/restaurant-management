@@ -31,7 +31,7 @@ namespace RestaurentManagementAPI.Controllers
         #region ===================== Public APIs =====================
 
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")]
+        
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.TenDangNhap) || string.IsNullOrWhiteSpace(dto.MatKhau))
@@ -59,9 +59,9 @@ namespace RestaurentManagementAPI.Controllers
                 MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau),
                 MaNV = newMaNV,
                 Quyen = string.IsNullOrWhiteSpace(dto.Quyen) ? "NhanVien" : dto.Quyen,
-                IsActive = false,
+                IsActive = true,
                 Email = dto.Email,
-                IsVerified = false
+                IsVerified = true
             };
             _context.TAIKHOAN.Add(tk);
             await _context.SaveChangesAsync();

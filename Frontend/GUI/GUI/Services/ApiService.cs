@@ -1,4 +1,4 @@
-﻿using RestaurantManagementGUI.Helpers; // Thêm
+﻿using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using System.Diagnostics;
 using System.Text;
@@ -6,7 +6,6 @@ using System.Text.Json;
 
 namespace RestaurantManagementGUI.Services
 {
-    // Thêm ": IApiService"
     public class ApiService 
     {
         // HttpClient này được tiêm từ MauiProgram.cs

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.ChefDashboardPage"
+             BackgroundColor="#263238"
+             Shell.NavBarIsVisible="True"
+             Title="Dashboard">
+
+    <ContentPage.Resources>
+        <Color x:Key="PrimaryColor">#263238</Color>
+        <Color x:Key="AccentColor">#FFBD59</Color>
+        <Color x:Key="LightBackground">#FAFAFA</Color>
+        <Color x:Key="TextPrimary">#FFFFFF</Color>
+        <Color x:Key="TextSecondary">#B0BEC5</Color>
+    </ContentPage.Resources>
+
+    <Grid ColumnDefinitions="160,*" RowDefinitions="*" BackgroundColor="#263238">
+
+        <!-- Bên trái: Welcome + Logout -->
+        <StackLayout BackgroundColor="{StaticResource AccentColor}"
+                     Padding="20"
+                     VerticalOptions="Fill"
+                     Spacing="25">
+
+            <Label Text="NHÓM II"
+                   TextColor="{StaticResource PrimaryColor}"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Restaurant Management System"
+                   TextColor="{StaticResource PrimaryColor}"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   HorizontalOptions="FillAndExpand" />
+
+            <BoxView HeightRequest="2" BackgroundColor="{StaticResource PrimaryColor}" Opacity="0.2" Margin="0,10,0,10" />
+
+            <Label x:Name="WelcomeLabel"
+                   Text="Welcome, User"
+                   FontSize="16"
+                   TextColor="{StaticResource PrimaryColor}"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,10,0,0" />
+			
+            <Button Text="Đăng xuất"
+                x:Name="LogoutButton"
+                TextColor="White"
+                BackgroundColor="#263238"
+                FontAttributes="Bold"
+                CornerRadius="10"
+                HeightRequest="40"
+                HorizontalOptions="Center"
+                Clicked="OnLogoutClicked"/>
+        </StackLayout>
+
+        <!-- Bên phải: 2 nút giống UserPage -->
+        <ScrollView Grid.Column="1" Padding="20">
+            <FlexLayout x:Name="ButtonsLayout"
+                        Direction="Row"
+                        Wrap="Wrap"
+                        JustifyContent="Start"
+                        AlignItems="Start"
+                        AlignContent="Start">
+
+                <!-- Orders -->
+                <Frame BackgroundColor="{StaticResource LightBackground}"
+                       CornerRadius="14"
+                       Padding="15"
+                       HasShadow="True"
+                       Margin="0,0,20,20"
+                       WidthRequest="160"
+                       HeightRequest="120">
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="orders.png" HeightRequest="50"/>
+                        <Button Text="Nhận đơn"
+                                TextColor="{StaticResource PrimaryColor}"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnOrdersClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Users -->
+                <Frame BackgroundColor="{StaticResource LightBackground}"
+                       CornerRadius="14"
+                       Padding="15"
+                       HasShadow="True"
+                       Margin="0,0,20,20"
+                       WidthRequest="190"
+                       HeightRequest="120">
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="users.png" HeightRequest="50"/>
+                        <Button Text="Thông tin cá nhân"
+                                TextColor="{StaticResource PrimaryColor}"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                Clicked="OnUsersClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </FlexLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

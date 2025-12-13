@@ -6,8 +6,9 @@
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Data",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services"
   ],
-  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\DatBanController.cs",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI.sln",
   "PreviewInSolutionExplorer": false
 }

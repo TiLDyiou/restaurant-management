@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.Views.Staff.StaffDashboardPage"
+             BackgroundColor="White"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <Style x:Key="DashboardButtonStyle" TargetType="Border">
+            <Setter Property="Stroke" Value="#E0E0E0"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="15"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="White"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="MinimumHeightRequest" Value="120"/>
+        </Style>
+
+        <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
+            <Setter Property="TextColor" Value="#263238"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+            <Setter Property="LineBreakMode" Value="WordWrap"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid ColumnDefinitions="160,*" RowDefinitions="*" BackgroundColor="White">
+
+        <Grid BackgroundColor="#FFBD59" Padding="20" HorizontalOptions="FillAndExpand">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Text="NHÓM II"
+                   TextColor="#263238" FontSize="18" FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <Label Grid.Row="1" Text="Staff Portal"
+                   TextColor="#263238" FontSize="14"
+                   HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+
+            <BoxView Grid.Row="2" HeightRequest="2" BackgroundColor="#263238"
+                     Opacity="0.2" Margin="0,10,0,10"/>
+
+            <Label Grid.Row="3" x:Name="WelcomeLabel" Text="Welcome, Staff"
+                   FontSize="16" TextColor="#263238" FontAttributes="Bold"
+                   HorizontalOptions="Center" VerticalOptions="Start"
+                   HorizontalTextAlignment="Center"/>
+
+            <Button Grid.Row="4" Text="Đăng xuất"
+                    TextColor="White" BackgroundColor="#263238" FontAttributes="Bold"
+                    CornerRadius="10" HeightRequest="40" WidthRequest="120"
+                    HorizontalOptions="Center"
+                    Clicked="OnLogoutClicked"/>
+        </Grid>
+
+        <ScrollView Grid.Column="1" Padding="30">
+            <FlexLayout x:Name="ButtonsLayout"
+                        Direction="Row"
+                        Wrap="Wrap"
+                        JustifyContent="Start"
+                        AlignItems="Start"
+                        AlignContent="Start">
+
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="users.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Hồ sơ cá nhân" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUserProfileClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="menu.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Menu món" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="orders.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Đặt món" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="tables.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Đặt bàn" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnTablesClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="bill.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Thanh toán" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnBillGenerationClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" Margin="0,0,20,20">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="chat_9374926.png" HeightRequest="40" WidthRequest="40" Aspect="AspectFit"/>
+                        <Button Text="Chat" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnChatClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </FlexLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

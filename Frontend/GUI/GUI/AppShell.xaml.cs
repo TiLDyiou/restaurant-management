@@ -9,6 +9,7 @@ namespace RestaurantManagementGUI
             InitializeComponent();
             Routing.RegisterRoute(nameof(FoodMenuPage), typeof(FoodMenuPage));
             Routing.RegisterRoute(nameof(TablesPage), typeof(TablesPage));
+            Routing.RegisterRoute("ChefOrdersPage", typeof(ChefOrdersPage));
         }
 
     }

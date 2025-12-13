@@ -47,9 +47,9 @@ namespace RestaurentManagementAPI.Data
                         MatKhau = hashedPassword,
                         MaNV = adminNhanVien.MaNV,
                         Quyen = "Admin",
-                        Email = "nguyentrangiabao7100@gmail.com", // gán email admin
+                        Email = "nguyentrangiabao7100@gmail.com",
                         IsActive = true,
-                        IsVerified = true // tự xác thực
+                        IsVerified = true
                     };
 
                     context.TAIKHOAN.Add(adminTaiKhoan);

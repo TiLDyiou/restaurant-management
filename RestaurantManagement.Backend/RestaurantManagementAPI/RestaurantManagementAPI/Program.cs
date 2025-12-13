@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RestaurentManagementAPI.Data;
-using RestaurentManagementAPI.Hubs;
 using RestaurentManagementAPI.Seeders;
 using RestaurentManagementAPI.Services;
-using System.Runtime;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,14 +14,11 @@ var configuration = builder.Configuration;
 builder.Services.AddDbContext<QLNHDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("QLNHDatabase")));
 
-
-// Controllers & SignalR
+// Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSignalR();
 
-
-// Swagger + JWT Auth
+// Swagger
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -33,57 +28,51 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Nhập token của bạn vào ô bên dưới.\n\nVí dụ: \"Bearer 12345abcdef\""
+        Description = "Nhập token: Bearer {token}"
     });
-
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             new string[] {}
         }
     });
 });
 
-// JWT Authentication
+// JWT Auth
 var jwt = configuration.GetSection("Jwt");
-var key = jwt.GetValue<string>("Key") ?? "default_secret_key_12345"; // tránh null
-var issuer = jwt.GetValue<string>("Issuer");
-var audience = jwt.GetValue<string>("Audience");
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+var key = jwt.GetValue<string>("Key");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = !string.IsNullOrEmpty(issuer),
-        ValidateAudience = !string.IsNullOrEmpty(audience),
-        ValidIssuer = issuer,
-        ValidAudience = audience,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidAudience = jwt["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 builder.Services.AddAuthorization();
+
+// Services
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+// Đăng ký Socket Server
+builder.Services.AddHostedService<TcpSocketServer>();
+
 var app = builder.Build();
 
-// Seed dữ liệu admin và bàn
+// Seeding dữ liệu mẫu
 try
 {
     using (var scope = app.Services.CreateScope())
@@ -94,8 +83,7 @@ try
 }
 catch (Exception ex)
 {
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "Đã xảy ra lỗi khi seeding admin.");
+    Console.WriteLine("Seeding Error: " + ex.Message);
 }
 
 // Middleware
@@ -104,13 +92,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
-app.MapHub<KitchenHub>("/kitchenHub");
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Map Controllers & SignalR Hubs
 app.MapControllers();
-app.MapHub<BanHub>("/banHub"); // Hub cho trạng thái bàn realtime
 app.Run();
