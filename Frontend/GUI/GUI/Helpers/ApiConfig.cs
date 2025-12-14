@@ -1,4 +1,4 @@
-using Microsoft.Maui.Devices;
+﻿using Microsoft.Maui.Devices;
 
 namespace RestaurantManagementGUI.Helpers
 {
@@ -8,20 +8,20 @@ namespace RestaurantManagementGUI.Helpers
             DeviceInfo.Platform == DevicePlatform.Android
                 ? "https://10.0.2.2:7004/api/"
                 : "https://localhost:7004/api/";
-
+        // --------------AUTH-----------------------------------
         public static string Register => $"{BaseUrl}auth/register";
         public static string Login => $"{BaseUrl}auth/login";
 
-        // OTP ??ng k�
+        // OTP đăng kí
         public static string SendRegisterOtp => $"{BaseUrl}auth/otp/register";
         public static string VerifyRegisterOtp => $"{BaseUrl}auth/verify/register";
 
-        // Qu�n m?t kh?u
+        // Quên mật khẩu
         public static string ForgotPassword => $"{BaseUrl}auth/forgot-password";
         public static string VerifyForgotOtp => $"{BaseUrl}auth/verify/reset-password";
         public static string ResetPassword => $"{BaseUrl}auth/reset-password";
 
-        // ================= USERS (UserController) =================
+        // -------------------- USERS -----------------------
         public static string Me => $"{BaseUrl}users/me";
         public static string GetAllUsers => $"{BaseUrl}users";
         public static string UpdateUser(string? id = null)
@@ -32,41 +32,41 @@ namespace RestaurantManagementGUI.Helpers
         public static string VerifyEmailOtp => $"{BaseUrl}users/email/verify";
         public static string ResendEmailOtp => $"{BaseUrl}users/email/resend-otp";
 
-        // ??i tr?ng th�i (Soft Delete / Block)
+        // Tải trạng thái (Soft Delete / Block)
         public static string ToggleUserStatus(string id) => $"{BaseUrl}users/{id}/status";
 
-        // X�a v?nh vi?n
+        // Xóa vĩnh viễn user
         public static string HardDeleteUser(string id) => $"{BaseUrl}users/{id}";
 
-        // ================= DISHES (DishesController) =================
-        // RESTful API: D�ng chung URL g?c, kh�c nhau ? Method (GET, POST, PUT, DELETE)
+        // ------------------------------- DISHES -------------------------------------
         public static string Dishes => $"{BaseUrl}dishes";
-
         public static string DishById(string id) => $"{BaseUrl}dishes/{id}";
 
-        // ================= TABLES (TableController) =================
+        // ------------------------------- TABLES (TableController) --------------------
         public static string Tables => $"{BaseUrl}tables";
         public static string UpdateTableStatus(string id) => $"{BaseUrl}tables/{id}/status";
 
-        // ================= ORDERS (OrdersController) =================
+        // ----------------------------- ORDERS -----------------------------------------
         public static string Orders => $"{BaseUrl}orders";
         public static string OrderById(string id) => $"{BaseUrl}orders/{id}";
 
-        // C?p nh?t tr?ng th�i t?ng m�n trong ??n
+        // Cập nhật trạng thái món
         public static string UpdateOrderItemStatus(string maHD, string maMA)
             => $"{BaseUrl}orders/{maHD}/items/{maMA}/status";
 
-        // C?p nh?t tr?ng th�i c? h�a ??n
+        // Cập nhật trạng thái hóa đơn
         public static string UpdateOrderStatus(string id) => $"{BaseUrl}orders/{id}/status";
 
-        // Thanh to�n
+        // Thanh toán
         public static string Checkout(string id) => $"{BaseUrl}orders/{id}/checkout";
 
-        // ================= REPORTS (ReportController) =================
-        // V� d?: api/reports/revenue?startDate=...&endDate=...
+        // ----------------------- REPORTS--------------------------
+        // api/reports/revenue?startDate=...&endDate=...
         public static string RevenueReport => $"{BaseUrl}reports/revenue";
 
-        // ================= RESERVATIONS (ReservationsController) =================
+        // ----------------------- RESERVATIONS ---------------------------------------
         public static string Reservations => $"{BaseUrl}reservations";
+
+        public static string Notifications = $"{BaseUrl}notifications";
     }
 }

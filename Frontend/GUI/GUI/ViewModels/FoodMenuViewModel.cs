@@ -20,8 +20,6 @@ namespace RestaurantManagementGUI.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<CartItemModel> cartItems = new();
-
-        // Danh sách gốc (không bao giờ thay đổi sau khi load)
         private List<FoodModel> _originalList = new();
 
         [ObservableProperty]
@@ -29,8 +27,6 @@ namespace RestaurantManagementGUI.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<string> categories = new();
-
-        // --- FIX TÌM KIẾM ---
         private string _searchText;
         public string SearchText
         {
@@ -39,7 +35,7 @@ namespace RestaurantManagementGUI.ViewModels
             {
                 if (SetProperty(ref _searchText, value))
                 {
-                    FilterFoods(); // Tự động lọc khi gõ chữ
+                    FilterFoods();
                 }
             }
         }
@@ -76,10 +72,7 @@ namespace RestaurantManagementGUI.ViewModels
 
                 if (response != null && response.Success && response.Data != null)
                 {
-                    // Lưu vào list gốc
                     _originalList = response.Data;
-
-                    // Lấy danh sách Category (Chuẩn hóa)
                     Categories.Clear();
                     Categories.Add("Tất cả");
 
@@ -102,20 +95,15 @@ namespace RestaurantManagementGUI.ViewModels
                 IsLoading = false;
             }
         }
-
-        // --- LOGIC LỌC TỔNG HỢP (Category + Search) ---
         private void FilterFoods()
         {
             var query = _originalList.AsEnumerable();
-
-            // 1. Lọc theo Category
             if (SelectedCategory != "Tất cả")
             {
                 query = query.Where(f =>
                     (f.Category?.Trim().ToLower() ?? "khác") == SelectedCategory.ToLower());
             }
 
-            // 2. Lọc theo Search Text (Tiếng Việt không dấu càng tốt, ở đây dùng Contains cơ bản)
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 string keyword = SearchText.ToLower();

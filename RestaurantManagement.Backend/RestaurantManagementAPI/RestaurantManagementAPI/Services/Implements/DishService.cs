@@ -92,11 +92,20 @@ namespace RestaurantManagementAPI.Services.Implements
             var monAn = await _context.MONAN.FirstOrDefaultAsync(m => m.MaMA == maMA);
             if (monAn == null) return (false, "Món ăn không tồn tại");
 
-            if (!string.IsNullOrWhiteSpace(dto.TenMA)) monAn.TenMA = dto.TenMA;
-            if (dto.DonGia.HasValue) monAn.DonGia = dto.DonGia.Value;
-            if (!string.IsNullOrWhiteSpace(dto.Loai)) monAn.Loai = dto.Loai;
-            if (!string.IsNullOrWhiteSpace(dto.HinhAnh)) monAn.HinhAnh = dto.HinhAnh;
-            if (dto.TrangThai.HasValue) monAn.TrangThai = dto.TrangThai.Value;
+            if (!string.IsNullOrWhiteSpace(dto.TenMA)) 
+                monAn.TenMA = dto.TenMA;
+
+            if (dto.DonGia.HasValue) 
+                monAn.DonGia = dto.DonGia.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.Loai)) 
+                monAn.Loai = dto.Loai;
+
+            if (!string.IsNullOrWhiteSpace(dto.HinhAnh)) 
+                monAn.HinhAnh = dto.HinhAnh;
+
+            if (dto.TrangThai.HasValue) 
+                monAn.TrangThai = dto.TrangThai.Value;
 
             _context.Entry(monAn).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -106,7 +115,8 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message)> SoftDeleteDishAsync(string maMA)
         {
             var monAn = await _context.MONAN.FindAsync(maMA);
-            if (monAn == null || monAn.TrangThai == false) return (false, "Món ăn không tồn tại hoặc đã bị xóa");
+            if (monAn == null || monAn.TrangThai == false) 
+                return (false, "Món ăn không tồn tại hoặc đã bị xóa");
 
             monAn.TrangThai = false;
             _context.Entry(monAn).State = EntityState.Modified;

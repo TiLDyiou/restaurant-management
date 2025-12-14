@@ -7,7 +7,7 @@ namespace RestaurantManagementGUI.Models
     public class FoodModel
     {
         [JsonPropertyName("maMA")]
-        public string Id { get; set; } // Map maMA sang Id
+        public string Id { get; set; }
 
         [JsonPropertyName("tenMA")]
         public string Name { get; set; }
@@ -22,9 +22,8 @@ namespace RestaurantManagementGUI.Models
         public string ImageUrl { get; set; }
 
         [JsonPropertyName("trangThai")]
-        public bool TrangThai { get; set; } = true;// true: bán, false: nghỉ
+        public bool TrangThai { get; set; } = true;
 
-        // Helper hiển thị ảnh (nếu null thì dùng ảnh mặc định)
         [JsonIgnore]
         public string DisplayImageUrl => string.IsNullOrEmpty(ImageUrl) ? "default_food.png" : ImageUrl;
 

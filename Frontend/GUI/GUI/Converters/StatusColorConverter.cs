@@ -9,7 +9,8 @@ public class StatusColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value == null) return Colors.Black;
+        if (value == null) 
+            return Colors.Black;
 
         return value.ToString() switch
         {

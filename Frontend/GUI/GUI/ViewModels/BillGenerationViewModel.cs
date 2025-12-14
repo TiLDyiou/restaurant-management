@@ -15,8 +15,8 @@ namespace RestaurantManagementGUI.ViewModels
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        private const string MY_BANK_ID = "TCB";
-        private const string MY_ACCOUNT_NO = "123456789";
+        private const string MY_BANK_ID = "VCB";
+        private const string MY_ACCOUNT_NO = "0969390384";
         private const string QR_TEMPLATE = "compact2";
 
         [ObservableProperty]

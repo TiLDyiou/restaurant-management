@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantManagementAPI.Data;
 
@@ -11,9 +12,11 @@ using RestaurantManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    partial class QLNHDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251214093235_ThemBangThongBao")]
+    partial class ThemBangThongBao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -410,10 +413,6 @@ namespace RestaurantManagementAPI.Migrations
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Loai")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NoiDung")
                         .IsRequired()

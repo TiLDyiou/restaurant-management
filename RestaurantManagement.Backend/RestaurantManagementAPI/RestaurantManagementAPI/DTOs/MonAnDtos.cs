@@ -2,7 +2,6 @@
 
 namespace RestaurantManagementAPI.DTOs
 {
-    // DTO để trả về (GET)
     public class MonAnDto
     {
         public string MaMA { get; set; }
@@ -11,8 +10,6 @@ namespace RestaurantManagementAPI.DTOs
         public string? Loai { get; set; }
         public string? HinhAnh { get; set; }
     }
-
-    // DTO để tạo mới (POST)
     public class CreateMonAnDto
     {
 
@@ -26,8 +23,6 @@ namespace RestaurantManagementAPI.DTOs
         public string? Loai { get; set; }
         public string? HinhAnh { get; set; }
     }
-
-    // DTO để cập nhật (PUT)
     public class UpdateMonAnDto
     {
         public string? TenMA { get; set; }

@@ -64,7 +64,6 @@ namespace RestaurantManagementGUI
             }
         }
 
-        // --- TÌM KIẾM (Giữ nguyên logic của bạn) ---
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             // Lấy từ khóa, xóa khoảng trắng thừa, chuyển thường và BỎ DẤU ngay lập tức
@@ -134,8 +133,6 @@ namespace RestaurantManagementGUI
             if (sender is Button btn && btn.BindingContext is UserModel user)
                 await Navigation.PushAsync(new EditUserPage(user));
         }
-
-        // --- ĐỔI TRẠNG THÁI (Toggle Status) ---
         private async void OnToggleStatusClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.BindingContext is UserModel user)
@@ -175,8 +172,6 @@ namespace RestaurantManagementGUI
                 }
             }
         }
-
-        // --- XÓA VĨNH VIỄN (Hard Delete) ---
         private async void OnHardDeleteClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.BindingContext is UserModel user)

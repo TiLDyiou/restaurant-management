@@ -15,7 +15,8 @@ namespace RestaurantManagementAPI.Seeders
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<BanSeeder>>();
 
             var existingBan = await context.BAN.CountAsync();
-            if (existingBan >= soBan) return;
+            if (existingBan >= soBan) 
+                return;
 
             for (int i = 1; i <= soBan; i++)
             {

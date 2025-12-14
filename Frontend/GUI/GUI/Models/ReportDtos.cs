@@ -14,7 +14,7 @@ namespace RestaurantManagementGUI.Models
         public decimal AverageOrderValue { get; set; }
 
         [JsonPropertyName("revenueTrend")]
-        public double RevenueTrend { get; set; } // % tăng/giảm
+        public double RevenueTrend { get; set; }
 
         [JsonPropertyName("dailyRevenues")]
         public List<DailyRevenueDto> DailyRevenues { get; set; }

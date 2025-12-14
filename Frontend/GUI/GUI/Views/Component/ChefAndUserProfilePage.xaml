@@ -23,25 +23,25 @@
                    CornerRadius="12" Padding="15" HasShadow="True">
 
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="🆔 Mã nhân viên:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label Text="Mã nhân viên:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="MaNVLabel" TextColor="{StaticResource TextSecondary}"/>
 
-                    <Label Text="👤 Họ tên:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label Text="Họ tên:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="HoTenLabel" TextColor="{StaticResource TextSecondary}"/>
 
-                    <Label Text="💼 Chức vụ:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label Text="Chức vụ:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="ChucVuLabel" TextColor="{StaticResource TextSecondary}"/>
 
-                    <Label Text="🔒 Quyền:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label Text="Quyền:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="QuyenLabel" TextColor="{StaticResource TextSecondary}"/>
 
                     <Label Text="Tên đăng nhập:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="TenDangNhapLabel" TextColor="{StaticResource TextSecondary}"/>
 
-                    <Label Text="📧 Email:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label Text="Email:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="EmailLabel" TextColor="{StaticResource TextSecondary}"/>
 
-                    <Label Text="📞 Số điện thoại:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label Text="Số điện thoại:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="SDTLabel" TextColor="{StaticResource TextSecondary}"/>
                 </VerticalStackLayout>
             </Frame>

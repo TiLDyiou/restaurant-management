@@ -19,7 +19,8 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message, DatBan? Data)> CreateReservationAsync(CreateDatBanDto dto)
         {
             var ban = await _context.BAN.FindAsync(dto.MaBan);
-            if (ban == null) return (false, "Bàn không tồn tại", null);
+            if (ban == null) 
+                return (false, "Bàn không tồn tại", null);
 
             using var trans = await _context.Database.BeginTransactionAsync();
             try
@@ -66,9 +67,11 @@ namespace RestaurantManagementAPI.Services.Implements
         private async Task<string> GenerateDatBanId()
         {
             var last = await _context.DATBAN.OrderByDescending(db => db.MaDatBan).FirstOrDefaultAsync();
-            if (last == null) return "DB00001";
+            if (last == null) 
+                return "DB00001";
             string num = last.MaDatBan.Substring(2);
-            if (int.TryParse(num, out int n)) return $"DB{n + 1:D5}";
+            if (int.TryParse(num, out int n)) 
+                return $"DB{n + 1:D5}";
             return "DB00001";
         }
     }

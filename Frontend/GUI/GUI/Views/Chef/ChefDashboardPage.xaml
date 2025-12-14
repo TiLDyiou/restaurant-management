@@ -14,6 +14,7 @@
             <Setter Property="Padding" Value="10"/>
             <Setter Property="HeightRequest" Value="130"/>
             <Setter Property="Shadow" Value="0,2,5,Black"/>
+            <Setter Property="Margin" Value="0,0,10,15"/>
         </Style>
 
         <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
@@ -28,7 +29,7 @@
 
         <Grid x:Name="UserInfoPanel" BackgroundColor="#263238" Padding="20">
             <VerticalStackLayout VerticalOptions="Center" Spacing="10">
-                <Label Text="BẾP TRƯỞNG" TextColor="#FFBD59" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="ĐẦU BẾP" TextColor="#FFBD59" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
                 <Label Text="Kitchen Portal" TextColor="White" FontSize="14" HorizontalOptions="Center" Opacity="0.8"/>
 
                 <BoxView HeightRequest="2" Color="#FFBD59" Opacity="0.5" WidthRequest="100"/>
@@ -44,18 +45,25 @@
         </Grid>
 
         <ScrollView x:Name="ContentScroll" Padding="30">
-            <FlexLayout Wrap="Wrap" JustifyContent="Center" AlignContent="Start">
+            <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignContent="Start">
 
-                <Border Style="{StaticResource DashboardButtonStyle}" WidthRequest="200" HeightRequest="160" Margin="10">
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Image Source="orders.png" HeightRequest="60" Aspect="AspectFit"/>
+                        <Image Source="orders.png" HeightRequest="50" Aspect="AspectFit"/>
                         <Button Text="QUẢN LÝ ĐƠN MÓN" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" WidthRequest="200" HeightRequest="160" Margin="10">
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Image Source="users.png" HeightRequest="60" Aspect="AspectFit"/>
+                        <Image Source="menu.png" HeightRequest="50" Aspect="AspectFit"/>
+                        <Button Text="TRA CỨU MENU" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Image Source="users.png" HeightRequest="50" Aspect="AspectFit"/>
                         <Button Text="HỒ SƠ CÁ NHÂN" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUsersClicked"/>
                     </VerticalStackLayout>
                 </Border>

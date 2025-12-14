@@ -12,7 +12,7 @@ namespace RestaurantManagementGUI.Models
         public string Username { get; set; }
 
         [JsonPropertyName("role")]
-        public string Role { get; set; } // Backend trả về "role" (Admin, NhanVien...)
+        public string Role { get; set; }
 
         [JsonPropertyName("maNV")]
         public string MaNV { get; set; }

@@ -23,7 +23,10 @@ namespace RestaurantManagementGUI.Services
                 var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<Ban>>>(ApiConfig.Tables, _jsonOptions);
                 return response?.Data ?? new List<Ban>();
             }
-            catch { return new List<Ban>(); }
+            catch 
+            { 
+                return new List<Ban>(); 
+            }
         }
 
         public async Task<bool> UpdateStatusAsync(string maBan, string trangThai)
@@ -33,7 +36,10 @@ namespace RestaurantManagementGUI.Services
                 var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateTableStatus(maBan), trangThai);
                 return response.IsSuccessStatusCode;
             }
-            catch { return false; }
+            catch 
+            { 
+                return false; 
+            }
         }
     }
 }

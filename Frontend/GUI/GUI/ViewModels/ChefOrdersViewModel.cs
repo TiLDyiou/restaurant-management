@@ -29,7 +29,7 @@ namespace RestaurantManagementGUI.ViewModels
         private bool showNotificationPopup;
 
         [ObservableProperty]
-        private bool isBusy; // Added to prevent double clicks
+        private bool isBusy;
 
         public ChefOrdersViewModel()
         {
@@ -39,6 +39,7 @@ namespace RestaurantManagementGUI.ViewModels
 
             InitializeSocket();
             _ = LoadInitialOrders();
+            _ = LoadNotificationsAsync();
         }
 
         private void InitializeSocket()
@@ -64,7 +65,6 @@ namespace RestaurantManagementGUI.ViewModels
                         .OrderByDescending(x => x.NgayLap)
                         .ToList();
 
-                    // Ensure UI updates happen on the main thread
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         ActiveOrders.Clear();
@@ -75,7 +75,6 @@ namespace RestaurantManagementGUI.ViewModels
             catch (Exception ex)
             {
                 Console.WriteLine($"Chef Load Error: {ex.Message}");
-                // Optional: Show a non-intrusive error message
             }
             finally
             {
@@ -86,8 +85,6 @@ namespace RestaurantManagementGUI.ViewModels
         private void HandleNewOrder(string msgContent)
         {
             string maHD = msgContent.Trim();
-
-            // Dispatch to MainThread immediately for UI operations
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 try
@@ -119,27 +116,20 @@ namespace RestaurantManagementGUI.ViewModels
         {
             if (item == null) return;
 
-            // Tìm đơn chứa món này
             var parentOrder = ActiveOrders.FirstOrDefault(o => o.ChiTietHoaDons.Contains(item));
             if (parentOrder == null) return;
 
             try
             {
-                // 1. URL chuẩn (Khớp với Route Backend)
-                // Đảm bảo ApiConfig trả về: $"api/orders/{parentOrder.MaHD}/items/{item.MaMA}/status"
                 var url = ApiConfig.UpdateOrderItemStatus(parentOrder.MaHD, item.MaMA);
 
-                // 2. Body chuẩn (Khớp với DTO Backend)
                 var payload = new { NewStatus = "Đã xong" };
 
                 var res = await _httpClient.PutAsJsonAsync(url, payload);
 
                 if (res.IsSuccessStatusCode)
                 {
-                    // 3. Cập nhật UI ngay lập tức (Không chờ Socket để trải nghiệm mượt hơn)
                     item.TrangThai = "Đã xong";
-
-                    // Báo cho lệnh CompleteOrder kiểm tra lại điều kiện (Enable nút Xong cả bàn)
                     CompleteOrderCommand.NotifyCanExecuteChanged();
                 }
                 else
@@ -184,7 +174,6 @@ namespace RestaurantManagementGUI.ViewModels
         private bool CanCompleteOrder(HoaDonDto order)
         {
             if (order == null || order.ChiTietHoaDons == null) return false;
-            // Check if all dishes are done
             return order.ChiTietHoaDons.All(x => x.IsDone);
         }
 
@@ -196,11 +185,47 @@ namespace RestaurantManagementGUI.ViewModels
                 NewOrderCount = 0;
         }
 
+        public async Task LoadNotificationsAsync()
+        {
+            try
+            {
+                string url = $"{ApiConfig.Notifications}?loai=BEP";
+
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<ThongBaoDto>>>(url, _jsonOptions);
+
+                if (response != null && response.Success && response.Data != null)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        NotificationList.Clear();
+                        foreach (var item in response.Data)
+                        {
+                            string time = item.ThoiGian.ToString("HH:mm");
+                            NotificationList.Add($"{item.NoiDung} ({time})");
+                        }
+                        NewOrderCount = NotificationList.Count;
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chef Load Noti Error: {ex.Message}");
+            }
+        }
+
         [RelayCommand]
-        void ClearAllNotifications()
+        async Task ClearAllNotifications()
         {
             NotificationList.Clear();
             ShowNotificationPopup = false;
+            NewOrderCount = 0;
+
+            try
+            {
+                string url = $"{ApiConfig.Notifications}?loai=BEP";
+                await _httpClient.DeleteAsync(url);
+            }
+            catch { }
         }
     }
 }

@@ -10,8 +10,6 @@ namespace RestaurantManagementGUI.Models
 
         [JsonPropertyName("tenBan")]
         public string TenBan { get; set; }
-
-        // Khi Socket cập nhật biến này, UI sẽ tự đổi màu
         [ObservableProperty]
         [JsonPropertyName("trangThai")]
         private string _trangThai;

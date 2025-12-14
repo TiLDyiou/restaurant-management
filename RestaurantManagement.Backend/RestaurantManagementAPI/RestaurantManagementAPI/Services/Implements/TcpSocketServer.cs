@@ -51,7 +51,6 @@ namespace RestaurantManagementAPI.Services.Implements
 
                     string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-                    // Nếu là tin nhắn CHAT -> Broadcast cho mọi người
                     if (message.StartsWith("CHAT|"))
                     {
                         await BroadcastAsync(message);

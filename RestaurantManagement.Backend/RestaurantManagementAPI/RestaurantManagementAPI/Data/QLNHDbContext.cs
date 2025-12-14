@@ -18,7 +18,7 @@ namespace RestaurantManagementAPI.Data
         public DbSet<ChiTietPhieuNhap> CHITIETPHIEUNHAP { get; set; }
         public DbSet<DonHangOnline> DONHANG_ONLINE { get; set; }
         public DbSet<DatBan> DATBAN { get; set; }
-
+        public DbSet<ThongBao> THONGBAO { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

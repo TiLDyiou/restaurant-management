@@ -156,7 +156,6 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="0,8" ColumnDefinitions="Auto, *">
-                                    <Label Text="✅" Margin="0,0,10,0" FontSize="16"/>
                                     <Label Grid.Column="1" Text="{Binding .}" TextColor="#333" FontSize="14" LineBreakMode="WordWrap"/>
                                 </Grid>
                             </DataTemplate>

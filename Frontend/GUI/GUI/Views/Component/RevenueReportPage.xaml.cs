@@ -26,8 +26,6 @@ namespace RestaurantManagementGUI.Views
 
             _endDate = DateTime.Now;
             _startDate = DateTime.Now.Date;
-
-            // ĐĂNG KÝ SỰ KIỆN
             PaymentEventService.PaymentCompleted += OnPaymentCompleted;
 
             CheckUserRole();
@@ -38,7 +36,7 @@ namespace RestaurantManagementGUI.Views
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 await DisplayAlert("💰 Tiền về!", $"Vừa thu {e.TongTien:N0}đ", "OK");
-                await LoadRevenueData(); // Reload ngay lập tức
+                await LoadRevenueData();
             });
         }
 
@@ -57,7 +55,6 @@ namespace RestaurantManagementGUI.Views
 
         private void CheckUserRole()
         {
-            // Giả lập lấy role từ storage
             _currentMaNV = UserState.CurrentMaNV ?? "";
             _isAdmin = (UserState.CurrentRole?.ToLower() == "admin");
 
@@ -65,7 +62,6 @@ namespace RestaurantManagementGUI.Views
             else { PageTitleLabel.Text = "Doanh Số Của Tôi"; RightPanelTitle.Text = "📋 Chi Tiết Giao Dịch"; }
         }
 
-        // --- LOAD DATA TỪ API ---
         private async Task LoadRevenueData()
         {
             try
@@ -103,8 +99,6 @@ namespace RestaurantManagementGUI.Views
             RevenueChartContainer.Children.Clear();
             RightPanelContent.Children.Clear();
         }
-
-        // --- VẼ BIỂU ĐỒ (LOGIC UI) ---
         private void DrawRevenueChart(List<DailyRevenueDto> list)
         {
             RevenueChartContainer.Children.Clear();
@@ -120,8 +114,6 @@ namespace RestaurantManagementGUI.Views
                 RevenueChartContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = 50 });
 
                 var stack = new VerticalStackLayout { Spacing = 5, VerticalOptions = LayoutOptions.End };
-
-                // Cột
                 var bar = new BoxView { Color = Color.FromArgb("#FFBD59"), WidthRequest = 40, CornerRadius = new CornerRadius(5, 5, 0, 0) };
                 bar.HeightRequest = Math.Max(10, 200 * ((double)item.Revenue / (double)max));
 

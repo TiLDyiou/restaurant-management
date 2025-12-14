@@ -22,14 +22,26 @@ namespace RestaurantManagementAPI.Services.Implements
 
         public async Task<object?> GetUserProfileAsync(string username)
         {
-            var user = await _context.TAIKHOAN.Include(t => t.NhanVien).FirstOrDefaultAsync(t => t.TenDangNhap == username);
-            if (user == null) return null;
-            return new { user.TenDangNhap, user.Quyen, user.MaNV, user.NhanVien?.HoTen, user.NhanVien?.ChucVu, user.NhanVien?.SDT, user.Email, user.IsVerified };
+            var user = await _context.TAIKHOAN
+                .Include(t => t.NhanVien)
+                .FirstOrDefaultAsync(t => t.TenDangNhap == username);
+            if (user == null) 
+                return null;
+            return new 
+            { 
+                user.TenDangNhap, 
+                user.Quyen, user.MaNV, 
+                user.NhanVien?.HoTen, 
+                user.NhanVien?.ChucVu, 
+                user.NhanVien?.SDT, 
+                user.Email, user.IsVerified 
+            };
         }
 
         public async Task<List<object>> GetAllUsersAsync()
         {
-            return await _context.NHANVIEN.Include(nv => nv.TaiKhoan)
+            return await _context.NHANVIEN
+                .Include(nv => nv.TaiKhoan)
                 .Select(nv => new { nv.MaNV, nv.HoTen, nv.ChucVu, nv.SDT, nv.TaiKhoan.Quyen, nv.TaiKhoan.TenDangNhap, nv.TrangThai, nv.TaiKhoan.IsActive, nv.TaiKhoan.Email })
                 .ToListAsync<object>();
         }
@@ -41,17 +53,31 @@ namespace RestaurantManagementAPI.Services.Implements
             {
                 TaiKhoan? user;
                 if (isAdmin && !string.IsNullOrEmpty(targetMaNV))
-                    user = await _context.TAIKHOAN.Include(t => t.NhanVien).FirstOrDefaultAsync(u => u.MaNV == targetMaNV);
+                    user = await _context.TAIKHOAN
+                        .Include(t => t.NhanVien)
+                        .FirstOrDefaultAsync(u => u.MaNV == targetMaNV);
                 else
-                    user = await _context.TAIKHOAN.Include(t => t.NhanVien).FirstOrDefaultAsync(u => u.TenDangNhap == requesterUsername);
+                    user = await _context.TAIKHOAN
+                        .Include(t => t.NhanVien)
+                        .FirstOrDefaultAsync(u => u.TenDangNhap == requesterUsername);
 
-                if (user == null) return (false, "Người dùng không tồn tại.", null);
+                if (user == null) 
+                    return (false, "Người dùng không tồn tại.", null);
 
-                if (!string.IsNullOrWhiteSpace(dto.HoTen)) user.NhanVien.HoTen = dto.HoTen.Trim();
-                if (!string.IsNullOrWhiteSpace(dto.ChucVu) && isAdmin) user.NhanVien.ChucVu = dto.ChucVu.Trim();
-                if (!string.IsNullOrWhiteSpace(dto.SDT)) user.NhanVien.SDT = dto.SDT.Trim();
-                if (!string.IsNullOrWhiteSpace(dto.Quyen) && isAdmin) user.Quyen = dto.Quyen.Trim();
-                if (!string.IsNullOrWhiteSpace(dto.MatKhau)) user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+                if (!string.IsNullOrWhiteSpace(dto.HoTen)) 
+                    user.NhanVien.HoTen = dto.HoTen.Trim();
+
+                if (!string.IsNullOrWhiteSpace(dto.ChucVu) && isAdmin) 
+                    user.NhanVien.ChucVu = dto.ChucVu.Trim();
+
+                if (!string.IsNullOrWhiteSpace(dto.SDT)) 
+                    user.NhanVien.SDT = dto.SDT.Trim();
+
+                if (!string.IsNullOrWhiteSpace(dto.Quyen) && isAdmin) 
+                    user.Quyen = dto.Quyen.Trim();
+
+                if (!string.IsNullOrWhiteSpace(dto.MatKhau)) 
+                    user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
 
                 bool emailChanged = false;
                 if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != user.Email)
@@ -96,7 +122,8 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message)> VerifyEmailOtpAsync(string email, string otp)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return (false, "Email không tồn tại.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
 
             if (user.OTP?.Trim() != otp.Trim() || user.OTPExpireTime < DateTime.UtcNow)
                 return (false, "OTP không hợp lệ hoặc đã hết hạn.");
@@ -112,8 +139,11 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message)> ResendEmailOtpAsync(string email)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return (false, "Email không tồn tại.");
-            if (user.IsVerified) return (false, "Email này đã xác thực, không cần gửi lại.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
+
+            if (user.IsVerified) 
+                return (false, "Email này đã xác thực, không cần gửi lại.");
 
             if (user.OTPExpireTime.HasValue && user.OTPExpireTime.Value > DateTime.UtcNow.AddMinutes(4))
             {
@@ -137,11 +167,16 @@ namespace RestaurantManagementAPI.Services.Implements
         }
         public async Task<(bool Success, string Message, object? Data)> ToggleUserStatusAsync(string maNV)
         {
-            var employee = await _context.NHANVIEN.Include(e => e.TaiKhoan).FirstOrDefaultAsync(e => e.MaNV == maNV);
-            if (employee == null) return (false, "Không tìm thấy NV.", null);
+            var employee = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+
+            if (employee == null) 
+                return (false, "Không tìm thấy NV.", null);
 
             employee.TrangThai = employee.TrangThai == "Đang làm" ? "Đã nghỉ" : "Đang làm";
-            if (employee.TaiKhoan != null) employee.TaiKhoan.IsActive = employee.TrangThai == "Đang làm";
+            if (employee.TaiKhoan != null) 
+                employee.TaiKhoan.IsActive = employee.TrangThai == "Đang làm";
 
             _context.NHANVIEN.Update(employee);
             await _context.SaveChangesAsync();
@@ -150,10 +185,14 @@ namespace RestaurantManagementAPI.Services.Implements
 
         public async Task<(bool Success, string Message)> HardDeleteUserAsync(string maNV)
         {
-            var employee = await _context.NHANVIEN.Include(e => e.TaiKhoan).FirstOrDefaultAsync(e => e.MaNV == maNV);
-            if (employee == null) return (false, "Không tìm thấy NV.");
+            var employee = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+            if (employee == null) 
+                return (false, "Không tìm thấy NV.");
 
-            if (employee.TaiKhoan != null) _context.TAIKHOAN.Remove(employee.TaiKhoan);
+            if (employee.TaiKhoan != null) 
+                _context.TAIKHOAN.Remove(employee.TaiKhoan);
             _context.NHANVIEN.Remove(employee);
             await _context.SaveChangesAsync();
             return (true, "Đã xóa vĩnh viễn.");

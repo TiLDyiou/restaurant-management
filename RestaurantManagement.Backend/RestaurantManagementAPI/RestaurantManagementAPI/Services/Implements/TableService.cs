@@ -23,7 +23,8 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message, Ban? Data)> UpdateStatusAsync(string maBan, string trangThai)
         {
             var ban = await _context.BAN.FindAsync(maBan);
-            if (ban == null) return (false, "Bàn không tồn tại", null);
+            if (ban == null) 
+                return (false, "Bàn không tồn tại", null);
 
             ban.TrangThai = trangThai;
             await _context.SaveChangesAsync();

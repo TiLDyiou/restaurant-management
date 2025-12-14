@@ -17,7 +17,6 @@ namespace RestaurantManagementGUI.Models
         public List<ChiTietHoaDonDto> ChiTietHoaDons { get; set; }
     }
 
-    // DTO chi tiết món ăn trong đơn
     public class ChiTietHoaDonDto
     {
         [JsonPropertyName("maMA")]
@@ -49,7 +48,7 @@ namespace RestaurantManagementGUI.Models
         public decimal? TongTien { get; set; }
 
         [JsonIgnore]
-        public string TableName => $"Bàn {MaBan}"; // Helper hiển thị
+        public string TableName => $"Bàn {MaBan}";
 
         [JsonIgnore]
         public string FormattedTotal => TongTien.HasValue ? $"{TongTien.Value:N0} đ" : "0 đ";
@@ -66,14 +65,10 @@ namespace RestaurantManagementGUI.Models
 
         [JsonPropertyName("soLuong")]
         public int SoLuong { get; set; }
-
-        // Dùng ObservableProperty để khi set value, UI tự đổi màu
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsDone))] // Báo hiệu cho IsDone thay đổi theo
+        [NotifyPropertyChangedFor(nameof(IsDone))] 
         [JsonPropertyName("trangThai")]
         private string trangThai;
-
-        // Helper cho UI (để disable nút check khi đã xong)
         public bool IsDone => TrangThai == "Đã xong" || TrangThai == "Hết món";
     }
 }

@@ -16,13 +16,11 @@ namespace RestaurantManagementAPI.Data
 
                 try
                 {
-                    // Kiểm tra admin đã tồn tại chưa
                     if (await context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == "admin"))
                         return;
 
                     logger.LogInformation("Không tìm thấy tài khoản admin. Bắt đầu tạo...");
 
-                    // Tạo nhân viên admin nếu chưa có
                     var adminNhanVien = await context.NHANVIEN.FirstOrDefaultAsync(nv => nv.MaNV == "ADMIN");
                     if (adminNhanVien == null)
                     {
@@ -31,16 +29,13 @@ namespace RestaurantManagementAPI.Data
                             MaNV = "ADMIN",
                             HoTen = "Nguyễn Trần Gia Bảo",
                             ChucVu = "Admin",
+                            SDT = "0969390382",
                             NgayVaoLam = DateTime.Now,
                             TrangThai = "Đang làm"
                         };
                         context.NHANVIEN.Add(adminNhanVien);
                     }
-
-                    // Hash mật khẩu admin
                     string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
-
-                    // Tạo tài khoản admin với email và tự xác thực
                     var adminTaiKhoan = new TaiKhoan
                     {
                         TenDangNhap = "admin",

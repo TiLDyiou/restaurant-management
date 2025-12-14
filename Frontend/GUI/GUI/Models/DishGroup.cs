@@ -2,7 +2,6 @@
 
 namespace RestaurantManagementGUI.Models
 {
-    // Kế thừa List<FoodModel> để binding trực tiếp vào list con
     public class DishGroup : List<FoodModel>
     {
         public string Category { get; private set; }

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace RestaurantManagementGUI.Models
 {
-    // DTO để gửi đi khi cập nhật trạng thái món
     public class UpdateOrderItemStatusDto
     {
         [JsonPropertyName("newStatus")]

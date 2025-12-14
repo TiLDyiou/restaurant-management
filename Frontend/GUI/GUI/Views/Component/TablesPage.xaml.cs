@@ -28,6 +28,7 @@ namespace RestaurantManagementGUI
         {
             base.OnAppearing();
             await _viewModel.LoadTablesAsync();
+            await _viewModel.LoadNotificationsAsync();
             _viewModel.SubscribeSocket();
         }
 
@@ -36,8 +37,6 @@ namespace RestaurantManagementGUI
             base.OnDisappearing();
             _viewModel.UnsubscribeSocket();
         }
-
-        // --- EVENTS ---
         private async void OnHamburgerTapped(object sender, EventArgs e)
         {
             FlyoutMenu.SelectedTable = null;
@@ -80,7 +79,6 @@ namespace RestaurantManagementGUI
         private async void OnFlyoutViewAddOrderRequested(object sender, Ban table)
         {
             await FlyoutMenu.CloseAsync();
-            // Truyền object Ban sang OrdersPage
             await Navigation.PushAsync(new OrdersPage(table));
         }
 

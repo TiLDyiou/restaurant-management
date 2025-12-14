@@ -7,16 +7,16 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Label Text="🆔 Mã nhân viên:" FontAttributes="Bold"/>
+            <Label Text="Mã nhân viên:" FontAttributes="Bold"/>
             <Label x:Name="MaNVLabel"/>
 
-            <Label Text="👤 Họ tên:" FontAttributes="Bold"/>
+            <Label Text="Họ tên:" FontAttributes="Bold"/>
             <Entry x:Name="HoTenEntry" Placeholder="Nhập họ tên"/>
 
-            <Label Text="📞 Số điện thoại:" FontAttributes="Bold"/>
+            <Label Text="Số điện thoại:" FontAttributes="Bold"/>
             <Entry x:Name="SDTEntry" Placeholder="Nhập số điện thoại" Keyboard="Telephone"/>
 
-            <Label Text="📧 Email:" FontAttributes="Bold"/>
+            <Label Text="Email:" FontAttributes="Bold"/>
             <Entry x:Name="EmailEntry" Placeholder="Nhập email" Keyboard="Email"/>
 
             <Label Text="Mật khẩu mới:" FontAttributes="Bold"/>

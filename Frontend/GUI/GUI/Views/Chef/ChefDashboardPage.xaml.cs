@@ -18,7 +18,7 @@ namespace RestaurantManagementGUI
             try
             {
                 string username = await SecureStorage.Default.GetAsync("user_username") ?? "Chef";
-                WelcomeLabel.Text = $"Bếp trưởng: {username}";
+                WelcomeLabel.Text = $"Đầu bếp: {username}";
                 UserState.CurrentRole = "DauBep";
             }
             catch { }
@@ -36,6 +36,8 @@ namespace RestaurantManagementGUI
         }
 
         private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChefOrdersPage());
+        private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
+
         private async void OnUsersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChefAndUserProfilePage());
     }
 }

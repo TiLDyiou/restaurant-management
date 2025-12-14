@@ -38,23 +38,17 @@ namespace RestaurantManagementGUI.ViewModels
                 if (response != null && response.Success && response.Data != null)
                 {
                     var dishes = response.Data;
-
-                    // --- ĐOẠN CODE ĐÃ SỬA ---
                     var groups = dishes
                         .GroupBy(d =>
                         {
-                            // 1. Kiểm tra null hoặc rỗng
-                            if (string.IsNullOrWhiteSpace(d.Category)) return "Khác";
-
-                            // 2. Chuẩn hóa: Trim -> Chuyển hết về chữ thường -> Chuyển sang dạng Title Case (Viết Hoa Chữ Cái Đầu)
-                            // Ví dụ: "món chính", "Món Chính", "MÓN CHÍNH" -> Đều thành "Món Chính"
+                            if (string.IsNullOrWhiteSpace(d.Category)) 
+                                return "Khác";
                             string cleanCat = d.Category.Trim().ToLower();
                             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cleanCat);
                         })
                         .Select(g => new DishGroup(g.Key, g.ToList()))
                         .OrderBy(g => g.Category)
                         .ToList();
-                    // ------------------------
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {

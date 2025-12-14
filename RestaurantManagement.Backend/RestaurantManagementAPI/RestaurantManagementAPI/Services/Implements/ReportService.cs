@@ -16,27 +16,27 @@ namespace RestaurantManagementAPI.Services.Implements
 
         public async Task<RevenueReportResponse> GetRevenueReportAsync(DateTime startDate, DateTime endDate)
         {
-            // 1. Chuẩn hóa thời gian (Từ đầu ngày start đến cuối ngày end)
+            // Chuẩn hóa thời gian (Từ đầu ngày start đến cuối ngày end)
             var start = startDate.Date;
             var end = endDate.Date.AddDays(1).AddTicks(-1);
 
-            // 2. Lấy dữ liệu trong khoảng thời gian
+            // Lấy dữ liệu trong khoảng thời gian
             var ordersInRange = await _context.HOADON
                 .Where(o => o.NgayLap.HasValue &&
                             o.NgayLap.Value >= start &&
                             o.NgayLap.Value <= end &&
                             o.TrangThai == "Đã thanh toán")
-                .Include(o => o.NhanVien) // Include để lấy tên nhân viên
+                .Include(o => o.NhanVien)
                 .ToListAsync();
 
-            // 3. Tính toán tổng quan
+            // Tính toán tổng quan
             var totalRevenue = ordersInRange.Sum(o => o.TongTien);
             var totalOrders = ordersInRange.Count;
             var avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-            // 4. Tính Trend (So sánh với kỳ trước đó)
+            // Tính Trend (So sánh với kỳ trước đó)
             var daysDiff = (end - start).TotalDays;
-            var prevStart = start.AddDays(-daysDiff); // Lùi lại đúng số ngày đã chọn
+            var prevStart = start.AddDays(-daysDiff);
             var prevEnd = start.AddTicks(-1);
 
             var prevRevenue = await _context.HOADON
@@ -52,7 +52,7 @@ namespace RestaurantManagementAPI.Services.Implements
             else if (totalRevenue > 0)
                 trend = 100; // Nếu kỳ trước 0 mà kỳ này có tiền thì tăng 100% (hoặc vô cực)
 
-            // 5. Tính biểu đồ doanh thu theo ngày (Daily Revenues)
+            // Tính biểu đồ doanh thu theo ngày (Daily Revenues)
             // Tạo danh sách tất cả các ngày trong range (để ngày nào không có đơn vẫn hiện doanh thu = 0)
             var allDates = Enumerable.Range(0, 1 + (end.Date - start.Date).Days)
                                      .Select(offset => start.Date.AddDays(offset))
@@ -72,7 +72,7 @@ namespace RestaurantManagementAPI.Services.Implements
                 .OrderBy(d => d.Date)
                 .ToList();
 
-            // 6. Tính Top Nhân viên xuất sắc
+            // Tính Top Nhân viên xuất sắc
             var topEmployees = ordersInRange
                 .GroupBy(o => o.NhanVien != null ? o.NhanVien.HoTen : "Không xác định")
                 .Select(g => new EmployeePerformanceDto
@@ -85,7 +85,7 @@ namespace RestaurantManagementAPI.Services.Implements
                 .Take(5)
                 .ToList();
 
-            // 7. Lấy danh sách giao dịch gần đây (Mới thêm logic này)
+            // Lấy danh sách giao dịch gần đây
             var recentTransactions = ordersInRange
                 .OrderByDescending(o => o.NgayLap)
                 .Take(10) // Chỉ lấy 10 đơn gần nhất để hiển thị list
@@ -98,13 +98,13 @@ namespace RestaurantManagementAPI.Services.Implements
                 })
                 .ToList();
 
-            // 8. Đóng gói kết quả
+            // Đóng gói kết quả
             return new RevenueReportResponse
             {
                 TotalRevenue = totalRevenue,
                 TotalOrders = totalOrders,
                 AverageOrderValue = avgOrderValue,
-                RevenueTrend = Math.Round(trend, 2), // Làm tròn 2 số thập phân
+                RevenueTrend = Math.Round(trend, 2),
                 DailyRevenues = dailyRevenues,
                 TopEmployees = topEmployees,
                 RecentTransactions = recentTransactions

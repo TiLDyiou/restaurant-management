@@ -15,10 +15,11 @@ namespace RestaurantManagementGUI.ViewModels
         private readonly JsonSerializerOptions _jsonOptions;
         private List<Ban> _allTables = new();
 
+        private string _currentFilter = "Tất cả";
+
         [ObservableProperty]
         private ObservableCollection<Ban> filteredTables = new();
 
-        // --- PHẦN THÊM MỚI CHO THÔNG BÁO ---
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasNewNotifications))]
         private int newNotificationCount = 0;
@@ -29,7 +30,6 @@ namespace RestaurantManagementGUI.ViewModels
 
         [ObservableProperty]
         private bool showNotificationPopup;
-        // -----------------------------------
 
         public event EventHandler DataUpdated;
 
@@ -48,20 +48,45 @@ namespace RestaurantManagementGUI.ViewModels
                 if (response != null && response.Success)
                 {
                     _allTables = response.Data ?? new List<Ban>();
-                    FilterTables("Tất cả");
+                    FilterTables(_currentFilter);
                 }
             }
-            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            catch (Exception ex) { Console.WriteLine($"LoadTables Error: {ex.Message}"); }
+        }
+        public async Task LoadNotificationsAsync()
+        {
+            try
+            {
+                string url = $"{ApiConfig.Notifications}?loai=PHUCVU";
+
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<ThongBaoDto>>>(url, _jsonOptions);
+
+                if (response != null && response.Success && response.Data != null)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        NotificationList.Clear();
+                        foreach (var item in response.Data)
+                        {
+                            string time = item.ThoiGian.ToString("HH:mm");
+                            NotificationList.Add($"{item.NoiDung} ({time})");
+                        }
+                        NewNotificationCount = NotificationList.Count;
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi tải thông báo: {ex.Message}");
+            }
         }
 
-        // --- SOCKET ---
         public void SubscribeSocket()
         {
-            // Lắng nghe cập nhật bàn
             _ = SocketListener.Instance.ConnectAsync();
             SocketListener.Instance.OnTableStatusChanged -= HandleTableUpdate;
             SocketListener.Instance.OnTableStatusChanged += HandleTableUpdate;
-            // Lắng nghe cập nhật thông báo từ bếp
+
             SocketListener.Instance.OnDishDone -= HandleDishDone;
             SocketListener.Instance.OnDishDone += HandleDishDone;
         }
@@ -84,18 +109,19 @@ namespace RestaurantManagementGUI.ViewModels
                         var table = _allTables.FirstOrDefault(t => t.MaBan == updatedBan.MaBan);
                         if (table != null)
                         {
-                            table.TrangThai = updatedBan.TrangThai; // UI đổi màu
-                            DataUpdated?.Invoke(this, EventArgs.Empty); // Cập nhật thống kê
+                            table.TrangThai = updatedBan.TrangThai;
+                            DataUpdated?.Invoke(this, EventArgs.Empty);
+
+                            FilterTables(_currentFilter);
                         }
                     });
                 }
             }
             catch { }
         }
-        // Xử lý khi Bếp báo xong món
+
         private void HandleDishDone(string message)
         {
-            // message có thể là "Bàn B01: Gà rán đã xong"
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 NewNotificationCount++;
@@ -103,9 +129,12 @@ namespace RestaurantManagementGUI.ViewModels
                 NotificationList.Insert(0, $"{message} ({time})");
             });
         }
+
         [RelayCommand]
         public void FilterTables(string filterType)
         {
+            _currentFilter = filterType;
+
             if (_allTables == null) return;
             IEnumerable<Ban> result = _allTables;
 
@@ -120,20 +149,27 @@ namespace RestaurantManagementGUI.ViewModels
             DataUpdated?.Invoke(this, EventArgs.Empty);
         }
 
-        // --- COMMANDS CHO THÔNG BÁO ---
+        [RelayCommand]
+        async Task ClearAllNotifications()
+        {
+            NotificationList.Clear();
+            ShowNotificationPopup = false;
+            NewNotificationCount = 0;
+
+            try
+            {
+                string url = $"{ApiConfig.Notifications}?loai=PHUCVU";
+                await _httpClient.DeleteAsync(url);
+            }
+            catch (Exception ex) { Console.WriteLine($"Clear Error: {ex.Message}"); }
+        }
+
         [RelayCommand]
         void ToggleNotifications()
         {
             ShowNotificationPopup = !ShowNotificationPopup;
-            if (ShowNotificationPopup) 
+            if (ShowNotificationPopup)
                 NewNotificationCount = 0;
-        }
-
-        [RelayCommand]
-        void ClearAllNotifications()
-        {
-            NotificationList.Clear();
-            ShowNotificationPopup = false;
         }
     }
 }

@@ -59,8 +59,8 @@ namespace RestaurantManagementAPI.Services.Implements
                     IsVerified = false
                 };
                 _context.TAIKHOAN.Add(tk);
-
                 await _context.SaveChangesAsync();
+
                 if (!string.IsNullOrWhiteSpace(dto.Email))
                 {
                     bool emailSent = await SendOtpInternal(tk, "OTP Xác Thực Email");
@@ -70,7 +70,6 @@ namespace RestaurantManagementAPI.Services.Implements
                         return (false, "Tạo tài khoản thất bại do lỗi hệ thống gửi email. Vui lòng thử lại sau.", null);
                     }
                 }
-
                 await transaction.CommitAsync();
                 return (true, "Đăng ký thành công, vui lòng kiểm tra email.", newMaNV);
             }
@@ -83,12 +82,20 @@ namespace RestaurantManagementAPI.Services.Implements
 
         public async Task<(bool Success, string Message, object? Data)> LoginAsync(LoginDto dto)
         {
-            var user = await _context.TAIKHOAN.Include(t => t.NhanVien)
+            var user = await _context.TAIKHOAN
+                                     .Include(t => t.NhanVien)
                                      .FirstOrDefaultAsync(t => t.TenDangNhap == dto.TenDangNhap);
             bool matched = false;
             if (user != null)
             {
-                try { matched = BCrypt.Net.BCrypt.Verify(dto.MatKhau, user.MatKhau); } catch { matched = false; }
+                try 
+                { 
+                    matched = BCrypt.Net.BCrypt.Verify(dto.MatKhau, user.MatKhau); 
+                } 
+                catch 
+                { 
+                    matched = false; 
+                }
             }
             else
             {
@@ -98,19 +105,30 @@ namespace RestaurantManagementAPI.Services.Implements
             if (user == null || !matched)
                 return (false, "Sai tài khoản hoặc mật khẩu.", null);
 
-            if (!user.IsVerified) return (false, "Tài khoản chưa xác thực email.", null);
-            if (!user.IsActive) return (false, "Tài khoản đã bị vô hiệu hóa.", null);
+            if (!user.IsVerified) 
+                return (false, "Tài khoản chưa xác thực email.", null);
+
+            if (!user.IsActive) 
+                return (false, "Tài khoản đã bị vô hiệu hóa.", null);
 
             var token = GenerateJwtToken(user);
-            return (true, "Đăng nhập thành công", new { token, username = user.TenDangNhap, role = user.Quyen, maNV = user.MaNV });
+            return (true, "Đăng nhập thành công", new 
+            { 
+                token, 
+                username = user.TenDangNhap, 
+                role = user.Quyen, 
+                maNV = user.MaNV 
+            });
         }
 
         public async Task<(bool Success, string Message)> SendRegisterOtpAsync(string email)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return (false, "Email không tồn tại.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
 
-            if (user.IsVerified) return (false, "Tài khoản này đã được xác thực rồi.");
+            if (user.IsVerified) 
+                return (false, "Tài khoản này đã được xác thực rồi.");
 
             bool sent = await SendOtpInternal(user, "OTP Xác Thực Email");
             return sent ? (true, "OTP đã được gửi.") : (false, "Gửi email thất bại.");
@@ -119,7 +137,8 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message)> VerifyRegisterOtpAsync(string email, string otp)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return (false, "Email không tồn tại.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
 
             if (user.OTP?.Trim() != otp.Trim() || user.OTPExpireTime < DateTime.UtcNow)
                 return (false, "OTP sai hoặc hết hạn.");
@@ -135,7 +154,8 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message)> ForgotPasswordAsync(string email)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return (false, "Email không tồn tại.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
 
             bool sent = await SendOtpInternal(user, "OTP Đổi Mật Khẩu");
             return sent ? (true, "OTP đã được gửi.") : (false, "Gửi email thất bại.");
@@ -144,16 +164,23 @@ namespace RestaurantManagementAPI.Services.Implements
         public async Task<(bool Success, string Message)> VerifyForgotOtpAsync(string email, string otp)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return (false, "Email không tồn tại.");
-            if (user.OTP?.Trim() != otp.Trim() || user.OTPExpireTime < DateTime.UtcNow) return (false, "OTP sai hoặc hết hạn.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
+
+            if (user.OTP?.Trim() != otp.Trim() || user.OTPExpireTime < DateTime.UtcNow) 
+                return (false, "OTP sai hoặc hết hạn.");
+
             return (true, "OTP hợp lệ.");
         }
 
         public async Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDto dto)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null) return (false, "Email không tồn tại.");
-            if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow) return (false, "OTP sai hoặc hết hạn.");
+            if (user == null) 
+                return (false, "Email không tồn tại.");
+
+            if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow) 
+                return (false, "OTP sai hoặc hết hạn.");
 
             user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             user.OTP = null;
@@ -202,7 +229,8 @@ namespace RestaurantManagementAPI.Services.Implements
         {
             var jwt = _config.GetSection("Jwt");
             var keyStr = jwt["Key"];
-            if (string.IsNullOrEmpty(keyStr)) throw new ArgumentNullException("Jwt:Key is missing in appsettings.json");
+            if (string.IsNullOrEmpty(keyStr)) 
+                throw new ArgumentNullException("Jwt:Key is missing in appsettings.json");
 
             var key = Encoding.UTF8.GetBytes(keyStr);
             var claims = new List<Claim>

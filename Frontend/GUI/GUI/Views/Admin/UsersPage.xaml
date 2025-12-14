@@ -64,32 +64,32 @@
                             </Border.Shadow>
                             <VerticalStackLayout Spacing="6">
 
-                                <Label Text="{Binding HoTen, StringFormat='👤 Họ tên: {0}'}"
+                                <Label Text="{Binding HoTen, StringFormat='Họ tên: {0}'}"
                                        FontSize="16"
                                        FontAttributes="Bold"
                                        TextColor="#000000" />
 
-                                <Label Text="{Binding MaNV, StringFormat='🆔 Mã nhân viên: {0}'}"
+                                <Label Text="{Binding MaNV, StringFormat='Mã nhân viên: {0}'}"
                                        FontSize="14"
                                        TextColor="#333333" />
 
-                                <Label Text="{Binding ChucVu, StringFormat='💼 Chức vụ: {0}'}"
+                                <Label Text="{Binding ChucVu, StringFormat='Chức vụ: {0}'}"
                                        FontSize="14"
                                        TextColor="#444444" />
 
-                                <Label Text="{Binding SDT, StringFormat='📞 Số điện thoại: {0}'}"
+                                <Label Text="{Binding SDT, StringFormat='Số điện thoại: {0}'}"
                                        FontSize="14"
                                        TextColor="#444444" />
 
-                                <Label Text="{Binding Email, StringFormat='📧 Email: {0}'}"
+                                <Label Text="{Binding Email, StringFormat='Email: {0}'}"
                                        FontSize="14"
                                        TextColor="#444444" />
 
-                                <Label Text="{Binding Quyen, StringFormat='🔒 Quyền: {0}'}"
+                                <Label Text="{Binding Quyen, StringFormat='Quyền: {0}'}"
                                        FontSize="14"
                                        TextColor="#757575" />
 
-                                <Label Text="{Binding TrangThai, StringFormat='⚡ Trạng thái: {0}'}"
+                                <Label Text="{Binding TrangThai, StringFormat='Trạng thái: {0}'}"
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        TextColor="{Binding TrangThai, Converter={StaticResource StatusColorConverter}}" />

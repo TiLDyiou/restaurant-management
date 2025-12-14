@@ -9,6 +9,6 @@
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services"
   ],
-  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers\\AuthController.cs",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\appsettings.Development.json",
   "PreviewInSolutionExplorer": false
 }

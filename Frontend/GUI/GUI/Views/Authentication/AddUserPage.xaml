@@ -47,6 +47,7 @@
                     <Picker.Items>
                         <x:String>NhanVien</x:String>
                         <x:String>Admin</x:String>
+                        <x:String>DauBep</x:String>
                     </Picker.Items>
                 </Picker>
             </Frame>

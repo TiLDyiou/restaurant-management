@@ -9,7 +9,8 @@ public class StatusButtonTextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value == null) return "🛑 Nghỉ việc";
+        if (value == null) 
+            return "🛑 Nghỉ việc";
 
         return value.ToString() == "Đang làm" ? "🛑 Nghỉ việc" : "✅ Quay lại";
     }

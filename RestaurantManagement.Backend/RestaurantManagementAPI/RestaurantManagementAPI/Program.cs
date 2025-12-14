@@ -77,7 +77,7 @@ builder.Services.AddHostedService<TcpSocketServer>();
 
 var app = builder.Build();
 
-// Seeding dữ liệu mẫu
+// Seeding dữ liệu mẫu lúc khởi tạo
 try
 {
     using (var scope = app.Services.CreateScope())
