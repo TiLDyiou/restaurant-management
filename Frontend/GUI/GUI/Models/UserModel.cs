@@ -6,7 +6,7 @@ namespace RestaurantManagementGUI.Models
 {
     public class UserModel : INotifyPropertyChanged
     {
-        private string _trangThai = "Đang làm";
+        private string _trangThai;
 
         [JsonPropertyName("maNV")]
         public string MaNV { get; set; }
@@ -26,27 +26,21 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("tenDangNhap")]
         public string TenDangNhap { get; set; }
 
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+
         [JsonPropertyName("trangThai")]
         public string TrangThai
         {
             get => _trangThai;
-            set
-            {
-                if (_trangThai != value)
-                {
-                    _trangThai = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { _trangThai = value; OnPropertyChanged(); }
         }
+
+        [JsonPropertyName("isActive")]
+        public bool IsActive { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        public string Email { get; set; }
-        public bool IsVerified { get; set; } = true;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

@@ -38,9 +38,6 @@
                     <Label Text="Tên đăng nhập:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="TenDangNhapLabel" TextColor="{StaticResource TextSecondary}"/>
 
-                    <Label Text="⚡ Trạng thái:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
-                    <Label x:Name="TrangThaiLabel" TextColor="{StaticResource TextSecondary}"/>
-
                     <Label Text="📧 Email:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
                     <Label x:Name="EmailLabel" TextColor="{StaticResource TextSecondary}"/>
 

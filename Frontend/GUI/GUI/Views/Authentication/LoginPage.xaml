@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RestaurantManagementGUI.Views.Authentication.LoginPage"
+             x:Class="RestaurantManagementGUI.LoginPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="White">
 
+    <!-- Màu thương hiệu -->
     <ContentPage.Resources>
         <Color x:Key="PrimaryBrandColor">#263238</Color>
         <Color x:Key="SecondaryTextColor">#737373</Color>
@@ -12,69 +13,126 @@
         <Color x:Key="ButtonText">#263238</Color>
     </ContentPage.Resources>
 
+    <!-- Layout chính -->
     <ScrollView VerticalOptions="FillAndExpand">
         <Grid x:Name="MainGrid"
               RowDefinitions="Auto,Auto"
               Padding="20"
               VerticalOptions="CenterAndExpand">
 
-            <Grid x:Name="HeaderImage" Grid.Row="0" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,20,0,20">
-                <Image x:Name="ChefImage" Source="chef.png" Aspect="AspectFit" HeightRequest="180" WidthRequest="180" />
+            <!-- Ảnh đầu bếp -->
+            <Grid x:Name="HeaderImage"
+                  Grid.Row="0"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center"
+                  Margin="0,20,0,20">
+                <Image x:Name="ChefImage"
+                       Source="chef.png"
+                       Aspect="AspectFit"
+                       HeightRequest="180"
+                       WidthRequest="180"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
             </Grid>
 
-            <Grid x:Name="LoginForm" Grid.Row="1" VerticalOptions="Start" HorizontalOptions="Fill">
-                <Border x:Name="LoginFormBorder" Stroke="{StaticResource PrimaryBrandColor}" StrokeThickness="2"
-                        StrokeShape="RoundRectangle 20" Padding="30,20" HorizontalOptions="Fill"
-                        MaximumWidthRequest="500" BackgroundColor="White" Shadow="5,5,10,Black">
+            <!-- Form đăng nhập -->
+            <Grid x:Name="LoginForm"
+                  Grid.Row="1"
+                  VerticalOptions="Start"
+                  HorizontalOptions="Fill">
+
+                <Border x:Name="LoginFormBorder"
+                        Stroke="{StaticResource PrimaryBrandColor}"
+                        StrokeThickness="2"
+                        StrokeShape="RoundRectangle 20"
+                        Padding="30,20"
+                        HorizontalOptions="Fill"
+                        MaximumWidthRequest="500"
+                        BackgroundColor="White"
+                        Shadow="5,5,10,Black">
 
                     <VerticalStackLayout Spacing="20">
-                        <Image Source="logo.png" Aspect="AspectFit" HorizontalOptions="Center" HeightRequest="130" />
 
-                        <Border Stroke="{StaticResource PrimaryBrandColor}" StrokeThickness="2" StrokeShape="RoundRectangle 30"
-                                HeightRequest="50" Padding="20,0">
-                            <Entry Text="{Binding Username}" 
-                                   Placeholder="Tên đăng nhập" PlaceholderColor="{StaticResource PrimaryBrandColor}"
-                                   TextColor="{StaticResource PrimaryBrandColor}" VerticalTextAlignment="Center"
-                                   FontFamily="RobotoMono" BackgroundColor="Transparent" />
+                        <!-- Logo -->
+                        <Image Source="logo.png"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Center"
+                               HeightRequest="130" />
+
+                        <!-- Ô nhập tên đăng nhập -->
+                        <Border Stroke="{StaticResource PrimaryBrandColor}"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 30"
+                                HeightRequest="50"
+                                Padding="20,0">
+                            <Entry x:Name="UsernameEntry"
+                                   Placeholder="Tên đăng nhập"
+                                   PlaceholderColor="{StaticResource PrimaryBrandColor}"
+                                   TextColor="{StaticResource PrimaryBrandColor}"
+                                   VerticalTextAlignment="Center"
+                                   FontFamily="RobotoMono"
+                                   BackgroundColor="Transparent" />
                         </Border>
 
-                        <Border Stroke="{StaticResource PrimaryBrandColor}" StrokeThickness="2" StrokeShape="RoundRectangle 30"
-                                HeightRequest="50" Padding="0">
+                        <!-- Ô nhập mật khẩu + icon mắt -->
+                        <Border Stroke="{StaticResource PrimaryBrandColor}"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 30"
+                                HeightRequest="50"
+                                Padding="0">
                             <Grid ColumnDefinitions="*,Auto" Padding="20,0,10,0">
-                                <Entry Grid.Column="0" 
-                                       Text="{Binding Password}" 
-                                       IsPassword="{Binding IsPassword}"
-                                       Placeholder="Mật khẩu" PlaceholderColor="{StaticResource PrimaryBrandColor}"
-                                       TextColor="{StaticResource PrimaryBrandColor}" VerticalTextAlignment="Center"
-                                       FontFamily="RobotoMono" BackgroundColor="Transparent" />
-
-                                <Image Grid.Column="1" 
-                                       Source="{Binding PasswordIcon}" 
-                                       WidthRequest="24" HeightRequest="24" Aspect="AspectFit">
+                                <Entry x:Name="PasswordEntry"
+                                       Grid.Column="0"
+                                       Placeholder="Mật khẩu"
+                                       PlaceholderColor="{StaticResource PrimaryBrandColor}"
+                                       TextColor="{StaticResource PrimaryBrandColor}"
+                                       IsPassword="True"
+                                       VerticalTextAlignment="Center"
+                                       FontFamily="RobotoMono"
+                                       BackgroundColor="Transparent" />
+                                <Image x:Name="PasswordToggleIcon"
+                                       Grid.Column="1"
+                                       Source="eye_hide.png"
+                                       WidthRequest="24"
+                                       HeightRequest="24"
+                                       Aspect="AspectFit"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center">
                                     <Image.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding TogglePasswordCommand}" />
+                                        <TapGestureRecognizer Tapped="OnPasswordToggleTapped" />
                                     </Image.GestureRecognizers>
                                 </Image>
                             </Grid>
                         </Border>
 
-                        <Button Text="{Binding LoginButtonText}" 
-                                Command="{Binding LoginCommand}"
-                                IsEnabled="{Binding IsNotBusy}"
-                                FontFamily="RobotoMono" FontAttributes="Bold"
-                                BackgroundColor="{StaticResource ButtonBackground}" TextColor="{StaticResource ButtonText}"
-                                HeightRequest="50" CornerRadius="25" Margin="0,10,0,0" />
+                        <!-- Nút đăng nhập -->
+                        <Button x:Name="LoginButton"
+                                Text="Đăng nhập"
+                                FontFamily="RobotoMono"
+                                FontAttributes="Bold"
+                                BackgroundColor="{StaticResource ButtonBackground}"
+                                TextColor="{StaticResource ButtonText}"
+                                HeightRequest="50"
+                                CornerRadius="25"
+                                Clicked="OnLoginClicked"
+                                Margin="0,10,0,0" />
 
-                        <Button Text="Quên mật khẩu?" 
-                                Command="{Binding ForgotPasswordCommand}"
-                                FontFamily="RobotoMono" FontSize="13"
-                                TextColor="{StaticResource SecondaryTextColor}" BackgroundColor="Transparent"
-                                Padding="0" Margin="0,-10,0,0" HorizontalOptions="Center" />
+                        <!-- Nút quên mật khẩu -->
+                        <Button Text="Quên mật khẩu?"
+                                FontFamily="RobotoMono"
+                                FontSize="13"
+                                TextColor="{StaticResource SecondaryTextColor}"
+                                BackgroundColor="Transparent"
+                                Clicked="OnForgotPasswordClicked"
+                                Padding="0"
+                                Margin="0,-10,0,0"
+                                HorizontalOptions="Center" />
 
                     </VerticalStackLayout>
                 </Border>
             </Grid>
 
+            <!-- VisualState cho Desktop -->
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="LayoutStates">
                     <VisualState x:Name="Desktop">
@@ -85,12 +143,20 @@
                             <Setter TargetName="MainGrid" Property="RowDefinitions" Value="*" />
                             <Setter TargetName="MainGrid" Property="ColumnDefinitions" Value="*,*" />
                             <Setter TargetName="MainGrid" Property="Padding" Value="60,0" />
+
                             <Setter TargetName="HeaderImage" Property="Grid.Row" Value="0" />
                             <Setter TargetName="HeaderImage" Property="Grid.Column" Value="0" />
+                            <Setter TargetName="HeaderImage" Property="HorizontalOptions" Value="Center" />
+                            <Setter TargetName="HeaderImage" Property="VerticalOptions" Value="Center" />
+
                             <Setter TargetName="ChefImage" Property="HeightRequest" Value="350" />
                             <Setter TargetName="ChefImage" Property="WidthRequest" Value="350" />
+
                             <Setter TargetName="LoginForm" Property="Grid.Row" Value="0" />
                             <Setter TargetName="LoginForm" Property="Grid.Column" Value="1" />
+                            <Setter TargetName="LoginForm" Property="HorizontalOptions" Value="Center" />
+                            <Setter TargetName="LoginForm" Property="VerticalOptions" Value="Center" />
+
                             <Setter TargetName="LoginFormBorder" Property="WidthRequest" Value="450" />
                         </VisualState.Setters>
                     </VisualState>

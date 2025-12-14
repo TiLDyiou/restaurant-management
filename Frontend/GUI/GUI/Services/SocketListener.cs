@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 
@@ -15,12 +16,10 @@ namespace RestaurantManagementGUI.Services
         private bool _isConnected;
         private CancellationTokenSource _cts;
 
-        // Sự kiện bắn ra UI
         public event Action<string> OnNewOrderReceived;
         public event Action<string> OnTableStatusChanged;
         public event Action<string> OnChatReceived;
-
-        // Cấu hình IP
+        public event Action<string> OnDishDone;
 #if ANDROID
         private const string SERVER_IP = "10.0.2.2";
 #else
@@ -53,19 +52,15 @@ namespace RestaurantManagementGUI.Services
                         _writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
                         _isConnected = true;
 
-                        Debug.WriteLine("✅ [SOCKET] KẾT NỐI THÀNH CÔNG!");
-
-                        // Bắt đầu lắng nghe ngay khi kết nối được
+                        Debug.WriteLine("KẾT NỐI THÀNH CÔNG!");
                         await ListenLoop();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"❌ [SOCKET] Lỗi kết nối: {ex.Message}. Thử lại sau 3s...");
+                    Debug.WriteLine($"Lỗi kết nối: {ex.Message}. Thử lại sau 3s...");
                     _isConnected = false;
                 }
-
-                // Nếu mất kết nối, chờ 3 giây rồi thử lại
                 await Task.Delay(3000, token);
             }
         }
@@ -78,9 +73,6 @@ namespace RestaurantManagementGUI.Services
                 {
                     string line = await _reader.ReadLineAsync();
                     if (string.IsNullOrWhiteSpace(line)) continue;
-
-                    Debug.WriteLine($"📩 [SOCKET NHẬN]: {line}"); // In ra Output để kiểm tra
-
                     var parts = line.Split('|', 2);
                     if (parts.Length < 2) continue;
 
@@ -92,12 +84,13 @@ namespace RestaurantManagementGUI.Services
                         if (type == "ORDER") OnNewOrderReceived?.Invoke(json);
                         else if (type == "TABLE") OnTableStatusChanged?.Invoke(json);
                         else if (type == "CHAT") OnChatReceived?.Invoke(json);
+                        else if (type == "KITCHEN_DONE") OnDishDone?.Invoke(json);
                     });
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"⚠️ [SOCKET] Ngắt kết nối: {ex.Message}");
+                Debug.WriteLine($"Ngắt kết nối: {ex.Message}");
                 _isConnected = false;
                 _client?.Close();
             }
@@ -117,7 +110,7 @@ namespace RestaurantManagementGUI.Services
             _isConnected = false;
             _client?.Close();
             _client = null;
-            Debug.WriteLine("🛑 [SOCKET] Đã ngắt kết nối thủ công.");
+            Debug.WriteLine("Đã ngắt kết nối thủ công.");
         }
     }
 }

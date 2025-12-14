@@ -1,4 +1,5 @@
-﻿using RestaurantManagementGUI.Services;
+﻿
+using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.Views;
 
 namespace RestaurantManagementGUI

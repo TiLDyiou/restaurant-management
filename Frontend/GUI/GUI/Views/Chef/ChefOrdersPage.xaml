@@ -4,7 +4,9 @@
              xmlns:vm="clr-namespace:RestaurantManagementGUI.ViewModels"
              xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
              xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
+             xmlns:local="clr-namespace:RestaurantManagementGUI"
              x:Class="RestaurantManagementGUI.ChefOrdersPage"
+             x:Name="ChefPage"
              Title="BẾP - NHẬN ĐƠN"
              BackgroundColor="DimGrey">
 
@@ -16,7 +18,6 @@
     </ContentPage.Resources>
 
     <Grid>
-
         <Grid RowDefinitions="Auto, *" ZIndex="0">
 
             <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="20">
@@ -27,37 +28,22 @@
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ToggleNotificationsCommand}"/>
                     </Grid.GestureRecognizers>
-
-                    <Label Text="🔔" FontSize="30" TextColor="White" 
-                           HorizontalOptions="Center" VerticalOptions="Center"/>
-
-                    <Border BackgroundColor="Red" 
-                            StrokeShape="RoundRectangle 10" 
-                            StrokeThickness="0"
-                            HeightRequest="20" WidthRequest="20"
-                            HorizontalOptions="End" VerticalOptions="Start"
-                            Margin="0,5,5,0"
-                            IsVisible="{Binding HasNewOrders}">
-                        <Label Text="{Binding NewOrderCount}" 
-                               TextColor="White" FontSize="12" FontAttributes="Bold"
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Label Text="🔔" FontSize="30" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border BackgroundColor="Red" StrokeShape="RoundRectangle 10" StrokeThickness="0"
+                            HeightRequest="20" WidthRequest="20" HorizontalOptions="End" VerticalOptions="Start"
+                            Margin="0,5,5,0" IsVisible="{Binding HasNewOrders}">
+                        <Label Text="{Binding NewOrderCount}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
                     </Border>
                 </Grid>
             </Grid>
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding ActiveOrders}" Margin="10">
-                <CollectionView.EmptyView>
-                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Label Text="Hiện tại không có đơn nào!" TextColor="Gray" FontSize="18"/>
-                    </StackLayout>
-                </CollectionView.EmptyView>
-
+            <CollectionView Grid.Row="1" ItemsSource="{Binding ActiveOrders}" Margin="10" SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="2" VerticalItemSpacing="15" HorizontalItemSpacing="15"/>
                 </CollectionView.ItemsLayout>
 
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:HoaDonModel">
+                    <DataTemplate x:DataType="models:HoaDonDto">
                         <Border StrokeShape="RoundRectangle 15" StrokeThickness="0" BackgroundColor="White" Padding="0">
                             <Grid RowDefinitions="Auto, *, Auto" Padding="15">
 
@@ -70,39 +56,68 @@
                                            TextColor="Gray" FontSize="16" HorizontalOptions="End" VerticalOptions="Center"/>
                                 </Grid>
 
-                                <ScrollView Grid.Row="1" HeightRequest="200" VerticalScrollBarVisibility="Always">
-                                    <StackLayout BindableLayout.ItemsSource="{Binding ChiTietHoaDons}">
-                                        <BindableLayout.ItemTemplate>
-                                            <DataTemplate x:DataType="models:ChiTietHoaDonModel">
-                                                <Grid ColumnDefinitions="40, *, 40" Margin="0,8">
-                                                    <Label Text="{Binding SoLuong}" TextColor="#D32F2F" FontAttributes="Bold" FontSize="20" VerticalOptions="Center"/>
+                                <StackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding ChiTietHoaDons}" Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ChiTietHoaDonViewDto">
+                                            <Grid ColumnDefinitions="40, *, 50">
 
-                                                    <StackLayout Grid.Column="1" VerticalOptions="Center">
-                                                        <Label Text="{Binding TenMA}" TextColor="#263238" FontAttributes="Bold" FontSize="18">
-                                                            <Label.Triggers>
-                                                                <DataTrigger TargetType="Label" Binding="{Binding IsDone}" Value="True">
-                                                                    <Setter Property="TextDecorations" Value="Strikethrough" />
-                                                                    <Setter Property="TextColor" Value="Gray" />
-                                                                    <Setter Property="Opacity" Value="0.6" />
-                                                                </DataTrigger>
-                                                            </Label.Triggers>
-                                                        </Label>
-                                                        <Label Text="{Binding TrangThai}" TextColor="Gray" FontSize="12" FontAttributes="Italic"/>
-                                                    </StackLayout>
+                                                <Label Text="{Binding SoLuong}" TextColor="#D32F2F" FontAttributes="Bold" FontSize="20" VerticalOptions="Center"/>
 
-                                                    <Button Grid.Column="2" Text="✔" ...
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChefOrdersViewModel}}, Path=CompleteDishCommand}"
-                                                    CommandParameter="{Binding .}">
-                                                    </Button>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </BindableLayout.ItemTemplate>
-                                    </StackLayout>
-                                </ScrollView>
+                                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                    <Label Text="{Binding TenMA}" TextColor="#263238" FontAttributes="Bold" FontSize="18">
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding IsDone}" Value="True">
+                                                                <Setter Property="TextDecorations" Value="Strikethrough" />
+                                                                <Setter Property="TextColor" Value="Gray" />
+                                                                <Setter Property="Opacity" Value="0.6" />
+                                                            </DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
+                                                    <Label Text="{Binding TrangThai}" TextColor="Gray" FontSize="12" FontAttributes="Italic"/>
+                                                </VerticalStackLayout>
 
-                                <Button Grid.Row="2" Text="XONG CẢ BÀN" ...
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChefOrdersViewModel}}, Path=CompleteOrderCommand}"
-                                CommandParameter="{Binding .}"/>
+                                                <Border Grid.Column="2" 
+                                                        HeightRequest="40" WidthRequest="40" 
+                                                        StrokeShape="RoundRectangle 20" StrokeThickness="0"
+                                                        BackgroundColor="{Binding IsDone, Converter={StaticResource StatusColorConverter}}">
+
+                                                    <Label Text="✔" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold"/>
+
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer 
+                                                            Command="{Binding Source={x:Reference ChefPage}, Path=BindingContext.CompleteDishCommand}"
+                                                            CommandParameter="{Binding .}"/>
+                                                    </Border.GestureRecognizers>
+
+                                                    <Border.Triggers>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding IsDone}" Value="True">
+                                                            <Setter Property="BackgroundColor" Value="Gray"/>
+                                                            <Setter Property="InputTransparent" Value="True"/>
+                                                        </DataTrigger>
+                                                    </Border.Triggers>
+                                                </Border>
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </StackLayout>
+
+                                <Border Grid.Row="2" BackgroundColor="#1E2630" StrokeShape="RoundRectangle 8" Padding="10" Margin="0,15,0,0">
+                                    <Label Text="XONG CẢ BÀN" TextColor="White" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                            Command="{Binding Source={x:Reference ChefPage}, Path=BindingContext.CompleteOrderCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </Border.GestureRecognizers>
+
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsPressed}" Value="True">
+                                            <Setter Property="Opacity" Value="0.7"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -110,16 +125,13 @@
             </CollectionView>
         </Grid>
 
-        <ContentView IsVisible="{Binding ShowNotificationPopup}" BackgroundColor="Transparent" ZIndex="99">
+        <ContentView IsVisible="{Binding ShowNotificationPopup}" BackgroundColor="Transparent" ZIndex="99" InputTransparent="False">
             <ContentView.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding ToggleNotificationsCommand}"/>
             </ContentView.GestureRecognizers>
 
-            <Border BackgroundColor="#2c3e50" 
-                    Stroke="#FFC107" StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="320" HeightRequest="300"
-                    HorizontalOptions="End" VerticalOptions="Start"
+            <Border BackgroundColor="#2c3e50" Stroke="#FFC107" StrokeThickness="1" StrokeShape="RoundRectangle 10"
+                    WidthRequest="320" HeightRequest="300" HorizontalOptions="End" VerticalOptions="Start"
                     Margin="0,75,20,0" Padding="15">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer />
@@ -127,7 +139,6 @@
 
                 <Grid RowDefinitions="Auto, *, Auto">
                     <Label Text="🔔 Thông báo mới nhất" TextColor="#FFC107" FontAttributes="Bold" FontSize="16" Margin="0,0,0,10"/>
-
                     <CollectionView Grid.Row="1" ItemsSource="{Binding NotificationList}">
                         <CollectionView.EmptyView>
                             <Label Text="Không có thông báo nào." TextColor="Gray" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,20,0,0"/>
@@ -141,9 +152,7 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
-
-                    <Button Grid.Row="2" Text="Xóa tất cả" 
-                            Command="{Binding ClearAllNotificationsCommand}"
+                    <Button Grid.Row="2" Text="Xóa tất cả" Command="{Binding ClearAllNotificationsCommand}"
                             BackgroundColor="Transparent" TextColor="#FF6B6B" FontSize="13" 
                             HorizontalOptions="End" Margin="0,10,0,0"/>
                 </Grid>

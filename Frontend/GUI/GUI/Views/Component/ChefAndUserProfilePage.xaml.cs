@@ -10,6 +10,7 @@ namespace RestaurantManagementGUI
     public partial class ChefAndUserProfilePage : ContentPage
     {
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions;
         private UserModel _user = new();
 
         public ChefAndUserProfilePage()
@@ -17,16 +18,11 @@ namespace RestaurantManagementGUI
             InitializeComponent();
 
 #if DEBUG
-            var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) =>
-                    msg?.RequestUri?.Host == "10.0.2.2" || msg?.RequestUri?.IsLoopback == true
-            };
-            _httpClient = new HttpClient(handler);
+            _httpClient = new HttpClient(GetInsecureHandler());
 #else
             _httpClient = new HttpClient();
 #endif
-            _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         protected override async void OnAppearing()
@@ -42,37 +38,48 @@ namespace RestaurantManagementGUI
                 var token = await SecureStorage.Default.GetAsync("auth_token");
                 if (string.IsNullOrEmpty(token))
                 {
-                    await DisplayAlert("Lỗi", "Chưa đăng nhập hoặc token hết hạn!", "OK");
+                    await DisplayAlert("Lỗi", "Phiên đăng nhập hết hạn.", "OK");
+                    await Navigation.PopToRootAsync();
                     return;
                 }
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync(ApiConfig.UserProfile);
 
-                if (response.IsSuccessStatusCode)
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<UserModel>>(ApiConfig.Me, _jsonOptions);
+
+                if (response != null && response.Success && response.Data != null)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
-                    _user = JsonSerializer.Deserialize<UserModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new UserModel();
+                    _user = response.Data;
 
                     MaNVLabel.Text = _user.MaNV;
                     HoTenLabel.Text = _user.HoTen;
                     ChucVuLabel.Text = _user.ChucVu;
                     QuyenLabel.Text = _user.Quyen;
                     TenDangNhapLabel.Text = _user.TenDangNhap;
-                    TrangThaiLabel.Text = _user.TrangThai;
                     SDTLabel.Text = _user.SDT;
                     EmailLabel.Text = _user.Email;
+                }
+                else
+                {
+                    await DisplayAlert("Lỗi", response?.Message ?? "Không tải được thông tin cá nhân", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi", $"Không thể lấy thông tin: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi kết nối", ex.Message, "OK");
             }
         }
 
         private async void OnEditProfileClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new EditChefAndUserProfilePage(_user));
+        }
+
+        private HttpClientHandler GetInsecureHandler()
+        {
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
+            return handler;
         }
     }
 }

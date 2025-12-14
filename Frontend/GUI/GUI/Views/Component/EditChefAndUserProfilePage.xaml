@@ -13,9 +13,6 @@
             <Label Text="👤 Họ tên:" FontAttributes="Bold"/>
             <Entry x:Name="HoTenEntry" Placeholder="Nhập họ tên"/>
 
-            <Label Text="💼 Chức vụ:" FontAttributes="Bold"/>
-            <Entry x:Name="ChucVuEntry" Placeholder="Nhập chức vụ"/>
-
             <Label Text="📞 Số điện thoại:" FontAttributes="Bold"/>
             <Entry x:Name="SDTEntry" Placeholder="Nhập số điện thoại" Keyboard="Telephone"/>
 

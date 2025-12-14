@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -15,9 +16,9 @@ namespace RestaurantManagementGUI.Converters
             return status switch
             {
                 "Bàn trống" => Colors.Green,
-                "Bàn bận" => Color.FromArgb("#503106"), 
+                "Bàn bận" => Color.FromArgb("#503106"),
                 "Bàn đã đặt" => Colors.Orange,
-                _ => Colors.Transparent 
+                _ => Colors.Transparent
             };
         }
     }

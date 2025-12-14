@@ -3,66 +3,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RestaurantManagementGUI.Views.FoodMenuPage"
              xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
+             xmlns:viewmodels="clr-namespace:RestaurantManagementGUI.ViewModels"
              Title="Thực Đơn Nhà Hàng"
              BackgroundColor="#f0f0f0">
 
     <Grid>
+        <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                           IsVisible="{Binding IsLoading}" 
+                           Color="#004d40"
+                           VerticalOptions="Center" 
+                           HorizontalOptions="Center"
+                           ZIndex="99"/>
+
         <ScrollView Orientation="Horizontal" Padding="10">
-            <HorizontalStackLayout BindableLayout.ItemsSource="{Binding GroupedDishes}"
-                                   Spacing="15">
+            <HorizontalStackLayout BindableLayout.ItemsSource="{Binding GroupedDishes}" Spacing="15">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="models:DishGroup">
 
-                        <Border StrokeShape="RoundRectangle 15"
-                                StrokeThickness="0"
-                                BackgroundColor="#e0f2f1"
-                                WidthRequest="320" 
-                                Padding="10">
+                        <Border StrokeShape="RoundRectangle 15" StrokeThickness="0" BackgroundColor="#e0f2f1" WidthRequest="320" Padding="10" VerticalOptions="Fill">
                             <Grid RowDefinitions="Auto, *" RowSpacing="10">
 
                                 <Frame Grid.Row="0" BackgroundColor="#004d40" CornerRadius="10" Padding="10" HasShadow="True">
-                                    <Label Text="{Binding Category}" 
-                                           FontSize="18" 
-                                           FontAttributes="Bold" 
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
+                                    <Label Text="{Binding Category}" FontSize="18" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
                                 </Frame>
 
                                 <ScrollView Grid.Row="1" Orientation="Vertical" VerticalScrollBarVisibility="Never">
                                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding .}" Spacing="10">
                                         <BindableLayout.ItemTemplate>
-                                            <DataTemplate x:DataType="models:Dish">
+                                            <DataTemplate x:DataType="models:FoodModel">
 
-                                                <Border StrokeShape="RoundRectangle 12" 
-                                                        StrokeThickness="0"
-                                                        BackgroundColor="White"
-                                                        Padding="0">
+                                                <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="White" Padding="0">
                                                     <Border.Shadow>
                                                         <Shadow Brush="Black" Offset="2,2" Radius="5" Opacity="0.1"/>
                                                     </Border.Shadow>
 
                                                     <Grid ColumnDefinitions="100, *" Padding="5">
-                                                        <Image Grid.Column="0" 
-                                                               Source="{Binding HinhAnh}" 
-                                                               Aspect="AspectFill"
-                                                               HeightRequest="80"
-                                                               WidthRequest="80">
+                                                        <Image Grid.Column="0" Source="{Binding DisplayImageUrl}" Aspect="AspectFill" HeightRequest="80" WidthRequest="80">
                                                             <Image.Clip>
                                                                 <EllipseGeometry Center="40,40" RadiusX="40" RadiusY="40" />
                                                             </Image.Clip>
                                                         </Image>
 
-                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2" Padding="5,0,0,0">
-                                                            <Label Text="{Binding TenMA}" 
-                                                                   FontAttributes="Bold" 
-                                                                   FontSize="15"
-                                                                   TextColor="#004d40"
-                                                                   LineBreakMode="TailTruncation"/>
-
-                                                            <Label Text="{Binding FormattedPrice}" 
-                                                                   FontSize="14" 
-                                                                   TextColor="#d32f2f"
-                                                                   FontAttributes="Bold"/>
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2" Padding="10,0,0,0">
+                                                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15" TextColor="#004d40" LineBreakMode="TailTruncation"/>
+                                                            <Label Text="{Binding FormattedPrice}" FontSize="14" TextColor="#d32f2f" FontAttributes="Bold"/>
                                                         </VerticalStackLayout>
                                                     </Grid>
                                                 </Border>

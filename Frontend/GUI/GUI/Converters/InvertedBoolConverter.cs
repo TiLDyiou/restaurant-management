@@ -1,4 +1,5 @@
-﻿// File: Converters/InvertedBoolConverter.cs
+﻿
+// File: Converters/InvertedBoolConverter.cs
 using System.Globalization;
 
 namespace RestaurantManagementGUI.Converters

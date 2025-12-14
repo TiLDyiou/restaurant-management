@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
+using Microsoft.Extensions.Logging;
 using RestaurantManagementGUI;
 using RestaurantManagementGUI.Views;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.ViewModels;
 using RestaurantManagementGUI.Views.Staff;
-using RestaurantManagementGUI.Views.Authentication;
-using RestaurantManagementGUI.Views.Admin;
 
 namespace RestaurantManagementGUI;
 
@@ -43,17 +42,13 @@ public static class MauiProgram
             });
 
         // SERVICES
-        builder.Services.AddSingleton<IUserSession, UserSession>();
-        builder.Services.AddSingleton<ApiService>();
         builder.Services.AddSingleton(SocketListener.Instance);
 
         // VIEWMODELS
         builder.Services.AddSingleton<ChefOrdersViewModel>();
         builder.Services.AddTransient<TablesViewModel>();
+        builder.Services.AddTransient<FoodMenuViewModel>();
         builder.Services.AddTransient<BillGenerationViewModel>();
-        builder.Services.AddTransient<DashboardViewModel>();
-        builder.Services.AddTransient<FoodViewModel>();
-        builder.Services.AddTransient<OrderViewModel>();
 
         // PAGES
         builder.Services.AddSingleton<ChefOrdersPage>();

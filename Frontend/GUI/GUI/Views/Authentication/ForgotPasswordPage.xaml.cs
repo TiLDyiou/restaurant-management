@@ -1,11 +1,15 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
 using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Models;
 
 namespace RestaurantManagementGUI
 {
     public partial class ForgotPasswordPage : ContentPage
     {
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions;
+
         private string _email;
         private string _otp;
 
@@ -14,19 +18,12 @@ namespace RestaurantManagementGUI
             InitializeComponent();
 
 #if DEBUG
-            var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) =>
-                    msg?.RequestUri?.Host == "10.0.2.2" || msg?.RequestUri?.IsLoopback == true
-            };
-            _httpClient = new HttpClient(handler);
+            _httpClient = new HttpClient(GetInsecureHandler());
 #else
             _httpClient = new HttpClient();
 #endif
-            _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
-
-        // Step 1: Gửi OTP
         private async void OnSendOtpClicked(object sender, EventArgs e)
         {
             _email = EmailEntry.Text?.Trim();
@@ -36,36 +33,34 @@ namespace RestaurantManagementGUI
                 return;
             }
 
-            SendOtpButton.IsEnabled = false;
-            SendOtpButton.Text = "Đang gửi mã...";
+            SetLoading(true, SendOtpButton, "Đang gửi...");
+
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ForgotPassword, new { email = _email });
-                var result = await response.Content.ReadAsStringAsync();
+                var req = new EmailDto { Email = _email };
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ForgotPassword, req);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
 
-                if (response.IsSuccessStatusCode)
+                if (result != null && result.Success)
                 {
-                    await DisplayAlert("Thành công", "OTP đã được gửi đến email.", "OK");
+                    await DisplayAlert("Thành công", result.Message, "OK");
                     Step1Layout.IsVisible = false;
                     Step2VerifyLayout.IsVisible = true;
                 }
                 else
                 {
-                    await DisplayAlert("Lỗi", $"Gửi OTP thất bại: {result}", "OK");
+                    await DisplayAlert("Thất bại", result?.Message ?? "Gửi OTP thất bại", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi kết nối", $"Không thể kết nối: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi kết nối", ex.Message, "OK");
             }
             finally
             {
-                SendOtpButton.IsEnabled = true;
-                SendOtpButton.Text = "Gửi OTP";
+                SetLoading(false, SendOtpButton, "Gửi OTP");
             }
         }
-
-        // Step 2: Xác minh OTP
         private async void OnVerifyOtpClicked(object sender, EventArgs e)
         {
             _otp = OtpEntry.Text?.Trim();
@@ -75,72 +70,61 @@ namespace RestaurantManagementGUI
                 return;
             }
 
-            VerifyOtpButton.IsEnabled = false;
-            VerifyOtpButton.Text = "Đang xác minh...";
+            SetLoading(true, VerifyOtpButton, "Đang xác minh...");
+
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.UserById(), new { email = _email, otp = _otp });
-                var result = await response.Content.ReadAsStringAsync();
+                var req = new VerifyOtpDto { Email = _email, OTP = _otp };
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyForgotOtp, req);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
 
-                if (response.IsSuccessStatusCode)
+                if (result != null && result.Success)
                 {
-                    await DisplayAlert("Thành công", "OTP hợp lệ. Hãy nhập mật khẩu mới.", "OK");
+                    await DisplayAlert("Thành công", result.Message, "OK");
                     Step2VerifyLayout.IsVisible = false;
                     Step3ResetLayout.IsVisible = true;
                 }
                 else
                 {
-                    await DisplayAlert("Lỗi", $"OTP không hợp lệ hoặc đã hết hạn: {result}", "OK");
+                    await DisplayAlert("Lỗi", result?.Message ?? "Mã OTP không đúng", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi kết nối", $"Không thể xác minh OTP: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi kết nối", ex.Message, "OK");
             }
             finally
             {
-                VerifyOtpButton.IsEnabled = true;
-                VerifyOtpButton.Text = "Xác nhận OTP";
+                SetLoading(false, VerifyOtpButton, "Xác nhận OTP");
             }
         }
 
-        // Step 2: Gửi lại OTP
         private async void OnResendOtpClicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(_email))
-            {
-                await DisplayAlert("Lỗi", "Email chưa được nhập.", "OK");
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(_email)) return;
 
-            ResendOtpButton.IsEnabled = false;
-            ResendOtpButton.Text = "Đang gửi lại...";
+            ResendOtpButton.Opacity = 0.5;
+
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ForgotPassword, new { email = _email });
-                var result = await response.Content.ReadAsStringAsync();
+                var req = new EmailDto { Email = _email };
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ForgotPassword, req);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    await DisplayAlert("Thành công", "OTP đã được gửi lại đến email.", "OK");
-                }
+                if (result != null && result.Success)
+                    await DisplayAlert("Đã gửi lại", result.Message, "OK");
                 else
-                {
-                    await DisplayAlert("Lỗi", $"Gửi lại OTP thất bại: {result}", "OK");
-                }
+                    await DisplayAlert("Lỗi", result?.Message ?? "Không thể gửi lại", "OK");
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi kết nối", $"Không thể gửi lại OTP: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi", ex.Message, "OK");
             }
             finally
             {
-                ResendOtpButton.IsEnabled = true;
-                ResendOtpButton.Text = "Gửi lại OTP";
+                ResendOtpButton.Opacity = 1.0;
             }
         }
-
-        // Step 3: Đặt lại mật khẩu
         private async void OnResetPasswordClicked(object sender, EventArgs e)
         {
             string newPassword = NewPasswordEntry.Text?.Trim();
@@ -148,47 +132,69 @@ namespace RestaurantManagementGUI
 
             if (string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
             {
-                await DisplayAlert("Lỗi", "Vui lòng nhập đầy đủ mật khẩu mới.", "OK");
+                await DisplayAlert("Lỗi", "Vui lòng nhập mật khẩu mới.", "OK");
                 return;
             }
 
             if (newPassword != confirmPassword)
             {
-                await DisplayAlert("Lỗi", "Mật khẩu xác nhận không trùng khớp.", "OK");
+                await DisplayAlert("Lỗi", "Mật khẩu xác nhận không khớp.", "OK");
                 return;
             }
 
-            ResetPasswordButton.IsEnabled = false;
-            ResetPasswordButton.Text = "Đang đặt lại mật khẩu...";
+            SetLoading(true, ResetPasswordButton, "Đang xử lý...");
+
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ResetPassword, new
+                var req = new ResetPasswordDto
                 {
-                    email = _email,
-                    otp = _otp,
-                    newPassword
-                });
-                var result = await response.Content.ReadAsStringAsync();
+                    Email = _email,
+                    OTP = _otp,
+                    NewPassword = newPassword
+                };
 
-                if (response.IsSuccessStatusCode)
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.ResetPassword, req);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
+
+                if (result != null && result.Success)
                 {
-                    await DisplayAlert("Thành công", "Đặt mật khẩu mới thành công!", "OK");
+                    await DisplayAlert("Thành công", "Đổi mật khẩu thành công. Vui lòng đăng nhập lại.", "OK");
                     await Navigation.PopToRootAsync();
                 }
                 else
                 {
-                    await DisplayAlert("Lỗi", $"Đặt mật khẩu thất bại: {result}", "OK");
+                    await DisplayAlert("Thất bại", result?.Message ?? "Không thể đổi mật khẩu", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi kết nối", $"Không thể kết nối: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi kết nối", ex.Message, "OK");
             }
             finally
             {
-                ResetPasswordButton.IsEnabled = true;
-                ResetPasswordButton.Text = "Đổi mật khẩu";
+                SetLoading(false, ResetPasswordButton, "Đổi mật khẩu");
             }
+        }
+
+        private void SetLoading(bool isLoading, Button btn, string text)
+        {
+            btn.IsEnabled = !isLoading;
+            btn.Text = text;
+        }
+
+        private HttpClientHandler GetInsecureHandler()
+        {
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) =>
+            {
+                if (sender is HttpRequestMessage request)
+                {
+                    return request.RequestUri.IsLoopback ||
+                           (DeviceInfo.Platform == DevicePlatform.Android && request.RequestUri.Host == "10.0.2.2");
+                }
+                return errors == System.Net.Security.SslPolicyErrors.None;
+            };
+            return handler;
         }
     }
 }

@@ -129,7 +129,7 @@ namespace RestaurantManagementAPI.Services.Implements
                     var tablePayload = JsonSerializer.Serialize(new { MaBan = dto.MaBan, TrangThai = "Có khách" });
                     await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{tablePayload}");
 
-                    await TcpSocketServer.Instance.BroadcastAsync($"ORDER|NEW|{maHD}");
+                    await TcpSocketServer.Instance.BroadcastAsync($"ORDER|{maHD}");
                 }
 
                 var resultDto = await GetOrderByIdAsync(maHD);
@@ -144,12 +144,21 @@ namespace RestaurantManagementAPI.Services.Implements
 
         public async Task<(bool Success, string Message)> UpdateOrderItemStatusAsync(string maHD, string maMA, string newStatus)
         {
-            var item = await _context.CHITIETHOADON.FindAsync(maHD, maMA);
+            var item = await _context.CHITIETHOADON
+                .Include(x => x.MonAn)
+                .Include(x => x.HoaDon)
+                .FirstOrDefaultAsync(x => x.MaHD == maHD && x.MaMA == maMA);
 
             if (item == null) return (false, "Chi tiết món không tồn tại");
 
             item.TrangThai = newStatus;
             await _context.SaveChangesAsync();
+            if (newStatus == "Đã xong" && TcpSocketServer.Instance != null)
+            {
+                string maBan = item.HoaDon?.MaBan ?? "Unknown";
+                string tenMon = item.MonAn?.TenMA ?? "Món";
+                await TcpSocketServer.Instance.BroadcastAsync($"KITCHEN_DONE|Bàn {maBan}: {tenMon} đã xong");
+            }    
             return (true, "Cập nhật trạng thái món thành công");
         }
 

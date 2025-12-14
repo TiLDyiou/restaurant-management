@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:viewModels="clr-namespace:RestaurantManagementGUI.ViewModels" xmlns:models="clr-namespace:RestaurantManagementGUI.Models" xmlns:local="clr-namespace:RestaurantManagementGUI" x:Class="RestaurantManagementGUI.TablesPage" Shell.NavBarIsVisible="False" Shell.NavBarHasShadow="False" Title="" Padding="0">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
+             xmlns:local="clr-namespace:RestaurantManagementGUI"
+             x:Class="RestaurantManagementGUI.TablesPage"
+             Shell.NavBarIsVisible="False" Padding="0">
+
     <ContentPage.Resources>
         <Color x:Key="ColorDarkBrown">#503106</Color>
         <Color x:Key="ColorLightTan">#fff8ed</Color>
         <Color x:Key="ColorYellowGold">#ffbd59</Color>
         <Color x:Key="ColorDarkGray">#263238</Color>
         <Style TargetType="Image" x:Key="TableIconStyle">
-            <Setter Property="Source" Value="table_icon_dark_gray.png" />
             <Setter Property="HeightRequest" Value="72" />
             <Setter Property="WidthRequest" Value="72" />
             <Setter Property="HorizontalOptions" Value="Center" />
@@ -16,7 +21,6 @@
             <Setter Property="FontSize" Value="18" />
             <Setter Property="FontAttributes" Value="Bold" />
             <Setter Property="HorizontalOptions" Value="Center" />
-            <Setter Property="FontFamily" Value="RobotoMono" />
         </Style>
         <Style TargetType="Border" x:Key="TableBorderStyle">
             <Setter Property="StrokeShape" Value="RoundRectangle 24" />
@@ -32,91 +36,141 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="Border" x:Key="LegendBorderStyle">
-            <Setter Property="StrokeShape" Value="RoundRectangle 18" />
-            <Setter Property="StrokeThickness" Value="0" />
-            <Setter Property="HeightRequest" Value="42" />
-            <Setter Property="Padding" Value="18,6" />
-        </Style>
     </ContentPage.Resources>
+
     <Grid>
         <Grid RowDefinitions="Auto, *" Padding="0" Margin="0,-50,0,0">
-            <Image Source="background.jpg" Aspect="AspectFill" Opacity="0.55" Grid.Row="0" Grid.RowSpan="2" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" />
-            <Grid Grid.Row="0" Grid.RowSpan="2" Padding="0">
-                <Grid Padding="10,20,10,10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Padding="5,0" Margin="0,0,0,10">
-                        <Border BackgroundColor="{StaticResource ColorYellowGold}" StrokeShape="RoundRectangle 16" Stroke="{StaticResource ColorDarkBrown}" StrokeThickness="2" Padding="12" HeightRequest="52" WidthRequest="52" VerticalOptions="Center" HorizontalOptions="Start">
-                            <Border.Shadow>
-                                <Shadow Brush="#33000000" Offset="0,4" Radius="12" Opacity="0.6" />
-                            </Border.Shadow>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnHamburgerTapped" />
-                            </Border.GestureRecognizers>
-                            <Label Text="&#xe5d2;" FontFamily="MaterialIcons" FontSize="28" TextColor="{StaticResource ColorDarkBrown}" HorizontalOptions="Center" VerticalOptions="Center" />
+            <Image Source="background.jpg" Aspect="AspectFill" Opacity="0.55" Grid.Row="0" Grid.RowSpan="2" />
+
+            <Grid Grid.Row="0" Grid.RowSpan="2" Padding="10,20,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Padding="5,0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BackgroundColor="{StaticResource ColorYellowGold}" StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="12" HeightRequest="52" WidthRequest="52" HorizontalOptions="Start">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnHamburgerTapped" />
+                        </Border.GestureRecognizers>
+                        <Label Text="&#xe5d2;" FontFamily="MaterialIcons" FontSize="28" TextColor="{StaticResource ColorDarkBrown}" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Grid Grid.Column="2" WidthRequest="50" HeightRequest="50" HorizontalOptions="End">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleNotificationsCommand}"/>
+                        </Grid.GestureRecognizers>
+
+                        <Label Text="🔔" FontSize="30" TextColor="{StaticResource ColorDarkBrown}" 
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+
+                        <Border BackgroundColor="Red" StrokeShape="RoundRectangle 10" StrokeThickness="0"
+                                HeightRequest="20" WidthRequest="20"
+                                HorizontalOptions="End" VerticalOptions="Start"
+                                Margin="0,5,5,0"
+                                IsVisible="{Binding HasNewNotifications}">
+                            <Label Text="{Binding NewNotificationCount}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
                         </Border>
                     </Grid>
-                    <CollectionView Grid.Row="1" x:Name="TablesCollectionView" 
-                        ItemsSource="{Binding FilteredTables}" 
-                        SelectionMode="None">
+                </Grid>
 
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
-                        </CollectionView.ItemsLayout>
+                <CollectionView Grid.Row="1" ItemsSource="{Binding FilteredTables}" SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Ban">
+                            <Border Style="{StaticResource TableBorderStyle}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnTableItemTapped" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
 
+                                <VerticalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image x:Name="TableIcon" Style="{StaticResource TableIconStyle}" />
+                                    <Label x:Name="TableName" Text="{Binding TenBan}" Style="{StaticResource TableNameStyle}" />
+                                </VerticalStackLayout>
+
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding TrangThai}" Value="Có khách">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource ColorDarkBrown}" />
+                                        <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_light_orange.png" />
+                                        <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorLightTan}" />
+                                    </DataTrigger>
+
+                                    <DataTrigger TargetType="Border" Binding="{Binding TrangThai}" Value="Trống">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource ColorLightTan}" />
+                                        <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_dark_gray.png" />
+                                        <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorDarkGray}" />
+                                    </DataTrigger>
+
+                                    <DataTrigger TargetType="Border" Binding="{Binding TrangThai}" Value="Bàn đã đặt">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource ColorYellowGold}" />
+                                        <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_dark_brown.png" />
+                                        <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorDarkBrown}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Grid>
+
+        <local:FlyoutMenuView x:Name="FlyoutMenu" 
+                              ChangeStatusRequested="OnFlyoutChangeStatusRequested" 
+                              ViewAddOrderRequested="OnFlyoutViewAddOrderRequested" 
+                              PaymentRequested="OnFlyoutPaymentRequested" 
+                              RefreshRequested="OnFlyoutRefreshRequested" 
+                              FilterChanged="OnFlyoutFilterChanged" />
+
+        <ContentView IsVisible="{Binding ShowNotificationPopup}" BackgroundColor="Transparent" ZIndex="99" InputTransparent="False">
+            <ContentView.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleNotificationsCommand}"/>
+            </ContentView.GestureRecognizers>
+
+            <Border BackgroundColor="White" 
+                    Stroke="{StaticResource ColorDarkBrown}" StrokeThickness="2"
+                    StrokeShape="RoundRectangle 10"
+                    WidthRequest="320" HeightRequest="350"
+                    HorizontalOptions="End" VerticalOptions="Start"
+                    Margin="0,80,10,0" Padding="15">
+
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer />
+                </Border.GestureRecognizers>
+
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <Label Text="🔔 Bếp báo xong món" TextColor="{StaticResource ColorDarkBrown}" FontAttributes="Bold" FontSize="16" Margin="0,0,0,10"/>
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding NotificationList}">
+                        <CollectionView.EmptyView>
+                            <Label Text="Chưa có thông báo nào." TextColor="Gray" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,20,0,0"/>
+                        </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:Ban">
-                                <Border Style="{StaticResource TableBorderStyle}">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding BindingContext.SelectTableCommand, Source={RelativeSource AncestorType={x:Type local:TablesPage}}}" 
-                                            CommandParameter="{Binding .}" />
-                                    </Border.GestureRecognizers>
-
-                                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
-                                        <Image x:Name="TableIcon" Style="{StaticResource TableIconStyle}" />
-                                        <Label x:Name="TableName" Text="{Binding TenBan}" Style="{StaticResource TableNameStyle}" />
-                                    </VerticalStackLayout>
-
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border" Binding="{Binding TrangThai}" Value="Bàn bận">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorDarkBrown}" />
-                                            <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_light_orange.png" />
-                                            <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorLightTan}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding TrangThai}" Value="Bàn đã đặt">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorYellowGold}" />
-                                            <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_dark_brown.png" />
-                                            <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorDarkBrown}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding TrangThai}" Value="Bàn trống">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorLightTan}" />
-                                            <Setter TargetName="TableIcon" Property="Image.Source" Value="table_icon_dark_gray.png" />
-                                            <Setter TargetName="TableName" Property="Label.TextColor" Value="{StaticResource ColorDarkGray}" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
-                                </Border>
+                            <DataTemplate>
+                                <Grid Padding="0,8" ColumnDefinitions="Auto, *">
+                                    <Label Text="✅" Margin="0,0,10,0" FontSize="16"/>
+                                    <Label Grid.Column="1" Text="{Binding .}" TextColor="#333" FontSize="14" LineBreakMode="WordWrap"/>
+                                </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <HorizontalStackLayout Grid.Row="2" Spacing="12" HorizontalOptions="Center" Margin="0,18,0,18">
-                        <Border Style="{StaticResource LegendBorderStyle}" BackgroundColor="{StaticResource ColorDarkBrown}">
-                            <Label Text="Bàn bận" TextColor="{StaticResource ColorLightTan}" VerticalOptions="Center" FontFamily="RobotoMono" FontAttributes="Bold" />
-                        </Border>
-                        <Border Style="{StaticResource LegendBorderStyle}" BackgroundColor="{StaticResource ColorLightTan}">
-                            <Label Text="Bàn trống" TextColor="{StaticResource ColorDarkGray}" VerticalOptions="Center" FontFamily="RobotoMono" FontAttributes="Bold" />
-                        </Border>
-                        <Border Style="{StaticResource LegendBorderStyle}" BackgroundColor="{StaticResource ColorYellowGold}">
-                            <Label Text="Bàn đã đặt" TextColor="{StaticResource ColorDarkBrown}" VerticalOptions="Center" FontFamily="RobotoMono" FontAttributes="Bold" />
-                        </Border>
-                    </HorizontalStackLayout>
+                    <Button Grid.Row="2" Text="Đã xem tất cả" 
+                            Command="{Binding ClearAllNotificationsCommand}"
+                            BackgroundColor="{StaticResource ColorYellowGold}" TextColor="{StaticResource ColorDarkBrown}" 
+                            FontAttributes="Bold" CornerRadius="8" FontSize="13" 
+                            HorizontalOptions="Fill" Margin="0,10,0,0"/>
                 </Grid>
-            </Grid>
-        </Grid>
-        <local:FlyoutMenuView x:Name="FlyoutMenu" ChangeStatusRequested="OnFlyoutChangeStatusRequested" ViewAddOrderRequested="OnFlyoutViewAddOrderRequested" PaymentRequested="OnFlyoutPaymentRequested" RefreshRequested="OnFlyoutRefreshRequested" FilterChanged="OnFlyoutFilterChanged" />
+            </Border>
+        </ContentView>
+
     </Grid>
 </ContentPage>

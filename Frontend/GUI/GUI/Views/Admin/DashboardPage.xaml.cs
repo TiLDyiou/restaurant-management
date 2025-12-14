@@ -1,60 +1,52 @@
-﻿using RestaurantManagementGUI.ViewModels;
+﻿using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Services;
+using RestaurantManagementGUI.Views;
+using RestaurantManagementGUI.Views.Staff;
 
-namespace RestaurantManagementGUI.Views.Admin
+namespace RestaurantManagementGUI
 {
     public partial class DashboardPage : ContentPage
     {
-        public DashboardPage(DashboardViewModel viewModel)
+        public DashboardPage()
         {
             InitializeComponent();
-            this.BindingContext = viewModel;
+            LoadUserInfo();
         }
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            AdjustButtonSizes();
-
-            // Cập nhật lại thông tin User mỗi khi trang hiện lên (đề phòng đổi tên/quyền)
-            if (BindingContext is DashboardViewModel vm)
-            {
-                vm.UpdateUserInfo();
-            }
-        }
-
-        // Logic UI: Giữ nguyên để layout đẹp
-        private void AdjustButtonSizes()
+        private async void LoadUserInfo()
         {
             try
             {
-                var screenWidth = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
-                double availableWidth = screenWidth - 160 - 60; // Trừ cột trái và padding
-
-                // Màn hình to thì 4 cột, nhỏ thì 2 cột
-                double buttonWidth = screenWidth >= 1000 ? availableWidth / 4 : availableWidth / 2;
-
-                if (ButtonsLayout != null)
-                {
-                    foreach (var child in ButtonsLayout.Children)
-                    {
-                        if (child is Border border)
-                        {
-                            border.WidthRequest = buttonWidth;
-
-                            // Chỉnh size nút bên trong border
-                            if (border.Content is VerticalStackLayout stack
-                                && stack.Children.Count > 1
-                                && stack.Children[1] is Button btn)
-                            {
-                                btn.WidthRequest = buttonWidth - 20;
-                                btn.HeightRequest = 80;
-                                btn.FontSize = 14;
-                            }
-                        }
-                    }
-                }
+                string tenNV = await SecureStorage.Default.GetAsync("user_username") ?? "Admin";
+                WelcomeLabel.Text = $"Xin chào, {tenNV}";
+                UserState.CurrentTenNV = tenNV;
+                UserState.CurrentMaNV = await SecureStorage.Default.GetAsync("user_manv") ?? "";
+                UserState.CurrentRole = "Admin";
             }
             catch { }
         }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
+            if (!confirm) return;
+
+            SecureStorage.RemoveAll();
+            UserState.Clear();
+            if (SocketListener.Instance != null)
+                SocketListener.Instance.Disconnect();
+
+            Application.Current.MainPage = new NavigationPage(new LoginPage());
+        }
+
+        private async void OnUsersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new UsersPage());
+        private async void OnFoodCategoriesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new QuanLyMonAnPage());
+        private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
+        private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrdersPage());
+        private async void OnTablesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TablesPage());
+        private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BillGenerationPage());
+        private async void OnRevenueReportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new RevenueReportPage());
+        private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
     }
 }

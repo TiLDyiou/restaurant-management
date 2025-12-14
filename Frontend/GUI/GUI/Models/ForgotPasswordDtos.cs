@@ -1,4 +1,5 @@
-﻿namespace RestaurantManagementGUI.Models
+﻿
+namespace RestaurantManagementGUI.Models
 {
     // Dùng để gửi email khi yêu cầu OTP
     public class EmailDto

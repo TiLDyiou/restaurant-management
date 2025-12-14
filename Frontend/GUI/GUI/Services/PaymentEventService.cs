@@ -1,5 +1,16 @@
-﻿namespace RestaurantManagementGUI.Services
+﻿using System;
+
+namespace RestaurantManagementGUI.Services
 {
+    public class PaymentCompletedEventArgs : EventArgs
+    {
+        public string MaHD { get; set; }
+        public decimal TongTien { get; set; }
+        public string TableName { get; set; }
+        public string PaymentMethod { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+
     public static class PaymentEventService
     {
         public static event EventHandler<PaymentCompletedEventArgs> PaymentCompleted;
@@ -15,14 +26,5 @@
                 Timestamp = DateTime.Now
             });
         }
-    }
-
-    public class PaymentCompletedEventArgs : EventArgs
-    {
-        public string MaHD { get; set; }
-        public decimal TongTien { get; set; }
-        public string TableName { get; set; }
-        public string PaymentMethod { get; set; }
-        public DateTime Timestamp { get; set; }
     }
 }

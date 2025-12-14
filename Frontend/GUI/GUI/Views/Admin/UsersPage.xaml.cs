@@ -3,6 +3,7 @@ using RestaurantManagementGUI.Models;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.Maui.Storage;
 
 namespace RestaurantManagementGUI
@@ -10,25 +11,21 @@ namespace RestaurantManagementGUI
     public partial class UsersPage : ContentPage
     {
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions;
+
         private ObservableCollection<UserModel> _users = new();
-        private List<UserModel> _allUsers = new(); // danh sách gốc để tìm kiếm
+        private List<UserModel> _allUsers = new();
 
         public UsersPage()
         {
             InitializeComponent();
 
 #if DEBUG
-            var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) =>
-                    msg?.RequestUri?.Host == "10.0.2.2" || msg?.RequestUri?.IsLoopback == true
-            };
-            _httpClient = new HttpClient(handler);
+            _httpClient = new HttpClient(GetInsecureHandler());
 #else
             _httpClient = new HttpClient();
 #endif
-
-            _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         protected override async void OnAppearing()
@@ -42,122 +39,181 @@ namespace RestaurantManagementGUI
             try
             {
                 var token = await SecureStorage.Default.GetAsync("auth_token");
-                if (string.IsNullOrEmpty(token))
-                {
-                    await DisplayAlert("Lỗi", "Chưa đăng nhập hoặc token hết hạn!", "OK");
-                    return;
-                }
+                if (string.IsNullOrEmpty(token)) return;
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync(ApiConfig.Users);
-                if (response.IsSuccessStatusCode)
+                // GỌI API GET ALL USERS
+                // Backend trả về: { success: true, data: [User1, User2...] }
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<UserModel>>>(ApiConfig.GetAllUsers, _jsonOptions);
+
+                if (response != null && response.Success)
                 {
-                    var data = await response.Content.ReadFromJsonAsync<List<UserModel>>();
-                    _allUsers = data ?? new();
+                    _allUsers = response.Data ?? new List<UserModel>();
                     _users = new ObservableCollection<UserModel>(_allUsers);
                     UsersCollectionView.ItemsSource = _users;
                 }
                 else
                 {
-                    await DisplayAlert("Lỗi", "Không thể tải danh sách người dùng.", "OK");
+                    await DisplayAlert("Lỗi", response?.Message ?? "Không thể tải danh sách.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Lỗi", $"Không thể kết nối: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi kết nối", ex.Message, "OK");
             }
         }
 
-        // Tìm kiếm theo mã hoặc tên
+        // --- TÌM KIẾM (Giữ nguyên logic của bạn) ---
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
-            string keyword = e.NewTextValue?.Trim().ToLower() ?? string.Empty;
+            // Lấy từ khóa, xóa khoảng trắng thừa, chuyển thường và BỎ DẤU ngay lập tức
+            string originKeyword = e.NewTextValue?.Trim() ?? "";
+            string keyword = RemoveSign4VietnameseString(originKeyword).ToLower();
 
             if (string.IsNullOrEmpty(keyword))
             {
+                // Nếu ô tìm kiếm rỗng, hiển thị lại toàn bộ danh sách gốc
                 _users = new ObservableCollection<UserModel>(_allUsers);
             }
             else
             {
-                var filtered = _allUsers
-                    .Where(u =>
-                        (!string.IsNullOrEmpty(u.HoTen) && u.HoTen.ToLower().Contains(keyword)) ||
-                        (!string.IsNullOrEmpty(u.MaNV) && u.MaNV.ToLower().Contains(keyword)))
-                    .ToList();
+                // Lọc danh sách
+                var filtered = _allUsers.Where(u =>
+                {
+                    // Chuẩn hóa tên và mã của nhân viên về dạng KHÔNG DẤU + CHỮ THƯỜNG
+                    string tenKhongDau = RemoveSign4VietnameseString(u.HoTen ?? "").ToLower();
+                    string maKhongDau = (u.MaNV ?? "").ToLower();
+
+                    // So sánh: Chỉ cần chứa từ khóa là được
+                    return tenKhongDau.Contains(keyword) || maKhongDau.Contains(keyword);
+                }).ToList();
 
                 _users = new ObservableCollection<UserModel>(filtered);
             }
 
+            // Cập nhật lên giao diện
             UsersCollectionView.ItemsSource = _users;
         }
 
-        private async void OnAddUserClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new AddUserPage());
+        private static string RemoveSign4VietnameseString(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+
+            string[] VietnameseSigns = new string[]
+            {
+                "aAeEoOuUiIdDyY",
+                "áàạảãâấầậẩẫăắằặẳẵ",
+                "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ",
+                "éèẹẻẽêếềệểễ",
+                "ÉÈẸẺẼÊẾỀỆỂỄ",
+                "óòọỏõôốồộổỗơớờợởỡ",
+                "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ",
+                "úùụủũưứừựửữ",
+                "ÚÙỤỦŨƯỨỪỰỬỮ",
+                "íìịỉĩ",
+                "ÍÌỊỈĨ",
+                "đ",
+                "Đ",
+                "ýỳỵỷỹ",
+                "ÝỲỴỶỸ"
+            };
+
+            for (int i = 1; i < VietnameseSigns.Length; i++)
+            {
+                for (int j = 0; j < VietnameseSigns[i].Length; j++)
+                    str = str.Replace(VietnameseSigns[i][j], VietnameseSigns[0][i - 1]);
+            }
+            return str;
+        }
+
+        private async void OnAddUserClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AddUserPage());
 
         private async void OnEditClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is UserModel user)
+            if (sender is Button btn && btn.BindingContext is UserModel user)
                 await Navigation.PushAsync(new EditUserPage(user));
         }
 
+        // --- ĐỔI TRẠNG THÁI (Toggle Status) ---
         private async void OnToggleStatusClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is UserModel user)
+            if (sender is Button btn && btn.BindingContext is UserModel user)
             {
+                bool isWorking = user.TrangThai == "Đang làm";
                 bool confirm = await DisplayAlert("Xác nhận",
-                    $"Bạn có chắc muốn cho {user.HoTen} {(user.TrangThai == "Đang làm" ? "nghỉ việc" : "quay lại làm việc")}?",
-                    "Có", "Không");
+                    $"Bạn có muốn {(isWorking ? "cho nghỉ việc" : "khôi phục")} nhân viên {user.HoTen}?", "Có", "Không");
+
                 if (!confirm) return;
 
-                var token = await SecureStorage.Default.GetAsync("auth_token");
-                if (!string.IsNullOrEmpty(token))
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await _httpClient.PutAsync(ApiConfig.UserById(user.MaNV), null);
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    var updated = await response.Content.ReadFromJsonAsync<UserModel>();
-                    if (updated != null)
+                    // Gọi API PUT: api/users/{id}/status
+                    var url = ApiConfig.ToggleUserStatus(user.MaNV);
+                    var response = await _httpClient.PutAsync(url, null); // Body null vì ID đã ở trên URL
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
+
+                    if (result != null && result.Success)
                     {
-                        user.TrangThai = updated.TrangThai;
-                        UsersCollectionView.ItemsSource = null;
-                        UsersCollectionView.ItemsSource = _users;
+                        // Cập nhật UI ngay lập tức (Optimistic UI)
+                        user.TrangThai = isWorking ? "Đã nghỉ" : "Đang làm";
+                        // Trick để refresh binding màu sắc nút bấm
+                        var index = _users.IndexOf(user);
+                        if (index >= 0)
+                        {
+                            _users[index] = user;
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Lỗi", result?.Message ?? "Thất bại", "OK");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    await DisplayAlert("Lỗi", "Cập nhật trạng thái thất bại!", "OK");
+                    await DisplayAlert("Lỗi", ex.Message, "OK");
                 }
             }
         }
 
+        // --- XÓA VĨNH VIỄN (Hard Delete) ---
         private async void OnHardDeleteClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is UserModel user)
+            if (sender is Button btn && btn.BindingContext is UserModel user)
             {
-                bool confirm = await DisplayAlert("Xác nhận", $"Xóa vĩnh viễn {user.HoTen}?", "Có", "Không");
+                bool confirm = await DisplayAlert("Cảnh báo", $"Xóa vĩnh viễn {user.HoTen}? Hành động này không thể hoàn tác!", "Xóa", "Hủy");
                 if (!confirm) return;
 
-                var token = await SecureStorage.Default.GetAsync("auth_token");
-                if (!string.IsNullOrEmpty(token))
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                try
+                {
+                    // Gọi API DELETE: api/users/{id}
+                    var url = ApiConfig.HardDeleteUser(user.MaNV);
+                    var response = await _httpClient.DeleteAsync(url);
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
 
-                var response = await _httpClient.DeleteAsync(ApiConfig.UserById(user.MaNV));
-                if (response.IsSuccessStatusCode)
-                {
-                    _users.Remove(user);
-                    _allUsers.Remove(user);
-                    await DisplayAlert("Thành công", "Nhân viên đã bị xóa vĩnh viễn", "OK");
+                    if (result != null && result.Success)
+                    {
+                        _users.Remove(user);
+                        _allUsers.Remove(user);
+                        await DisplayAlert("Thành công", "Đã xóa nhân viên.", "OK");
+                    }
+                    else
+                    {
+                        await DisplayAlert("Lỗi", result?.Message ?? "Không thể xóa.", "OK");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    await DisplayAlert("Lỗi", "Không thể xóa người dùng.", "OK");
+                    await DisplayAlert("Lỗi", ex.Message, "OK");
                 }
             }
         }
 
-        private async void OnBackClicked(object sender, EventArgs e)
-            => await Navigation.PopAsync();
+        private HttpClientHandler GetInsecureHandler()
+        {
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
+            return handler;
+        }
     }
 }

@@ -1,18 +1,30 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿
+using System;
+using Microsoft.Maui.Graphics;
 
 namespace RestaurantManagementGUI.Models
 {
-    public partial class CartItemModel : ObservableObject
+    public class CartItemModel : BindableObject
     {
-        public FoodModel FoodItem { get; set; }
+        private int _quantity = 1;
+        private string? _note;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalPrice))] // Tự động cập nhật TotalPrice khi Quantity đổi
-        private int _quantity;
+        public FoodModel FoodItem { get; set; } = new();
 
-        public decimal TotalPrice => FoodItem != null ? FoodItem.Price * Quantity : 0;
+        public int Quantity
+        {
+            get => _quantity;
+            set { _quantity = value; OnPropertyChanged(); OnPropertyChanged(nameof(TotalPrice)); }
+        }
 
-        [ObservableProperty]
-        private string _note;
+        public string? Note
+        {
+            get => _note;
+            set { _note = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasNote)); }
+        }
+
+        public bool HasNote => !string.IsNullOrWhiteSpace(Note);
+
+        public decimal TotalPrice => FoodItem.Price * Quantity;
     }
 }

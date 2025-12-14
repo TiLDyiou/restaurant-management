@@ -1,141 +1,139 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Text.Json;
-using System.Windows.Input;
 
 namespace RestaurantManagementGUI.ViewModels
 {
-    public partial class TablesViewModel : ObservableObject, IDisposable
+    public partial class TablesViewModel : ObservableObject
     {
-        private readonly ApiService _apiService;
+        private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions;
+        private List<Ban> _allTables = new();
 
-        private ObservableCollection<Ban> _allTables;
-        private ObservableCollection<Ban> _filteredTables;
+        [ObservableProperty]
+        private ObservableCollection<Ban> filteredTables = new();
 
-        public ObservableCollection<Ban> FilteredTables
-        {
-            get => _filteredTables;
-            private set => SetProperty(ref _filteredTables, value);
-        }
+        // --- PHẦN THÊM MỚI CHO THÔNG BÁO ---
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasNewNotifications))]
+        private int newNotificationCount = 0;
+        public bool HasNewNotifications => NewNotificationCount > 0;
+
+        [ObservableProperty]
+        private ObservableCollection<string> notificationList = new();
+
+        [ObservableProperty]
+        private bool showNotificationPopup;
+        // -----------------------------------
 
         public event EventHandler DataUpdated;
-        public event EventHandler<Ban> TableSelected;
-        public ICommand FilterTablesCommand { get; }
-        public ICommand SelectTableCommand { get; }
 
-        public TablesViewModel(ApiService apiService)
+        public TablesViewModel()
         {
-            _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
-            _allTables = new ObservableCollection<Ban>();
-            FilteredTables = new ObservableCollection<Ban>();
-
-            FilterTablesCommand = new RelayCommand(param => FilterTables(param as string));
-            SelectTableCommand = new RelayCommand(param => SelectTable(param as Ban));
+            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         public async Task LoadTablesAsync()
         {
-            var tableList = await _apiService.GetTablesAsync();
-            MainThread.BeginInvokeOnMainThread(() =>
+            try
             {
-                _allTables.Clear();
-                FilteredTables.Clear();
-                foreach (var table in tableList)
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<Ban>>>(ApiConfig.Tables, _jsonOptions);
+                if (response != null && response.Success)
                 {
-                    _allTables.Add(table);
-                    FilteredTables.Add(table);
+                    _allTables = response.Data ?? new List<Ban>();
+                    FilterTables("Tất cả");
                 }
-            });
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
         }
-        public void SubscribeToSocket()
+
+        // --- SOCKET ---
+        public void SubscribeSocket()
         {
+            // Lắng nghe cập nhật bàn
             _ = SocketListener.Instance.ConnectAsync();
             SocketListener.Instance.OnTableStatusChanged -= HandleTableUpdate;
             SocketListener.Instance.OnTableStatusChanged += HandleTableUpdate;
+            // Lắng nghe cập nhật thông báo từ bếp
+            SocketListener.Instance.OnDishDone -= HandleDishDone;
+            SocketListener.Instance.OnDishDone += HandleDishDone;
         }
 
-        public void UnsubscribeFromSocket()
+        public void UnsubscribeSocket()
         {
             SocketListener.Instance.OnTableStatusChanged -= HandleTableUpdate;
-        }
-
-        public void Dispose()
-        {
-            UnsubscribeFromSocket();
+            SocketListener.Instance.OnDishDone -= HandleDishDone;
         }
 
         private void HandleTableUpdate(string json)
         {
             try
             {
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var data = JsonSerializer.Deserialize<Ban>(json, options);
-
-                if (data != null && !string.IsNullOrEmpty(data.MaBan))
+                var updatedBan = JsonSerializer.Deserialize<Ban>(json, _jsonOptions);
+                if (updatedBan != null)
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        // Cập nhật danh sách hiển thị
-                        var tableFiltered = FilteredTables.FirstOrDefault(t => t.MaBan.Equals(data.MaBan, StringComparison.OrdinalIgnoreCase));
-                        if (tableFiltered != null)
+                        var table = _allTables.FirstOrDefault(t => t.MaBan == updatedBan.MaBan);
+                        if (table != null)
                         {
-                            // Nhờ ObservableObject trong Model, dòng này sẽ làm UI đổi màu
-                            tableFiltered.TrangThai = data.TrangThai;
+                            table.TrangThai = updatedBan.TrangThai; // UI đổi màu
+                            DataUpdated?.Invoke(this, EventArgs.Empty); // Cập nhật thống kê
                         }
-
-                        // Cập nhật danh sách gốc (để khi filter không bị sai)
-                        var tableMaster = _allTables.FirstOrDefault(t => t.MaBan.Equals(data.MaBan, StringComparison.OrdinalIgnoreCase));
-                        if (tableMaster != null) tableMaster.TrangThai = data.TrangThai;
-
-                        // Bắn event để cập nhật thống kê (số bàn trống/bận)
-                        DataUpdated?.Invoke(this, EventArgs.Empty);
                     });
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Lỗi Socket Table: {ex.Message}");
-            }
+            catch { }
         }
-
-        private void FilterTables(string filterType)
+        // Xử lý khi Bếp báo xong món
+        private void HandleDishDone(string message)
+        {
+            // message có thể là "Bàn B01: Gà rán đã xong"
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                NewNotificationCount++;
+                string time = DateTime.Now.ToString("HH:mm");
+                NotificationList.Insert(0, $"{message} ({time})");
+            });
+        }
+        [RelayCommand]
+        public void FilterTables(string filterType)
         {
             if (_allTables == null) return;
-            ObservableCollection<Ban> filteredList;
-            switch (filterType)
-            {
-                case "Bàn trống": 
-                    filteredList = new ObservableCollection<Ban>(_allTables.Where(t => t.TrangThai == "Bàn trống")); 
-                    break;
-                case "Bàn bận": 
-                    filteredList = new ObservableCollection<Ban>(_allTables.Where(t => t.TrangThai == "Bàn bận")); 
-                    break;
-                case "Bàn đã đặt": 
-                    filteredList = new ObservableCollection<Ban>(_allTables.Where(t => t.TrangThai == "Bàn đã đặt")); 
-                    break;
-                default: 
-                    filteredList = new ObservableCollection<Ban>(_allTables); 
-                    break;
-            }
-            FilteredTables = filteredList;
+            IEnumerable<Ban> result = _allTables;
+
+            if (filterType == "Bàn trống")
+                result = _allTables.Where(t => t.TrangThai == "Trống" || t.TrangThai == "Bàn trống");
+            else if (filterType == "Bàn bận")
+                result = _allTables.Where(t => t.TrangThai == "Có khách" || t.TrangThai == "Bàn bận");
+            else if (filterType == "Bàn đã đặt")
+                result = _allTables.Where(t => t.TrangThai == "Bàn đã đặt" || t.TrangThai == "Đã đặt");
+
+            FilteredTables = new ObservableCollection<Ban>(result);
+            DataUpdated?.Invoke(this, EventArgs.Empty);
         }
 
-        public void SelectTable(Ban selectedTable)
+        // --- COMMANDS CHO THÔNG BÁO ---
+        [RelayCommand]
+        void ToggleNotifications()
         {
-            if (selectedTable != null) TableSelected?.Invoke(this, selectedTable);
+            ShowNotificationPopup = !ShowNotificationPopup;
+            if (ShowNotificationPopup) 
+                NewNotificationCount = 0;
         }
 
-        class RelayCommand : ICommand
+        [RelayCommand]
+        void ClearAllNotifications()
         {
-            Action<object> _action;
-            public RelayCommand(Action<object> action) => _action = action;
-            public bool CanExecute(object parameter) => true;
-            public void Execute(object parameter) => _action(parameter);
-            public event EventHandler CanExecuteChanged;
+            NotificationList.Clear();
+            ShowNotificationPopup = false;
         }
     }
 }

@@ -115,7 +115,7 @@
 
                     <!-- SECTION: Hành động nhanh -->
                     <VerticalStackLayout Spacing="4" x:Name="QuickActionsSection" IsVisible="False">
-                        
+
 
                         <!-- Button: Đổi trạng thái -->
                         <Border Style="{StaticResource ActionButtonStyle}">

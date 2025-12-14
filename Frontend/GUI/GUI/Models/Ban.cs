@@ -1,39 +1,19 @@
-﻿
-
-using CommunityToolkit.Mvvm.ComponentModel; 
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
-   
-    public class Ban : ObservableObject
+    public partial class Ban : ObservableObject
     {
-        
-        private string _maBan = string.Empty;
         [JsonPropertyName("maBan")]
-        public string MaBan
-        {
-            get => _maBan;
-            set => SetProperty(ref _maBan, value); 
-        }
+        public string MaBan { get; set; }
 
-     
-        private string? _tenBan;
         [JsonPropertyName("tenBan")]
-        public string? TenBan
-        {
-            get => _tenBan;
-            set => SetProperty(ref _tenBan, value); 
-        }
+        public string TenBan { get; set; }
 
-   
-        private string? _trangThai;
+        // Khi Socket cập nhật biến này, UI sẽ tự đổi màu
+        [ObservableProperty]
         [JsonPropertyName("trangThai")]
-        public string? TrangThai
-        {
-            get => _trangThai;
-            
-            set => SetProperty(ref _trangThai, value);
-        }
+        private string _trangThai;
     }
 }

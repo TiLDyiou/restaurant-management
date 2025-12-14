@@ -1,39 +1,26 @@
 using RestaurantManagementGUI.ViewModels;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized; // Cần cho NotifyCollectionChanged
+using System.Net.Http.Json;
+using RestaurantManagementGUI.Helpers;
 
 namespace RestaurantManagementGUI
 {
     public partial class TablesPage : ContentPage
     {
         private readonly TablesViewModel _viewModel;
-        private readonly ApiService _apiService;
-        private Ban _selectedTable;
-
-        public TablesPage(TablesViewModel viewModel, ApiService apiService)
-        {
-            InitializeComponent();
-            _viewModel = viewModel;
-            _apiService = apiService;
-            BindingContext = _viewModel;
-            SetupEvents();
-        }
+        private readonly HttpClient _httpClient;
 
         public TablesPage()
         {
             InitializeComponent();
-            _apiService = new ApiService();
-            _viewModel = new TablesViewModel(_apiService);
-            BindingContext = _viewModel;
-            SetupEvents();
-        }
 
-        private void SetupEvents()
-        {
-            _viewModel.TableSelected += OnTableSelected;
+            _viewModel = new TablesViewModel();
+            BindingContext = _viewModel;
+
+            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
+
             _viewModel.DataUpdated += (s, e) => FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
         }
 
@@ -41,73 +28,60 @@ namespace RestaurantManagementGUI
         {
             base.OnAppearing();
             await _viewModel.LoadTablesAsync();
-            _viewModel.SubscribeToSocket(); // Kích hoạt Socket
+            _viewModel.SubscribeSocket();
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-            _viewModel.UnsubscribeFromSocket();
+            _viewModel.UnsubscribeSocket();
         }
 
-        private void OnFilteredTablesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            // Dùng 'FilteredTables'
-            FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
-        }
-
+        // --- EVENTS ---
         private async void OnHamburgerTapped(object sender, EventArgs e)
         {
             FlyoutMenu.SelectedTable = null;
             await FlyoutMenu.OpenAsync();
         }
 
-        private async void OnTableSelected(object sender, Ban selectedTable)
+        private async void OnTableItemTapped(object sender, TappedEventArgs e)
         {
-            if (selectedTable == null) return;
-            _selectedTable = selectedTable;
-            FlyoutMenu.SelectedTable = selectedTable;
-            await FlyoutMenu.OpenAsync();
+            if (sender is Border border && border.BindingContext is Ban table)
+            {
+                FlyoutMenu.SelectedTable = table;
+                await FlyoutMenu.OpenAsync();
+            }
         }
 
         private async void OnFlyoutChangeStatusRequested(object sender, Ban table)
         {
             await FlyoutMenu.CloseAsync();
-
-            var possibleStatuses = new[] { "Bàn bận", "Bàn trống", "Bàn đã đặt" };
-            var otherStatuses = possibleStatuses.Where(s => s != table.TrangThai).ToArray();
-
-            string statusAction = await DisplayActionSheet(
-                $"Chọn trạng thái mới cho {table.TenBan}", "Hủy", null, otherStatuses
-            );
-
-            if (statusAction == null || statusAction == "Hủy")
-                return;
+            var status = await DisplayActionSheet($"Trạng thái {table.TenBan}", "Hủy", null, "Trống", "Có khách", "Bàn đã đặt");
+            if (string.IsNullOrEmpty(status) || status == "Hủy") return;
 
             try
             {
-                bool success = await _apiService.UpdateTableStatusAsync(table.MaBan, statusAction);
-
-                if (success)
+                var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateTableStatus(table.MaBan), status);
+                if (response.IsSuccessStatusCode)
                 {
-                    await DisplayAlert("Thành công", $"Đã đổi {table.TenBan} sang '{statusAction}'", "OK");
+                    table.TrangThai = status;
                 }
                 else
                 {
-                    await DisplayAlert("Lỗi", "Không thể cập nhật trạng thái bàn.", "OK");
+                    await DisplayAlert("Lỗi", "Cập nhật thất bại", "OK");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Lỗi cập nhật trạng thái: {ex.Message}");
-                await DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
+                await DisplayAlert("Lỗi", ex.Message, "OK");
             }
         }
 
         private async void OnFlyoutViewAddOrderRequested(object sender, Ban table)
         {
             await FlyoutMenu.CloseAsync();
-            await Navigation.PushAsync(new OrdersPage(table.TenBan));
+            // Truyền object Ban sang OrdersPage
+            await Navigation.PushAsync(new OrdersPage(table));
         }
 
         private async void OnFlyoutPaymentRequested(object sender, Ban table)
@@ -118,23 +92,13 @@ namespace RestaurantManagementGUI
 
         private async void OnFlyoutRefreshRequested(object sender, EventArgs e)
         {
-            try
-            {
-                await _viewModel.LoadTablesAsync();
-                await FlyoutMenu.CloseAsync();
-                await DisplayAlert("Thành công", "Đã làm mới danh sách bàn", "OK");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Lỗi làm mới: {ex.Message}");
-                await DisplayAlert("Lỗi", $"Không thể làm mới: {ex.Message}", "OK");
-            }
+            await _viewModel.LoadTablesAsync();
+            await FlyoutMenu.CloseAsync();
         }
 
         private void OnFlyoutFilterChanged(object sender, string filterType)
         {
-            // Dùng 'FilterTablesCommand' (được tạo bởi [RelayCommand])
-            _viewModel.FilterTablesCommand.Execute(filterType);
+            _viewModel.FilterTables(filterType);
         }
     }
 }
