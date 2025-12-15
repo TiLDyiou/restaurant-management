@@ -108,7 +108,7 @@ namespace RestaurantManagementGUI.ViewModels
 
             try
             {
-                var response = await _httpClient.PutAsJsonAsync(ApiConfig.Checkout(SelectedBill.MaHD), requestDto);
+                var response = await _httpClient.PostAsJsonAsync(ApiConfig.Checkout(SelectedBill.MaHD), requestDto);
 
                 if (response.IsSuccessStatusCode)
                 {
