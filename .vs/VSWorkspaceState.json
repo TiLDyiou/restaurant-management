@@ -7,8 +7,9 @@
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Data",
     "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services"
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services\\Implements"
   ],
-  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\appsettings.Development.json",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services\\Implements\\TcpSocketServer.cs",
   "PreviewInSolutionExplorer": false
 }

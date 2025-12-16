@@ -11,17 +11,20 @@
             <Setter Property="StrokeThickness" Value="1"/>
             <Setter Property="StrokeShape" Value="RoundRectangle 15"/>
             <Setter Property="BackgroundColor" Value="White"/>
-            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Padding" Value="5"/>
             <Setter Property="HeightRequest" Value="130"/>
             <Setter Property="Shadow" Value="0,2,5,Black"/>
             <Setter Property="Margin" Value="0,0,10,15"/>
         </Style>
 
-        <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
+        <Style x:Key="DashboardLabelStyle" TargetType="Label">
             <Setter Property="TextColor" Value="#263238"/>
             <Setter Property="FontAttributes" Value="Bold"/>
-            <Setter Property="BackgroundColor" Value="Transparent"/>
-            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+            <Setter Property="VerticalTextAlignment" Value="Center"/>
+            <Setter Property="LineBreakMode" Value="WordWrap"/>
+            <Setter Property="MaxLines" Value="2"/>
         </Style>
     </ContentPage.Resources>
 
@@ -44,27 +47,37 @@
             </VerticalStackLayout>
         </Grid>
 
-        <ScrollView x:Name="ContentScroll" Padding="30">
-            <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignContent="Start">
+        <ScrollView x:Name="ContentScroll" Padding="{OnIdiom Phone='15', Default='30'}">
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Image Source="orders.png" HeightRequest="50" Aspect="AspectFit"/>
-                        <Button Text="QUẢN LÝ ĐƠN MÓN" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
+            <FlexLayout Wrap="Wrap" JustifyContent="SpaceBetween" AlignContent="Start">
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOrdersClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="orders.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="QUẢN LÝ ĐƠN MÓN" Style="{StaticResource DashboardLabelStyle}"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Image Source="menu.png" HeightRequest="50" Aspect="AspectFit"/>
-                        <Button Text="TRA CỨU MENU" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFoodMenuClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="menu.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="TRA CỨU MENU" Style="{StaticResource DashboardLabelStyle}"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Image Source="users.png" HeightRequest="50" Aspect="AspectFit"/>
-                        <Button Text="HỒ SƠ CÁ NHÂN" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUsersClicked"/>
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnUsersClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="users.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="HỒ SƠ CÁ NHÂN" Style="{StaticResource DashboardLabelStyle}"/>
                     </VerticalStackLayout>
                 </Border>
 
@@ -80,8 +93,10 @@
                     <VisualState.Setters>
                         <Setter TargetName="MainLayout" Property="RowDefinitions" Value="Auto, *" />
                         <Setter TargetName="MainLayout" Property="ColumnDefinitions" Value="*" />
+
                         <Setter TargetName="UserInfoPanel" Property="Grid.Row" Value="0" />
                         <Setter TargetName="UserInfoPanel" Property="Grid.Column" Value="0" />
+
                         <Setter TargetName="ContentScroll" Property="Grid.Row" Value="1" />
                         <Setter TargetName="ContentScroll" Property="Grid.Column" Value="0" />
                     </VisualState.Setters>
@@ -93,8 +108,10 @@
                     <VisualState.Setters>
                         <Setter TargetName="MainLayout" Property="RowDefinitions" Value="*" />
                         <Setter TargetName="MainLayout" Property="ColumnDefinitions" Value="280, *" />
+
                         <Setter TargetName="UserInfoPanel" Property="Grid.Row" Value="0" />
                         <Setter TargetName="UserInfoPanel" Property="Grid.Column" Value="0" />
+
                         <Setter TargetName="ContentScroll" Property="Grid.Row" Value="0" />
                         <Setter TargetName="ContentScroll" Property="Grid.Column" Value="1" />
                     </VisualState.Setters>

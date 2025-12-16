@@ -8,10 +8,8 @@
     <Grid Padding="20" RowDefinitions="Auto,Auto,Auto,*">
 
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-            <Button Grid.Column="0" Text="← Quay lại" BackgroundColor="Transparent" TextColor="#666" FontSize="16" Clicked="OnBackClicked" HorizontalOptions="Start" Padding="0"/>
             <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
                 <Label x:Name="PageTitleLabel" Text="Báo Cáo Doanh Thu" FontSize="20" FontAttributes="Bold" TextColor="#263238" HorizontalOptions="Center"/>
-                <Label x:Name="DateRangeLabel" Text="Đang tải..." FontSize="13" TextColor="#999" HorizontalOptions="Center"/>
             </VerticalStackLayout>
         </Grid>
 
@@ -65,11 +63,16 @@
 
         <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="20">
 
-            <Border Grid.Column="0" BackgroundColor="White" Padding="20" StrokeShape="RoundRectangle 15">
+            <Border Grid.Column="0" BackgroundColor="White" Padding="20" StrokeShape="RoundRectangle 15" VerticalOptions="Start">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="📊 Biểu đồ Doanh Thu" FontSize="16" FontAttributes="Bold" TextColor="#263238"/>
-                    <ScrollView Orientation="Horizontal" VerticalOptions="FillAndExpand">
-                        <Grid x:Name="RevenueChartContainer" RowDefinitions="*,Auto,Auto" ColumnSpacing="8" Padding="10,20,10,10" MinimumWidthRequest="600">
+
+                    <ScrollView Orientation="Horizontal" VerticalOptions="Fill" HeightRequest="320">
+                        <Grid x:Name="RevenueChartContainer"
+                  RowDefinitions="*,Auto,Auto"
+                  ColumnSpacing="8"
+                  Padding="10,20,10,30"
+                  MinimumWidthRequest="600">
                             <VerticalStackLayout x:Name="EmptyChartState" Grid.RowSpan="3" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="True">
                                 <Label Text="📊" FontSize="48" HorizontalOptions="Center" Opacity="0.3"/>
                                 <Label Text="Không có dữ liệu" FontSize="14" TextColor="#999"/>

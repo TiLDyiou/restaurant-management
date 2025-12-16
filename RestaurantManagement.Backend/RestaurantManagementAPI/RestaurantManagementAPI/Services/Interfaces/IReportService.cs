@@ -4,6 +4,7 @@ namespace RestaurantManagementAPI.Services.Interfaces
 {
     public interface IReportService
     {
-        Task<RevenueReportResponse> GetRevenueReportAsync(DateTime startDate, DateTime endDate);
+        // groupBy có thể nhận: "day" hoặc "month"
+        Task<RevenueReportResponse> GetRevenueReportAsync(DateTime startDate, DateTime endDate, string groupBy = "day");
     }
 }

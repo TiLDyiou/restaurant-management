@@ -16,17 +16,16 @@ namespace RestaurantManagementAPI.Controllers
 
         // GET: api/reports/revenue?startDate=2025-11-01&endDate=2025-11-30
         [HttpGet("revenue")]
-        public async Task<IActionResult> GetRevenueReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<IActionResult> GetRevenueReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] string groupBy = "day")
         {
             try
             {
-                // Kiểm tra input cơ bản
                 if (startDate > endDate)
                 {
                     return BadRequest(new { success = false, message = "Ngày bắt đầu không được lớn hơn ngày kết thúc." });
                 }
 
-                var data = await _reportService.GetRevenueReportAsync(startDate, endDate);
+                var data = await _reportService.GetRevenueReportAsync(startDate, endDate, groupBy);
 
                 return Ok(new
                 {

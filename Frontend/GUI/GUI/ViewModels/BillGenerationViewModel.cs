@@ -16,7 +16,7 @@ namespace RestaurantManagementGUI.ViewModels
         private readonly JsonSerializerOptions _jsonOptions;
 
         private const string MY_BANK_ID = "VCB";
-        private const string MY_ACCOUNT_NO = "0969390384";
+        private const string MY_ACCOUNT_NO = "9969390384";
         private const string QR_TEMPLATE = "compact2";
 
         [ObservableProperty]
@@ -122,8 +122,6 @@ namespace RestaurantManagementGUI.ViewModels
                     );
 
                     await Application.Current.MainPage.DisplayAlert("Thành công", $"Đã thanh toán đơn {finalBill.MaHD}", "OK");
-
-                    await Application.Current.MainPage.Navigation.PushAsync(new RevenueReportPage());
 
                     PendingBills.Remove(SelectedBill);
                     SelectedBill = PendingBills.FirstOrDefault();

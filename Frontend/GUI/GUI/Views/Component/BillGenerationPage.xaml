@@ -9,9 +9,56 @@
              Title="Thu Ngân"
              BackgroundColor="#F2F2F7">
 
-    <Grid ColumnDefinitions="280, 460, *" Padding="20" ColumnSpacing="20">
+    <Grid x:Name="MainLayout" Padding="10" ColumnSpacing="10" RowSpacing="10">
 
-        <Border Grid.Column="0" BackgroundColor="White" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="15">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Desktop">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1000" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="MainLayout" Property="Grid.RowDefinitions" Value="*, Auto" />
+                        <Setter TargetName="MainLayout" Property="Grid.ColumnDefinitions" Value="280, 460, *" />
+                        <Setter TargetName="LeftPanel" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="LeftPanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="LeftPanel" Property="Grid.RowSpan" Value="2" />
+                        <Setter TargetName="MiddlePanel" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="MiddlePanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="MiddlePanel" Property="Grid.RowSpan" Value="2" />
+                        <Setter TargetName="RightPanel" Property="Grid.Column" Value="2" />
+                        <Setter TargetName="RightPanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="RightPanel" Property="Grid.RowSpan" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="Phone">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="MainLayout" Property="Grid.ColumnDefinitions" Value="*" />
+                        <Setter TargetName="MainLayout" Property="Grid.RowDefinitions" Value="Auto, 4*, 6*" />
+
+                        <Setter TargetName="LeftPanel" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="LeftPanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="LeftPanel" Property="Grid.RowSpan" Value="1" />
+                        <Setter TargetName="LeftPanel" Property="HeightRequest" Value="140" />
+
+                        <Setter TargetName="MiddlePanel" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="MiddlePanel" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="MiddlePanel" Property="Grid.RowSpan" Value="1" />
+
+                        <Setter TargetName="RightPanel" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="RightPanel" Property="Grid.Row" Value="2" />
+                        <Setter TargetName="RightPanel" Property="Grid.RowSpan" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <Border x:Name="LeftPanel" 
+                BackgroundColor="White" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="15">
             <Border.Shadow>
                 <Shadow Brush="Black" Opacity="0.05" Radius="10" Offset="0,2"/>
             </Border.Shadow>
@@ -39,7 +86,7 @@
                                     </VisualStateGroupList>
                                 </VisualStateManager.VisualStateGroups>
                                 <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
-                                    <Border Grid.RowSpan="2" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 8" BackgroundColor="#8B6B47" Margin="0,0,10,0">
+                                    <Border Grid.RowSpan="2" HeightRequest="40" WidthRequest="70" StrokeShape="RoundRectangle 8" BackgroundColor="#8B6B47" Margin="0,0,10,0">
                                         <Label Text="{Binding TableName}" TextColor="White" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
                                     </Border>
                                     <Label Grid.Column="1" Text="{Binding FormattedTotal}" FontSize="15" FontAttributes="Bold" TextColor="#333"/>
@@ -52,7 +99,7 @@
             </Grid>
         </Border>
 
-        <ScrollView Grid.Column="1">
+        <ScrollView x:Name="MiddlePanel">
             <Border StrokeShape="RoundRectangle 20" BackgroundColor="#8B6B47" StrokeThickness="0" Padding="0">
                 <Border.Shadow>
                     <Shadow Brush="Black" Opacity="0.15" Radius="15" Offset="0,5"/>
@@ -93,7 +140,8 @@
             </Border>
         </ScrollView>
 
-        <Border Grid.Column="2" BackgroundColor="White" StrokeShape="RoundRectangle 20" Padding="25">
+        <Border x:Name="RightPanel" 
+                BackgroundColor="White" StrokeShape="RoundRectangle 20" Padding="25">
             <ScrollView>
                 <VerticalStackLayout Spacing="20">
                     <Label Text="Thanh Toán" FontSize="22" FontAttributes="Bold" TextColor="#333"/>
@@ -145,14 +193,15 @@
                             <ActivityIndicator IsRunning="True" Color="#8B6B47" HorizontalOptions="Center" VerticalOptions="Center"/>
 
                             <Image Source="{Binding QrCodeUrl}" 
-                                    Aspect="AspectFit"
-                                    HorizontalOptions="Fill"
-                                    VerticalOptions="Fill"/>
+                                   Aspect="AspectFit"
+                                   HorizontalOptions="Fill"
+                                   VerticalOptions="Fill"/>
                         </Grid>
                     </Border>
                     <Button Text="XÁC NHẬN THANH TOÁN" Command="{Binding PayAndPrintCommand}" BackgroundColor="#8B6B47" TextColor="White" FontAttributes="Bold" HeightRequest="50" CornerRadius="10" Margin="0,20,0,0"/>
                 </VerticalStackLayout>
             </ScrollView>
         </Border>
+
     </Grid>
 </ContentPage>

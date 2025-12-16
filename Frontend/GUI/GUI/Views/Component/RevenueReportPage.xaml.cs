@@ -58,7 +58,7 @@ namespace RestaurantManagementGUI.Views
             _currentMaNV = UserState.CurrentMaNV ?? "";
             _isAdmin = (UserState.CurrentRole?.ToLower() == "admin");
 
-            if (_isAdmin) { PageTitleLabel.Text = "Doanh Số (Admin)"; RightPanelTitle.Text = "🏆 Hiệu Suất Nhân Viên"; }
+            if (_isAdmin) { PageTitleLabel.Text = "Doanh Số"; RightPanelTitle.Text = "🏆 Hiệu Suất Nhân Viên"; }
             else { PageTitleLabel.Text = "Doanh Số Của Tôi"; RightPanelTitle.Text = "📋 Chi Tiết Giao Dịch"; }
         }
 
@@ -66,8 +66,11 @@ namespace RestaurantManagementGUI.Views
         {
             try
             {
-                string url = $"{ApiConfig.RevenueReport}?startDate={_startDate:yyyy-MM-dd}&endDate={_endDate:yyyy-MM-dd}";
-                if (!_isAdmin && !string.IsNullOrEmpty(_currentMaNV)) url += $"&maNV={_currentMaNV}";
+                string groupBy = _currentPeriod == "year" ? "month" : "day";
+                string url = $"{ApiConfig.RevenueReport}?startDate={_startDate:yyyy-MM-dd}&endDate={_endDate:yyyy-MM-dd}&groupBy={groupBy}";
+
+                if (!_isAdmin && !string.IsNullOrEmpty(_currentMaNV))
+                    url += $"&maNV={_currentMaNV}";
 
                 var response = await _httpClient.GetFromJsonAsync<ApiResponse<RevenueReportDto>>(url, _jsonOptions);
 
@@ -76,7 +79,11 @@ namespace RestaurantManagementGUI.Views
                 else
                     ResetUI();
             }
-            catch { ResetUI(); }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ResetUI();
+            }
         }
 
         private void UpdateUI(RevenueReportDto data)
@@ -103,7 +110,15 @@ namespace RestaurantManagementGUI.Views
         {
             RevenueChartContainer.Children.Clear();
             RevenueChartContainer.ColumnDefinitions.Clear();
-            if (list == null || list.Count == 0) return;
+
+            // Nếu list null hoặc rỗng thì hiện trạng thái Empty
+            if (list == null || list.Count == 0)
+            {
+                EmptyChartState.IsVisible = true;
+                return;
+            }
+
+            EmptyChartState.IsVisible = false; // Ẩn icon "Không có dữ liệu"
 
             decimal max = list.Max(x => x.Revenue);
             if (max == 0) max = 1;
@@ -111,15 +126,45 @@ namespace RestaurantManagementGUI.Views
             for (int i = 0; i < list.Count; i++)
             {
                 var item = list[i];
-                RevenueChartContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = 50 });
+
+                // Điều chỉnh độ rộng cột tùy theo số lượng dữ liệu để nhìn đẹp hơn
+                // Nếu xem năm (12 tháng) thì cột to hơn chút, xem tháng (30 ngày) thì cột nhỏ lại
+                double colWidth = _currentPeriod == "year" ? 60 : 50;
+                RevenueChartContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = colWidth });
 
                 var stack = new VerticalStackLayout { Spacing = 5, VerticalOptions = LayoutOptions.End };
-                var bar = new BoxView { Color = Color.FromArgb("#FFBD59"), WidthRequest = 40, CornerRadius = new CornerRadius(5, 5, 0, 0) };
-                bar.HeightRequest = Math.Max(10, 200 * ((double)item.Revenue / (double)max));
 
-                stack.Children.Add(new Label { Text = FormatCurrency(item.Revenue), FontSize = 10, HorizontalOptions = LayoutOptions.Center });
+                // Màu sắc cột: Nếu là ngày hiện tại/tháng hiện tại thì đổi màu cho nổi bật (Optional)
+                bool isCurrent = _currentPeriod == "year"
+                    ? (item.Date.Month == DateTime.Now.Month && item.Date.Year == DateTime.Now.Year)
+                    : (item.Date.Date == DateTime.Now.Date);
+
+                Color barColor = isCurrent ? Color.FromArgb("#FF9800") : Color.FromArgb("#FFBD59");
+
+                var bar = new BoxView { Color = barColor, WidthRequest = colWidth - 10, CornerRadius = new CornerRadius(5, 5, 0, 0) };
+
+                // Tính chiều cao cột (Max height 200)
+                bar.HeightRequest = Math.Max(5, 200 * ((double)item.Revenue / (double)max));
+
+                // Label tiền trên đầu cột
+                stack.Children.Add(new Label { Text = FormatCurrency(item.Revenue), FontSize = 10, HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Gray });
+
                 stack.Children.Add(bar);
-                stack.Children.Add(new Label { Text = item.Date.ToString("dd/MM"), FontSize = 10, HorizontalOptions = LayoutOptions.Center });
+
+                // Format nhãn thời gian dưới chân cột
+                string timeLabel;
+                if (_currentPeriod == "year")
+                {
+                    // Nếu xem năm -> Hiển thị "T1", "T2"...
+                    timeLabel = $"T{item.Date.Month}";
+                }
+                else
+                {
+                    // Nếu xem ngày/tuần/tháng -> Hiển thị "15/12"
+                    timeLabel = item.Date.ToString("dd/MM");
+                }
+
+                stack.Children.Add(new Label { Text = timeLabel, FontSize = 11, HorizontalOptions = LayoutOptions.Center, FontAttributes = isCurrent ? FontAttributes.Bold : FontAttributes.None });
 
                 Grid.SetColumn(stack, i);
                 Grid.SetRow(stack, 0);
@@ -181,13 +226,40 @@ namespace RestaurantManagementGUI.Views
         }
 
         private string FormatCurrency(decimal amount) => amount >= 1000000 ? $"{amount / 1000000:F1}M" : $"{amount / 1000:F0}K";
-
-        // Navigation & Filter handlers
         private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
         private async void OnDayClicked(object sender, EventArgs e) => await UpdatePeriod("day", DateTime.Now.Date, DateTime.Now);
-        private async void OnWeekClicked(object sender, EventArgs e) => await UpdatePeriod("week", DateTime.Now.AddDays(-7), DateTime.Now);
+        private async void OnWeekClicked(object sender, EventArgs e)
+        {
+            var today = DateTime.Now;
+
+            // Tính toán độ lệch để tìm về Thứ 2
+            // Nếu hôm nay là Thứ 2 (1) -> trừ 0 ngày
+            // Nếu hôm nay là Thứ 3 (2) -> trừ 1 ngày
+            // Nếu hôm nay là Chủ Nhật (0) -> trừ 6 ngày
+            int diff = today.DayOfWeek - DayOfWeek.Monday;
+            if (diff < 0)
+            {
+                diff += 7;
+            }
+
+            var startOfWeek = today.AddDays(-diff).Date; // Đây là ngày Thứ 2 đầu tuần
+            var endOfWeek = startOfWeek.AddDays(6).Date; // Đây là ngày Chủ Nhật cuối tuần
+
+            // Gọi hàm cập nhật. 
+            // Backend của bạn đã có logic tự động lấy hết ngày cuối cùng (23:59:59) 
+            // nên ở đây chỉ cần truyền ngày Chủ Nhật là đủ.
+            await UpdatePeriod("week", startOfWeek, endOfWeek);
+        }
         private async void OnMonthClicked(object sender, EventArgs e) => await UpdatePeriod("month", new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now);
-        private async void OnYearClicked(object sender, EventArgs e) => await UpdatePeriod("year", new DateTime(DateTime.Now.Year, 1, 1), DateTime.Now);
+        private async void OnYearClicked(object sender, EventArgs e)
+        {
+            // Lấy ngày đầu năm nay
+            var start = new DateTime(DateTime.Now.Year, 1, 1);
+            // Lấy ngày cuối năm nay (để Backend tạo đủ list 12 tháng)
+            var end = new DateTime(DateTime.Now.Year, 12, 31);
+
+            await UpdatePeriod("year", start, end);
+        }
 
         private async Task UpdatePeriod(string period, DateTime start, DateTime end)
         {
