@@ -18,7 +18,7 @@ builder.Services.AddDbContext<QLNHDbContext>(options =>
 // Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddHostedService<TcpSocketServer>();
 // Swagger
 builder.Services.AddSwaggerGen(options =>
 {

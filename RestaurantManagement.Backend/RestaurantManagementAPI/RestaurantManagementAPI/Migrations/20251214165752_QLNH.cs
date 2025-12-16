@@ -87,6 +87,22 @@ namespace RestaurantManagementAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "THONGBAO",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoiDung = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ThoiGian = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    Loai = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_THONGBAO", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DATBAN",
                 columns: table => new
                 {
@@ -291,6 +307,9 @@ namespace RestaurantManagementAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "TAIKHOAN");
+
+            migrationBuilder.DropTable(
+                name: "THONGBAO");
 
             migrationBuilder.DropTable(
                 name: "HOADON");

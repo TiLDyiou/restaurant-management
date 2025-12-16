@@ -66,14 +66,29 @@ namespace RestaurantManagementGUI
 
                     if (!string.IsNullOrWhiteSpace(data.Token))
                     {
+                        // --- BƯỚC 1: LƯU TOÀN BỘ DỮ LIỆU VÀO BỘ NHỚ TRƯỚC ---
                         await SecureStorage.Default.SetAsync("auth_token", data.Token);
                         await SecureStorage.Default.SetAsync("user_username", data.Username ?? data.MaNV);
                         await SecureStorage.Default.SetAsync("user_manv", data.MaNV);
                         await SecureStorage.Default.SetAsync("user_role", data.Role ?? "");
+
+                        // QUAN TRỌNG: Phải lưu cái này thì Socket mới biết đường gửi LOGIN
+                        if (!string.IsNullOrEmpty(data.MaNV))
+                        {
+                            await SecureStorage.Default.SetAsync("current_ma_nv", data.MaNV);
+                        }
+
+                        // Cập nhật biến toàn cục
                         UserState.CurrentMaNV = data.MaNV;
                         UserState.CurrentTenNV = data.Username;
                         UserState.CurrentRole = data.Role;
-                        _ = SocketListener.Instance.ConnectAsync();
+
+                        // --- BƯỚC 2: KÍCH HOẠT SOCKET (CHỈ GỌI 1 LẦN DUY NHẤT TẠI ĐÂY) ---
+                        // Gọi sau khi đã lưu xong current_ma_nv
+                        _ = Services.SocketListener.Instance.ConnectAsync();
+                        // -----------------------------------------------------------------
+
+                        // --- BƯỚC 3: ĐIỀU HƯỚNG TRANG ---
                         string role = data.Role?.Trim().ToLower() ?? "";
 
                         if (role == "admin")

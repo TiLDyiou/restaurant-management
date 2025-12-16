@@ -34,7 +34,8 @@ namespace RestaurantManagementAPI.Services.Implements
                 user.NhanVien?.HoTen, 
                 user.NhanVien?.ChucVu, 
                 user.NhanVien?.SDT, 
-                user.Email, user.IsVerified 
+                user.Email, user.IsVerified,
+                user.Online
             };
         }
 
@@ -42,7 +43,7 @@ namespace RestaurantManagementAPI.Services.Implements
         {
             return await _context.NHANVIEN
                 .Include(nv => nv.TaiKhoan)
-                .Select(nv => new { nv.MaNV, nv.HoTen, nv.ChucVu, nv.SDT, nv.TaiKhoan.Quyen, nv.TaiKhoan.TenDangNhap, nv.TrangThai, nv.TaiKhoan.IsActive, nv.TaiKhoan.Email })
+                .Select(nv => new { nv.MaNV, nv.HoTen, nv.ChucVu, nv.SDT, nv.TaiKhoan.Quyen, nv.TaiKhoan.TenDangNhap, nv.TrangThai, nv.TaiKhoan.IsActive, nv.TaiKhoan.Email, Online = nv.TaiKhoan.Online })
                 .ToListAsync<object>();
         }
 

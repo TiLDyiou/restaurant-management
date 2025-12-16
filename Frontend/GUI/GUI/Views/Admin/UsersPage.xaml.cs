@@ -3,6 +3,8 @@ using RestaurantManagementGUI.Models;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net.Sockets;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
 
@@ -16,6 +18,11 @@ namespace RestaurantManagementGUI
         private ObservableCollection<UserModel> _users = new();
         private List<UserModel> _allUsers = new();
 
+        //TCP Client để lắng nghe sự kiện từ server
+        private TcpClient _tcpClient;
+        private NetworkStream _stream;
+        private bool _isListening;
+        private string _myMaNV;
         public UsersPage()
         {
             InitializeComponent();
@@ -32,8 +39,100 @@ namespace RestaurantManagementGUI
         {
             base.OnAppearing();
             await LoadUsersAsync();
+
+            // Đăng ký nhận tin từ SocketListener
+            MessagingCenter.Subscribe<Services.SocketListener, string>(this, "UpdateStatus", (sender, message) =>
+            {
+                if (message.StartsWith("STATUS|"))
+                {
+                    var parts = message.Split('|');
+                    if (parts.Length == 3)
+                    {
+                        string targetNV = parts[1];
+                        bool isOnline = parts[2] == "TRUE";
+
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            var user = _users.FirstOrDefault(u => u.MaNV == targetNV);
+                            if (user != null)
+                            {
+                                user.Online = isOnline; // Tự động đổi màu (xanh/xám)
+                            }
+                        });
+                    }
+                }
+            });
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            MessagingCenter.Unsubscribe<Services.SocketListener, string>(this, "UpdateStatus");
+        }
+
+        private async Task ConnectTcpAsync()
+        {
+            try
+            {
+                _myMaNV = await SecureStorage.GetAsync("current_ma_nv");
+
+                if (string.IsNullOrEmpty(_myMaNV))
+                {
+                    _myMaNV = "UNKNOWN";
+                }
+                string ip = DeviceInfo.Platform == DevicePlatform.Android ? "10.0.2.2" : "localhost";
+
+                _tcpClient = new TcpClient();
+                await _tcpClient.ConnectAsync(ip, 9000);
+                _stream = _tcpClient.GetStream();
+                _isListening = true;
+                if (!string.IsNullOrEmpty(_myMaNV))
+                {
+                    byte[] loginData = Encoding.UTF8.GetBytes($"LOGIN|{_myMaNV}");
+                    await _stream.WriteAsync(loginData);
+                }
+                _ = Task.Run(ListenTcpLoop);
+            }
+            catch
+            {
+            }
+        }
+        private async Task ListenTcpLoop()
+        {
+            byte[] buffer = new byte[1024];
+            try
+            {
+                while (_isListening && _tcpClient.Connected)
+                {
+                    int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
+                    if (bytesRead == 0) break;
+
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                    // Message dạng: STATUS|NV001|TRUE  hoặc STATUS|NV002|FALSE
+                    if (message.StartsWith("STATUS|"))
+                    {
+                        var parts = message.Split('|');
+                        if (parts.Length == 3)
+                        {
+                            string targetNV = parts[1];
+                            bool isOnline = parts[2] == "TRUE";
+
+                            // Cập nhật giao diện (Phải dùng MainThread)
+                            MainThread.BeginInvokeOnMainThread(() =>
+                            {
+                                var user = _users.FirstOrDefault(u => u.MaNV == targetNV);
+                                if (user != null)
+                                {
+                                    user.Online = isOnline;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
         private async Task LoadUsersAsync()
         {
             try

@@ -32,11 +32,17 @@ namespace RestaurantManagementGUI
             bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
             if (!confirm) return;
 
+            // 1. Ngắt kết nối TCP (Gửi LOGOUT lên Server để Server báo Offline)
+            if (Services.SocketListener.Instance != null)
+            {
+                Services.SocketListener.Instance.Disconnect();
+            }
+
+            // 2. Sau đó mới xóa dữ liệu máy
             SecureStorage.RemoveAll();
             UserState.Clear();
-            if (SocketListener.Instance != null)
-                SocketListener.Instance.Disconnect();
 
+            // 3. Chuyển trang
             Application.Current.MainPage = new NavigationPage(new LoginPage());
         }
 

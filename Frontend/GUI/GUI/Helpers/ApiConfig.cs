@@ -11,6 +11,7 @@ namespace RestaurantManagementGUI.Helpers
         // --------------AUTH-----------------------------------
         public static string Register => $"{BaseUrl}auth/register";
         public static string Login => $"{BaseUrl}auth/login";
+        public static string Logout => $"{BaseUrl}auth/logout";
 
         // OTP đăng kí
         public static string SendRegisterOtp => $"{BaseUrl}auth/otp/register";

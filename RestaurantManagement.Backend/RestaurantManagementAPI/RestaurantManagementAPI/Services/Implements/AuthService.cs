@@ -80,6 +80,17 @@ namespace RestaurantManagementAPI.Services.Implements
             }
         }
 
+        public async Task<(bool Success, string Message)> LogoutAsync(string maNV)
+        {
+            var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.MaNV == maNV);
+            if (user == null) return (false, "Không tìm thấy người dùng.");
+
+            user.Online = false; // Set về Offline
+            await _context.SaveChangesAsync();
+
+            return (true, "Đăng xuất thành công.");
+        }
+
         public async Task<(bool Success, string Message, object? Data)> LoginAsync(LoginDto dto)
         {
             var user = await _context.TAIKHOAN
@@ -111,6 +122,8 @@ namespace RestaurantManagementAPI.Services.Implements
             if (!user.IsActive) 
                 return (false, "Tài khoản đã bị vô hiệu hóa.", null);
 
+            user.Online = true;
+            await _context.SaveChangesAsync();
             var token = GenerateJwtToken(user);
             return (true, "Đăng nhập thành công", new 
             { 

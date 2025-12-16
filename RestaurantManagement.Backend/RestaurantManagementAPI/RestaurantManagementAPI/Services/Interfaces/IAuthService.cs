@@ -12,5 +12,6 @@ namespace RestaurantManagementAPI.Services.Interfaces
         Task<(bool Success, string Message)> ForgotPasswordAsync(string email);
         Task<(bool Success, string Message)> VerifyForgotOtpAsync(string email, string otp);
         Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDto dto);
+        Task<(bool Success, string Message)> LogoutAsync(string maNV);
     }
 }   

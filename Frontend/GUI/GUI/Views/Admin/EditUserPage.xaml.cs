@@ -5,30 +5,30 @@ using Microsoft.Maui.Storage;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 
+
 namespace RestaurantManagementGUI
 {
     public partial class EditUserPage : ContentPage
     {
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions;
-
         private readonly string _maNV;
         private readonly string _currentEmail;
-
         public EditUserPage(UserModel user)
         {
             InitializeComponent();
 
 #if DEBUG
+
             _httpClient = new HttpClient(GetInsecureHandler());
 #else
+
             _httpClient = new HttpClient();
 #endif
-            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             _maNV = user.MaNV;
             _currentEmail = user.Email;
-
             MaNVLabel.Text = $"Mã nhân viên: {user.MaNV}";
             HoTenEntry.Text = user.HoTen;
             ChucVuEntry.Text = user.ChucVu;
@@ -58,7 +58,9 @@ namespace RestaurantManagementGUI
             }
 
             UpdateButton.IsEnabled = false;
+
             UpdateButton.Text = "Đang cập nhật...";
+
 
             try
             {
@@ -120,23 +122,19 @@ namespace RestaurantManagementGUI
                     placeholder: "Nhập 6 số OTP",
                     keyboard: Keyboard.Numeric,
                     maxLength: 6);
-
                 if (string.IsNullOrWhiteSpace(otp))
                 {
                     await DisplayAlert("Thông báo", "Bạn đã hủy xác thực. Email chưa được cập nhật.", "OK");
                     return;
                 }
-
                 if (otp.Trim().ToLower() == "resend")
                 {
                     await ResendOtp(email);
                     continue;
                 }
-
                 var verifyReq = new VerifyOtpDto { Email = email, OTP = otp };
                 var response = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyEmailOtp, verifyReq);
                 var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
-
                 if (result != null && result.Success)
                 {
                     await DisplayAlert("Thành công", "Email đã được xác thực!", "OK");
@@ -149,7 +147,6 @@ namespace RestaurantManagementGUI
                 }
             }
         }
-
         private async Task ResendOtp(string email)
         {
             var req = new EmailDto { Email = email };
@@ -161,7 +158,6 @@ namespace RestaurantManagementGUI
             else
                 await DisplayAlert("Lỗi", result?.Message ?? "Không thể gửi lại OTP", "OK");
         }
-
         private HttpClientHandler GetInsecureHandler()
         {
             var handler = new HttpClientHandler();

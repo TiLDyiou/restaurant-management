@@ -29,6 +29,21 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("email")]
         public string Email { get; set; }
 
+        private bool _online;
+        [JsonPropertyName("online")]
+        public bool Online
+        {
+            get => _online;
+            set
+            {
+                if (_online != value)
+                {
+                    _online = value;
+                    OnPropertyChanged(); 
+                }
+            }
+        }
+
         [JsonPropertyName("trangThai")]
         public string TrangThai
         {

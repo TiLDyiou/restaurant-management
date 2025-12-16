@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RestaurantManagementAPI.DTOs;
 using RestaurantManagementAPI.Services.Interfaces;
+using System.Security.Claims;
 
 namespace RestaurantManagementAPI.Controllers
 {
@@ -13,6 +15,37 @@ namespace RestaurantManagementAPI.Controllers
         public AuthController(IAuthService authService)
         {
             _authService = authService;
+        }
+
+        [HttpPost("logout")]
+        [Authorize] // Yêu cầu phải có Token (đã đăng nhập) mới được gọi
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                // 1. Lấy Mã Nhân Viên từ Token của người đang gọi
+                // (Trong AuthService bạn đã lưu MaNV vào ClaimTypes.NameIdentifier)
+                var maNV = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(maNV))
+                {
+                    return Unauthorized(new { message = "Không xác định được người dùng." });
+                }
+
+                // 2. Gọi Service để set trạng thái về Offline
+                var result = await _authService.LogoutAsync(maNV);
+
+                if (result.Success)
+                {
+                    return Ok(new { message = result.Message });
+                }
+
+                return BadRequest(new { message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
 
         [HttpPost("register")]

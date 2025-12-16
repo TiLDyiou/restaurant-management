@@ -12,8 +12,8 @@ using RestaurantManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    [Migration("20251214110648_AddLoaiToThongBao")]
-    partial class AddLoaiToThongBao
+    [Migration("20251214165752_QLNH")]
+    partial class QLNH
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
