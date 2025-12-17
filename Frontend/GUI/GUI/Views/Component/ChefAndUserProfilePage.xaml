@@ -47,7 +47,7 @@
             </Frame>
 
             <!-- Nút cập nhật thông tin -->
-            <Button Text="✏️ Cập nhật thông tin"
+            <Button Text="Cập nhật thông tin"
                     BackgroundColor="{StaticResource AccentColor}"
                     TextColor="White"
                     FontAttributes="Bold"

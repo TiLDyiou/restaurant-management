@@ -1,26 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantManagementAPI.Common.Constants;
+using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs.BanDtos;
+using RestaurantManagementAPI.Infrastructure.Sockets;
+using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
-using RestaurantManagementAPI.Services.Interfaces;
 using System.Text.Json;
 
-namespace RestaurantManagementAPI.Services.Implements
+namespace RestaurantManagementAPI.Services
 {
     public class ReservationService : IReservationService
     {
         private readonly QLNHDbContext _context;
+        public ReservationService(QLNHDbContext context) { _context = context; }
 
-        public ReservationService(QLNHDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<(bool Success, string Message, DatBan? Data)> CreateReservationAsync(CreateDatBanDto dto)
+        public async Task<ServiceResult<DatBan>> CreateReservationAsync(CreateDatBanDto dto)
         {
             var ban = await _context.BAN.FindAsync(dto.MaBan);
-            if (ban == null) 
-                return (false, "Bàn không tồn tại", null);
+            if (ban == null) return ServiceResult<DatBan>.Fail("Bàn không tồn tại");
 
             using var trans = await _context.Database.BeginTransactionAsync();
             try
@@ -39,7 +37,7 @@ namespace RestaurantManagementAPI.Services.Implements
                 bool isUpdated = false;
                 if (datBan.ThoiGianDat > DateTime.UtcNow && datBan.ThoiGianDat < DateTime.UtcNow.AddHours(3))
                 {
-                    ban.TrangThai = "Bàn đã đặt";
+                    ban.TrangThai = SystemConstants.TableReserved;
                     isUpdated = true;
                 }
 
@@ -47,31 +45,27 @@ namespace RestaurantManagementAPI.Services.Implements
                 await _context.SaveChangesAsync();
                 await trans.CommitAsync();
 
-                // Gửi Socket
                 if (isUpdated && TcpSocketServer.Instance != null)
                 {
-                    var payload = new { MaBan = dto.MaBan, TrangThai = "Bàn đã đặt" };
-                    string jsonTable = JsonSerializer.Serialize(payload);
-                    await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{jsonTable}");
+                    var payload = new { MaBan = dto.MaBan, TrangThai = SystemConstants.TableReserved };
+                    await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{JsonSerializer.Serialize(payload)}");
                 }
 
-                return (true, "Đặt bàn thành công", datBan);
+                return ServiceResult<DatBan>.Ok(datBan, "Đặt bàn thành công");
             }
             catch (Exception ex)
             {
                 await trans.RollbackAsync();
-                return (false, "Lỗi hệ thống: " + ex.Message, null);
+                return ServiceResult<DatBan>.Fail("Lỗi: " + ex.Message);
             }
         }
 
         private async Task<string> GenerateDatBanId()
         {
             var last = await _context.DATBAN.OrderByDescending(db => db.MaDatBan).FirstOrDefaultAsync();
-            if (last == null) 
-                return "DB00001";
+            if (last == null) return "DB00001";
             string num = last.MaDatBan.Substring(2);
-            if (int.TryParse(num, out int n)) 
-                return $"DB{n + 1:D5}";
+            if (int.TryParse(num, out int n)) return $"DB{n + 1:D5}";
             return "DB00001";
         }
     }

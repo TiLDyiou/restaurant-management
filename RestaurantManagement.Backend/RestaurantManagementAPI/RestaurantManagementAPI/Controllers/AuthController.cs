@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RestaurantManagementAPI.DTOs;
-using RestaurantManagementAPI.Services.Interfaces;
+using RestaurantManagementAPI.Interfaces;
+using System.Security.Claims;
 
 namespace RestaurantManagementAPI.Controllers
 {
@@ -13,6 +15,34 @@ namespace RestaurantManagementAPI.Controllers
         public AuthController(IAuthService authService)
         {
             _authService = authService;
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                var maNV = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(maNV))
+                {
+                    return Unauthorized(new { message = "Không xác định được người dùng." });
+                }
+
+                var result = await _authService.LogoutAsync(maNV);
+
+                if (result.Success)
+                {
+                    return Ok(new { message = result.Message });
+                }
+
+                return BadRequest(new { message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
 
         [HttpPost("register")]
@@ -28,8 +58,8 @@ namespace RestaurantManagementAPI.Controllers
                     message = result.Message,
                     data = new
                     {
-                        email = dto.Email, 
-                        maNV = result.MaNV
+                        email = dto.Email,
+                        maNV = result.Data
                     }
                 });
             }

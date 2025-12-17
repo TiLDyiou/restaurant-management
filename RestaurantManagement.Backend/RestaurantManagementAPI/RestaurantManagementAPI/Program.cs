@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.Infrastructure.Email;
+using RestaurantManagementAPI.Infrastructure.Security;
+using RestaurantManagementAPI.Infrastructure.Sockets;
+using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Seeders;
-using RestaurantManagementAPI.Services.Implements;
-using RestaurantManagementAPI.Services.Interfaces;
+using RestaurantManagementAPI.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,11 +18,9 @@ var configuration = builder.Configuration;
 builder.Services.AddDbContext<QLNHDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("QLNHDatabase")));
 
-// Controllers
+// Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-// Swagger
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -43,9 +44,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// JWT Auth
+// JWT Auth Configuration
 var jwt = configuration.GetSection("Jwt");
 var key = jwt.GetValue<string>("Key");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -57,15 +59,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidIssuer = jwt["Issuer"],
             ValidAudience = jwt["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!)),
             ClockSkew = TimeSpan.Zero
         };
     });
 
 builder.Services.AddAuthorization();
 
-// Services
+// Dependency Injection (Đăng ký Services)
+
+// Infrastructure
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddHostedService<TcpSocketServer>(); 
+
+// Business Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITableService, TableService>();
@@ -73,11 +81,10 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IReportService, ReportService>();
-builder.Services.AddHostedService<TcpSocketServer>();
+
 
 var app = builder.Build();
 
-// Seeding dữ liệu mẫu lúc khởi tạo
 try
 {
     using (var scope = app.Services.CreateScope())
@@ -96,6 +103,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

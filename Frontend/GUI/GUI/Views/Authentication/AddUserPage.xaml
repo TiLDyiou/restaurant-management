@@ -53,7 +53,7 @@
             </Frame>
 
             <Button x:Name="AddButton"
-                    Text="➕ Thêm nhân viên"
+                    Text="Thêm nhân viên"
                     Clicked="OnAddUserClicked"
                     BackgroundColor="#FFBD59"
                     TextColor="#263238"

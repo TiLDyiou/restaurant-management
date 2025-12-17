@@ -21,14 +21,12 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <!-- Tiêu đề -->
             <Label Text="Danh sách nhân viên"
                    FontSize="22"
                    FontAttributes="Bold"
                    TextColor="{StaticResource AccentColor}"
                    HorizontalOptions="Center"/>
 
-            <!-- Thanh tìm kiếm -->
             <SearchBar x:Name="SearchBarUsers"
                        Placeholder="🔍 Tìm kiếm theo mã hoặc tên nhân viên..."
                        PlaceholderColor="#B0BEC5"
@@ -39,8 +37,7 @@
                        Margin="0,5,0,10"
                        TextChanged="OnSearchTextChanged" />
 
-            <!-- Nút thêm nhân viên -->
-            <Button Text="➕ Thêm nhân viên"
+            <Button Text="Thêm nhân viên"
                     BackgroundColor="{StaticResource AccentColor}"
                     TextColor="{StaticResource PrimaryColor}"
                     CornerRadius="12"
@@ -48,7 +45,6 @@
                     FontAttributes="Bold"
                     Clicked="OnAddUserClicked" />
 
-            <!-- Danh sách nhân viên -->
             <CollectionView x:Name="UsersCollectionView"
                             SelectionMode="Single">
                 <CollectionView.ItemTemplate>
@@ -94,11 +90,21 @@
                                        FontAttributes="Bold"
                                        TextColor="{Binding TrangThai, Converter={StaticResource StatusColorConverter}}" />
 
-                                <!-- Nút hành động -->
+                                <Label FontSize="14" FontAttributes="Bold">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Online}" Value="True">
+                                            <Setter Property="Text" Value="● Online (Đang hoạt động)" />
+                                            <Setter Property="TextColor" Value="#4CAF50" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Online}" Value="False">
+                                            <Setter Property="Text" Value="○ Offline" />
+                                            <Setter Property="TextColor" Value="Gray" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                                 <HorizontalStackLayout Spacing="10" Margin="0,10,0,0">
 
-                                    <!-- Nút Sửa -->
-                                    <Button Text="✏️ Sửa"
+                                    <Button Text="Sửa"
                                             BackgroundColor="{StaticResource AccentColor}"
                                             TextColor="{StaticResource PrimaryColor}"
                                             CornerRadius="8"
@@ -107,7 +113,6 @@
                                             IsEnabled="{Binding TrangThai, Converter={StaticResource CanEditConverter}}"
                                             Padding="10,0"/>
 
-                                    <!-- Nút Nghỉ việc / Quay lại -->
                                     <Button Text="{Binding TrangThai, Converter={StaticResource StatusButtonTextConverter}}"
                                             BackgroundColor="#FFA000"
                                             TextColor="White"
@@ -116,8 +121,7 @@
                                             Clicked="OnToggleStatusClicked"
                                             Padding="10,0"/>
 
-                                    <!-- Nút Xóa -->
-                                    <Button Text="🗑 Xóa"
+                                    <Button Text="Xóa"
                                             BackgroundColor="#E53935"
                                             TextColor="White"
                                             CornerRadius="8"

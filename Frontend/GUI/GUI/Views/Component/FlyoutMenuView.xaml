@@ -82,7 +82,7 @@
                             x:Name="SelectedTableInfo"
                             IsVisible="False">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="📍 BÀN ĐANG CHỌN"
+                            <Label Text="BÀN ĐANG CHỌN"
                                    FontFamily="RobotoMono"
                                    FontSize="12"
                                    FontAttributes="Bold"

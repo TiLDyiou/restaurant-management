@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantManagementAPI.Common.Constants;
+using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs;
 using RestaurantManagementAPI.DTOs.MonAnDtos;
+using RestaurantManagementAPI.Infrastructure.Sockets;
+using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
-using RestaurantManagementAPI.Services.Interfaces;
 using System.Text.Json;
 
-namespace RestaurantManagementAPI.Services.Implements
+namespace RestaurantManagementAPI.Services
 {
     public class OrderService : IOrderService
     {
@@ -17,9 +20,9 @@ namespace RestaurantManagementAPI.Services.Implements
             _context = context;
         }
 
-        public async Task<List<HoaDonDto>> GetOrdersAsync()
+        public async Task<ServiceResult<List<HoaDonDto>>> GetOrdersAsync()
         {
-            return await _context.HOADON
+            var list = await _context.HOADON
                 .Include(hd => hd.ChiTietHoaDons)!.ThenInclude(ct => ct.MonAn)
                 .Select(hd => new HoaDonDto
                 {
@@ -41,18 +44,18 @@ namespace RestaurantManagementAPI.Services.Implements
                 })
                 .OrderByDescending(h => h.NgayLap)
                 .ToListAsync();
+            return ServiceResult<List<HoaDonDto>>.Ok(list);
         }
 
-        public async Task<HoaDonDto?> GetOrderByIdAsync(string id)
+        public async Task<ServiceResult<HoaDonDto>> GetOrderByIdAsync(string id)
         {
             var hd = await _context.HOADON
                 .Include(h => h.ChiTietHoaDons)!.ThenInclude(ct => ct.MonAn)
                 .FirstOrDefaultAsync(h => h.MaHD == id);
 
-            if (hd == null) 
-                return null;
+            if (hd == null) return ServiceResult<HoaDonDto>.Fail("Không tìm thấy đơn");
 
-            return new HoaDonDto
+            var dto = new HoaDonDto
             {
                 MaHD = hd.MaHD,
                 MaBan = hd.MaBan,
@@ -70,21 +73,19 @@ namespace RestaurantManagementAPI.Services.Implements
                     TrangThai = ct.TrangThai
                 }).ToList()
             };
+            return ServiceResult<HoaDonDto>.Ok(dto);
         }
 
-        public async Task<(bool Success, string Message, HoaDonDto? Data)> CreateOrderAsync(CreateHoaDonDto dto)
+        public async Task<ServiceResult<HoaDonDto>> CreateOrderAsync(CreateHoaDonDto dto)
         {
             using var trans = await _context.Database.BeginTransactionAsync();
             try
             {
                 var ban = await _context.BAN.FindAsync(dto.MaBan);
-                if (ban == null) 
-                    return (false, "Bàn không tồn tại", null);
+                if (ban == null) return ServiceResult<HoaDonDto>.Fail("Bàn không tồn tại");
 
                 var nv = await _context.NHANVIEN.FindAsync(dto.MaNV);
-                if (nv == null) 
-                    return (false, $"Nhân viên {dto.MaNV} không tồn tại.", null);
-
+                if (nv == null) return ServiceResult<HoaDonDto>.Fail($"Nhân viên {dto.MaNV} không tồn tại.");
 
                 var maHD = await GenerateMaHD();
                 var hoaDon = new HoaDon
@@ -93,8 +94,7 @@ namespace RestaurantManagementAPI.Services.Implements
                     MaBan = dto.MaBan,
                     MaNV = dto.MaNV,
                     NgayLap = DateTime.Now,
-                    TrangThai = "Chưa thanh toán",
-                    PaymentMethod = null,
+                    TrangThai = SystemConstants.OrderUnpaid,
                     TongTien = 0
                 };
 
@@ -104,9 +104,7 @@ namespace RestaurantManagementAPI.Services.Implements
                 foreach (var item in dto.ChiTietHoaDons)
                 {
                     var monAn = await _context.MONAN.FindAsync(item.MaMA);
-                    if (monAn == null) 
-                        throw new Exception($"Món ăn {item.MaMA} không tồn tại");
-                    decimal thanhTienItem = item.SoLuong * monAn.DonGia;
+                    if (monAn == null) throw new Exception($"Món ăn {item.MaMA} không tồn tại");
 
                     var chiTiet = new ChiTietHoaDon
                     {
@@ -114,95 +112,82 @@ namespace RestaurantManagementAPI.Services.Implements
                         MaMA = item.MaMA,
                         SoLuong = item.SoLuong,
                         DonGia = monAn.DonGia,
-                        TrangThai = "Đang chờ"
+                        TrangThai = SystemConstants.ItemWaiting
                     };
-
                     listChiTiet.Add(chiTiet);
-                    tongTienCalc += thanhTienItem;
+                    tongTienCalc += (item.SoLuong * monAn.DonGia);
                 }
 
                 hoaDon.TongTien = tongTienCalc;
                 _context.HOADON.Add(hoaDon);
                 _context.CHITIETHOADON.AddRange(listChiTiet);
 
-                ban.TrangThai = "Có khách";
+                ban.TrangThai = SystemConstants.TableOccupied;
                 _context.BAN.Update(ban);
-                var thongBaoBep = new ThongBao
+
+                var thongBao = new ThongBao
                 {
                     NoiDung = $"Bàn {dto.MaBan} vừa lên đơn mới",
                     ThoiGian = DateTime.Now,
                     IsRead = false,
-                    Loai = "BEP"
+                    Loai = SystemConstants.NotiKitchen
                 };
-                _context.THONGBAO.Add(thongBaoBep);
+                _context.THONGBAO.Add(thongBao);
 
-                // Lưu tất cả vào DB (Hóa đơn + Chi tiết + Trạng thái Bàn + Thông báo)
                 await _context.SaveChangesAsync();
                 await trans.CommitAsync();
 
-                // Gửi Socket
                 try
                 {
                     if (TcpSocketServer.Instance != null)
                     {
-                        // Báo cho TablePage cập nhật màu bàn
-                        var tablePayload = JsonSerializer.Serialize(new { MaBan = dto.MaBan, TrangThai = "Có khách" });
+                        var tablePayload = JsonSerializer.Serialize(new { MaBan = dto.MaBan, TrangThai = SystemConstants.TableOccupied });
                         await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{tablePayload}");
                         await TcpSocketServer.Instance.BroadcastAsync($"ORDER|{maHD}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Lỗi gửi Socket: {ex.Message}");
-                }
+                catch (Exception ex) { Console.WriteLine($"Lỗi Socket: {ex.Message}"); }
 
-                var resultDto = await GetOrderByIdAsync(maHD);
-                return (true, "Tạo đơn thành công", resultDto);
+                var resultDto = (await GetOrderByIdAsync(maHD)).Data;
+                return ServiceResult<HoaDonDto>.Ok(resultDto!, "Tạo đơn thành công");
             }
             catch (Exception ex)
             {
                 await trans.RollbackAsync();
-                return (false, "Lỗi hệ thống: " + ex.Message, null);
+                return ServiceResult<HoaDonDto>.Fail("Lỗi hệ thống: " + ex.Message);
             }
         }
 
-        public async Task<(bool Success, string Message)> UpdateOrderItemStatusAsync(string maHD, string maMA, string newStatus)
+        public async Task<ServiceResult> UpdateOrderItemStatusAsync(string maHD, string maMA, string newStatus)
         {
             var item = await _context.CHITIETHOADON
-                .Include(x => x.MonAn)
-                .Include(x => x.HoaDon)
+                .Include(x => x.MonAn).Include(x => x.HoaDon)
                 .FirstOrDefaultAsync(x => x.MaHD == maHD && x.MaMA == maMA);
 
-            if (item == null) return (false, "Chi tiết món không tồn tại");
+            if (item == null) return ServiceResult.Fail("Không tìm thấy món");
 
             item.TrangThai = newStatus;
 
-            if (newStatus == "Đã xong")
+            // --- LOGIC FIX LỖI NHẬN THÔNG BÁO ---
+            string statusNorm = newStatus?.ToLower().Trim() ?? "";
+
+            // So sánh với "đã xong" (viết thường)
+            if (statusNorm == SystemConstants.ItemReady.ToLower() || statusNorm == "done")
             {
-                string maBan = item.HoaDon?.MaBan ?? "Unknown";
-                string tenMon = item.MonAn?.TenMA ?? "Món";
-                string msg = $"Bàn {maBan}: {tenMon} đã xong";
+                string msg = $"Bàn {item.HoaDon?.MaBan}: {item.MonAn?.TenMA} đã xong";
 
                 var thongBao = new ThongBao
                 {
                     NoiDung = msg,
                     ThoiGian = DateTime.Now,
-                    IsRead = false,
-                    Loai = "PHUCVU"
+                    Loai = SystemConstants.NotiService
                 };
                 _context.THONGBAO.Add(thongBao);
                 await _context.SaveChangesAsync();
 
-                try
+                if (TcpSocketServer.Instance != null)
                 {
-                    if (TcpSocketServer.Instance != null)
-                    {
-                        await TcpSocketServer.Instance.BroadcastAsync($"KITCHEN_DONE|{msg}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Lỗi gửi Socket: {ex.Message}");
+                    await TcpSocketServer.Instance.BroadcastAsync($"KITCHEN_DONE|{msg}");
                 }
             }
             else
@@ -210,63 +195,54 @@ namespace RestaurantManagementAPI.Services.Implements
                 await _context.SaveChangesAsync();
             }
 
-            return (true, "Cập nhật trạng thái món thành công");
+            return ServiceResult.Ok("Cập nhật thành công");
         }
 
-        public async Task<(bool Success, string Message)> UpdateOrderStatusAsync(string id, string newStatus)
+        public async Task<ServiceResult> UpdateOrderStatusAsync(string id, string newStatus)
         {
             var hd = await _context.HOADON.FindAsync(id);
-            if (hd == null) 
-                return (false, "Hóa đơn không tồn tại");
+            if (hd == null) return ServiceResult.Fail("Hóa đơn không tồn tại");
 
             hd.TrangThai = newStatus;
             await _context.SaveChangesAsync();
-            return (true, "Cập nhật trạng thái hóa đơn thành công");
+            return ServiceResult.Ok("Cập nhật thành công");
         }
 
-        public async Task<(bool Success, string Message, HoaDonDto? Data)> CheckoutAsync(string maHD, CheckoutRequestDto dto)
+        public async Task<ServiceResult<HoaDonDto>> CheckoutAsync(string maHD, CheckoutRequestDto dto)
         {
             var hd = await _context.HOADON.FindAsync(maHD);
-            if (hd == null) 
-                return (false, "Hóa đơn không tồn tại", null);
+            if (hd == null) return ServiceResult<HoaDonDto>.Fail("Hóa đơn không tồn tại");
 
-            if (hd.TrangThai == "Đã thanh toán")
-                return (false, "Hóa đơn này đã được thanh toán trước đó", null);
+            if (hd.TrangThai == SystemConstants.OrderPaid)
+                return ServiceResult<HoaDonDto>.Fail("Hóa đơn này đã thanh toán rồi");
 
-            hd.TrangThai = "Đã thanh toán";
+            hd.TrangThai = SystemConstants.OrderPaid;
             hd.PaymentMethod = dto.PaymentMethod;
 
             var ban = await _context.BAN.FindAsync(hd.MaBan);
             if (ban != null)
             {
-                ban.TrangThai = "Trống";
+                ban.TrangThai = SystemConstants.TableEmpty;
                 _context.BAN.Update(ban);
             }
 
             await _context.SaveChangesAsync();
+
             if (TcpSocketServer.Instance != null && ban != null)
             {
-                var payload = JsonSerializer.Serialize(new { MaBan = ban.MaBan, TrangThai = "Trống" });
+                var payload = JsonSerializer.Serialize(new { MaBan = ban.MaBan, TrangThai = SystemConstants.TableEmpty });
                 await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{payload}");
             }
 
-            return (true, "Thanh toán thành công", await GetOrderByIdAsync(maHD));
+            var resultDto = (await GetOrderByIdAsync(maHD)).Data;
+            return ServiceResult<HoaDonDto>.Ok(resultDto!, "Thanh toán thành công");
         }
 
         private async Task<string> GenerateMaHD()
         {
-            var lastHD = await _context.HOADON
-                .OrderByDescending(h => h.MaHD)
-                .Select(h => h.MaHD)
-                .FirstOrDefaultAsync();
-
-            if (string.IsNullOrEmpty(lastHD)) 
-                return "HD00001";
-
-            if (lastHD.Length > 2 && int.TryParse(lastHD.Substring(2), out int num))
-            {
-                return $"HD{(num + 1):D5}";
-            }
+            var lastHD = await _context.HOADON.OrderByDescending(h => h.MaHD).Select(h => h.MaHD).FirstOrDefaultAsync();
+            if (string.IsNullOrEmpty(lastHD)) return "HD00001";
+            if (lastHD.Length > 2 && int.TryParse(lastHD.Substring(2), out int num)) return $"HD{(num + 1):D5}";
             return $"HD{DateTime.Now.Ticks}";
         }
     }

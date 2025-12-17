@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using RestaurantManagementAPI.Services.Interfaces;
+using RestaurantManagementAPI.Interfaces;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace RestaurantManagementAPI.Services.Implements
+namespace RestaurantManagementAPI.Infrastructure.Email
 {
     public class EmailService : IEmailService
     {

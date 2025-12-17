@@ -14,4 +14,10 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("trangThai")]
         private string _trangThai;
     }
+
+    public class TableUpdatePayload
+    {
+        public string MaBan { get; set; }
+        public string TrangThai { get; set; }
+    }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestaurantManagementAPI.DTOs.BanDtos;
-using RestaurantManagementAPI.Services.Interfaces;
+using RestaurantManagementAPI.Interfaces;
 
 namespace RestaurantManagementAPI.Controllers
 {
@@ -8,22 +8,15 @@ namespace RestaurantManagementAPI.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
-        private readonly IReservationService _reservationService;
-
-        public ReservationsController(IReservationService reservationService)
-        {
-            _reservationService = reservationService;
-        }
+        private readonly IReservationService _service;
+        public ReservationsController(IReservationService service) { _service = service; }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateDatBanDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var result = await _reservationService.CreateReservationAsync(dto);
-            return result.Success
-                ? Ok(new { success = true, message = result.Message, data = result.Data })
-                : BadRequest(new { success = false, message = result.Message });
+            var result = await _service.CreateReservationAsync(dto);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }

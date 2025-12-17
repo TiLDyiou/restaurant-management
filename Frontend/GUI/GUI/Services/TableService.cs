@@ -16,16 +16,18 @@ namespace RestaurantManagementGUI.Services
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
-        public async Task<List<Ban>> GetAllTablesAsync()
+        public async Task<List<Ban>?> GetAllTablesAsync()
         {
             try
             {
+                // Dùng ApiResponse<List<Ban>> để hứng
                 var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<Ban>>>(ApiConfig.Tables, _jsonOptions);
-                return response?.Data ?? new List<Ban>();
+                return (response != null && response.Success) ? response.Data : new List<Ban>();
             }
-            catch 
-            { 
-                return new List<Ban>(); 
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TableService] GetTables Error: {ex.Message}");
+                return new List<Ban>();
             }
         }
 
@@ -33,12 +35,21 @@ namespace RestaurantManagementGUI.Services
         {
             try
             {
+                // Gửi string trực tiếp (Backend nhận [FromBody] string)
                 var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateTableStatus(maBan), trangThai);
-                return response.IsSuccessStatusCode;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Đọc kết quả để chắc chắn Success = true
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse>(_jsonOptions);
+                    return result != null && result.Success;
+                }
+                return false;
             }
-            catch 
-            { 
-                return false; 
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TableService] UpdateStatus Error: {ex.Message}");
+                return false;
             }
         }
     }

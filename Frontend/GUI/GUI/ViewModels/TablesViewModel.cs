@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using RestaurantManagementGUI.Constants;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
@@ -101,18 +102,17 @@ namespace RestaurantManagementGUI.ViewModels
         {
             try
             {
-                var updatedBan = JsonSerializer.Deserialize<Ban>(json, _jsonOptions);
-                if (updatedBan != null)
+                var updatePayload = JsonSerializer.Deserialize<TableUpdatePayload>(json, _jsonOptions);
+                if (updatePayload != null)
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        var table = _allTables.FirstOrDefault(t => t.MaBan == updatedBan.MaBan);
+                        var table = _allTables.FirstOrDefault(t => t.MaBan == updatePayload.MaBan);
                         if (table != null)
                         {
-                            table.TrangThai = updatedBan.TrangThai;
-                            DataUpdated?.Invoke(this, EventArgs.Empty);
-
-                            FilterTables(_currentFilter);
+                            table.TrangThai = updatePayload.TrangThai; // Cập nhật trạng thái mới
+                            FilterTables(_currentFilter); // Refresh UI
+                            DataUpdated?.Invoke(this, EventArgs.Empty); // Báo cho Flyout biết
                         }
                     });
                 }
@@ -134,16 +134,16 @@ namespace RestaurantManagementGUI.ViewModels
         public void FilterTables(string filterType)
         {
             _currentFilter = filterType;
-
             if (_allTables == null) return;
+
             IEnumerable<Ban> result = _allTables;
 
             if (filterType == "Bàn trống")
-                result = _allTables.Where(t => t.TrangThai == "Trống" || t.TrangThai == "Bàn trống");
+                result = _allTables.Where(t => t.TrangThai == SystemConstants.TableEmpty);
             else if (filterType == "Bàn bận")
-                result = _allTables.Where(t => t.TrangThai == "Có khách" || t.TrangThai == "Bàn bận");
+                result = _allTables.Where(t => t.TrangThai == SystemConstants.TableOccupied);
             else if (filterType == "Bàn đã đặt")
-                result = _allTables.Where(t => t.TrangThai == "Bàn đã đặt" || t.TrangThai == "Đã đặt");
+                result = _allTables.Where(t => t.TrangThai == SystemConstants.TableReserved);
 
             FilteredTables = new ObservableCollection<Ban>(result);
             DataUpdated?.Invoke(this, EventArgs.Empty);

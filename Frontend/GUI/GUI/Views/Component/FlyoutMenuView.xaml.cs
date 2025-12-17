@@ -1,6 +1,7 @@
 ﻿using RestaurantManagementGUI.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using RestaurantManagementGUI.Constants;
 
 namespace RestaurantManagementGUI
 {
@@ -71,22 +72,35 @@ namespace RestaurantManagementGUI
             if (table == null) return;
             SelectedTableName.Text = table.TenBan;
 
-            // Xử lý hiển thị màu chữ theo trạng thái Backend
             string status = table.TrangThai;
-            SelectedTableStatus.Text = (status == "Trống" ? "⚪" : status == "Có khách" ? "🔴" : "🟡") + " " + status;
 
-            if (status == "Trống" || status == "Bàn trống") SelectedTableStatus.TextColor = Colors.Green;
-            else if (status == "Có khách" || status == "Bàn bận") SelectedTableStatus.TextColor = Colors.Red;
-            else SelectedTableStatus.TextColor = Color.FromArgb("#FFBD59");
+            // Logic hiển thị chuẩn theo SystemConstants
+            if (status == SystemConstants.TableEmpty)
+            {
+                SelectedTableStatus.Text = "Trống";
+                SelectedTableStatus.TextColor = Colors.Green;
+            }
+            else if (status == SystemConstants.TableOccupied)
+            {
+                SelectedTableStatus.Text = "Có khách";
+                SelectedTableStatus.TextColor = Colors.Red;
+            }
+            else // Bàn đã đặt
+            {
+                SelectedTableStatus.Text = "Đã đặt";
+                SelectedTableStatus.TextColor = Color.FromArgb("#FFBD59");
+            }
         }
 
         public void UpdateStatistics(ObservableCollection<Ban> tables)
         {
             if (tables == null) return;
             TotalTablesLabel.Text = tables.Count.ToString();
-            EmptyTablesLabel.Text = tables.Count(t => t.TrangThai == "Trống" || t.TrangThai == "Bàn trống").ToString();
-            OccupiedTablesLabel.Text = tables.Count(t => t.TrangThai == "Có khách" || t.TrangThai == "Bàn bận").ToString();
-            ReservedTablesLabel.Text = tables.Count(t => t.TrangThai == "Bàn đã đặt" || t.TrangThai == "Đã đặt").ToString();
+
+            // Đếm chuẩn theo SystemConstants
+            EmptyTablesLabel.Text = tables.Count(t => t.TrangThai == SystemConstants.TableEmpty).ToString();
+            OccupiedTablesLabel.Text = tables.Count(t => t.TrangThai == SystemConstants.TableOccupied).ToString();
+            ReservedTablesLabel.Text = tables.Count(t => t.TrangThai == SystemConstants.TableReserved).ToString();
         }
 
         private void OnOverlayTapped(object sender, EventArgs e) => _ = CloseAsync();

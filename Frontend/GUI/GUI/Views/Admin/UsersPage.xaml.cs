@@ -32,7 +32,43 @@ namespace RestaurantManagementGUI
         {
             base.OnAppearing();
             await LoadUsersAsync();
+
+            MessagingCenter.Subscribe<Services.SocketListener, string>(this, "UpdateStatus", (sender, message) =>
+            {
+                // Format: STATUS|NV001|TRUE
+                var parts = message.Split('|');
+                if (parts.Length == 3)
+                {
+                    string targetNV = parts[1];
+                    bool isOnline = parts[2] == "TRUE";
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        var user = _users.FirstOrDefault(u => u.MaNV == targetNV);
+                        if (user != null)
+                        {
+                            // 1. Cập nhật dữ liệu
+                            user.Online = isOnline;
+
+                            // 2. MẸO: Ép giao diện vẽ lại bằng cách gán đè phần tử trong Collection
+                            // (Cách này hoạt động kể cả khi UserModel không có INotifyPropertyChanged)
+                            int index = _users.IndexOf(user);
+                            if (index >= 0)
+                            {
+                                _users[index] = user;
+                            }
+                        }
+                    });
+                }
+            });
         }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            MessagingCenter.Unsubscribe<Services.SocketListener, string>(this, "UpdateStatus");
+        }
+
 
         private async Task LoadUsersAsync()
         {
@@ -98,26 +134,12 @@ namespace RestaurantManagementGUI
         private static string RemoveSign4VietnameseString(string str)
         {
             if (string.IsNullOrEmpty(str)) return str;
-
             string[] VietnameseSigns = new string[]
             {
-                "aAeEoOuUiIdDyY",
-                "áàạảãâấầậẩẫăắằặẳẵ",
-                "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ",
-                "éèẹẻẽêếềệểễ",
-                "ÉÈẸẺẼÊẾỀỆỂỄ",
-                "óòọỏõôốồộổỗơớờợởỡ",
-                "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ",
-                "úùụủũưứừựửữ",
-                "ÚÙỤỦŨƯỨỪỰỬỮ",
-                "íìịỉĩ",
-                "ÍÌỊỈĨ",
-                "đ",
-                "Đ",
-                "ýỳỵỷỹ",
-                "ÝỲỴỶỸ"
+                "aAeEoOuUiIdDyY", "áàạảãâấầậẩẫăắằặẳẵ", "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ", "éèẹẻẽêếềệểễ", "ÉÈẸẺẼÊẾỀỆỂỄ",
+                "óòọỏõôốồộổỗơớờợởỡ", "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ", "úùụủũưứừựửữ", "ÚÙỤỦŨƯỨỪỰỬỮ", "íìịỉĩ", "ÍÌỊỈĨ",
+                "đ", "Đ", "ýỳỵỷỹ", "ÝỲỴỶỸ"
             };
-
             for (int i = 1; i < VietnameseSigns.Length; i++)
             {
                 for (int j = 0; j < VietnameseSigns[i].Length; j++)

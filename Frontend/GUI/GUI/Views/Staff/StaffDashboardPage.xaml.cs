@@ -1,13 +1,18 @@
 ﻿using Microsoft.Maui.Storage;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Services;
+using System.Net.Http.Headers;
+
 namespace RestaurantManagementGUI.Views.Staff
 {
     public partial class StaffDashboardPage : ContentPage
     {
+        private readonly HttpClient _httpClient;
         public StaffDashboardPage()
         {
             InitializeComponent();
+            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
+            _httpClient = new HttpClient(handler);
             LoadUserInfo();
         }
 
@@ -27,9 +32,40 @@ namespace RestaurantManagementGUI.Views.Staff
             bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
             if (!confirm) return;
 
+            // Xử lý UI cho nút bấm (Lấy từ sender để không cần sửa XAML)
+            if (sender is Button btn)
+            {
+                btn.IsEnabled = false;
+                btn.Text = "Đang thoát...";
+            }
+
+            try
+            {
+                // Bước 1: Ngắt Socket (Async) để Server báo Offline
+                if (SocketListener.Instance != null)
+                {
+                    await SocketListener.Instance.DisconnectAsync();
+                }
+
+                // Bước 2: Gọi API Logout
+                var token = await SecureStorage.Default.GetAsync("auth_token");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    using (var request = new HttpRequestMessage(HttpMethod.Post, ApiConfig.Logout))
+                    {
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                        await _httpClient.SendAsync(request);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi đăng xuất: {ex.Message}");
+            }
+
+            // Bước 3: Xóa dữ liệu máy & Chuyển trang
             SecureStorage.RemoveAll();
             UserState.Clear();
-            if (SocketListener.Instance != null) SocketListener.Instance.Disconnect();
             Application.Current.MainPage = new NavigationPage(new LoginPage());
         }
 

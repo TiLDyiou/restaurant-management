@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManagementAPI.DTOs;
-using RestaurantManagementAPI.Services.Interfaces;
+using RestaurantManagementAPI.Interfaces;
 
 namespace RestaurantManagementAPI.Controllers
 {
@@ -10,45 +10,38 @@ namespace RestaurantManagementAPI.Controllers
     public class DishesController : ControllerBase
     {
         private readonly IDishService _dishService;
-
-        public DishesController(IDishService dishService)
-        {
-            _dishService = dishService;
-        }
+        public DishesController(IDishService dishService) { _dishService = dishService; }
 
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetDishes()
         {
-            var data = await _dishService.GetAllDishesAsync();
-            return Ok(new { success = true, data });
+            var result = await _dishService.GetAllDishesAsync();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDish(string id)
         {
-            var dish = await _dishService.GetDishByIdAsync(id);
-            if (dish == null) return NotFound(new { success = false, message = "Không tìm thấy món ăn" });
-            return Ok(new { success = true, data = dish });
+            var result = await _dishService.GetDishByIdAsync(id);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PostDish([FromBody] CreateMonAnDto createDto)
+        public async Task<IActionResult> PostDish([FromBody] CreateMonAnDto dto)
         {
-            var result = await _dishService.CreateDishAsync(createDto);
-            return Ok(new { success = true, message = result.Message, data = result.Data });
+            var result = await _dishService.CreateDishAsync(dto);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutDish(string id, [FromBody] UpdateMonAnDto updateDto)
+        public async Task<IActionResult> PutDish(string id, [FromBody] UpdateMonAnDto dto)
         {
-            var result = await _dishService.UpdateDishAsync(id, updateDto);
-            return result.Success
-                ? Ok(new { success = true, message = result.Message })
-                : NotFound(new { success = false, message = result.Message });
+            var result = await _dishService.UpdateDishAsync(id, dto);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpDelete("{id}")]
@@ -56,9 +49,7 @@ namespace RestaurantManagementAPI.Controllers
         public async Task<IActionResult> DeleteDish(string id)
         {
             var result = await _dishService.SoftDeleteDishAsync(id);
-            return result.Success
-                ? Ok(new { success = true, message = result.Message })
-                : NotFound(new { success = false, message = result.Message });
+            return result.Success ? Ok(result) : NotFound(result);
         }
     }
 }

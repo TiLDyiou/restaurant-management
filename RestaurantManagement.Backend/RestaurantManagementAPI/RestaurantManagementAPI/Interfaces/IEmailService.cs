@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace RestaurantManagementAPI.Services.Interfaces
+namespace RestaurantManagementAPI.Interfaces
 {
     public interface IEmailService
     {
