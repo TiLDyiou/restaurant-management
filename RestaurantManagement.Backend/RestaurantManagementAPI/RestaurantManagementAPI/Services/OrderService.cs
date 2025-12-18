@@ -167,11 +167,7 @@ namespace RestaurantManagementAPI.Services
             if (item == null) return ServiceResult.Fail("Không tìm thấy món");
 
             item.TrangThai = newStatus;
-
-            // --- LOGIC FIX LỖI NHẬN THÔNG BÁO ---
             string statusNorm = newStatus?.ToLower().Trim() ?? "";
-
-            // So sánh với "đã xong" (viết thường)
             if (statusNorm == SystemConstants.ItemReady.ToLower() || statusNorm == "done")
             {
                 string msg = $"Bàn {item.HoaDon?.MaBan}: {item.MonAn?.TenMA} đã xong";

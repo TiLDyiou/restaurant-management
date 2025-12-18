@@ -42,7 +42,7 @@ public static class MauiProgram
             });
 
         // SERVICES
-        builder.Services.AddSingleton(SocketListener.Instance);
+        builder.Services.AddSingleton(TCPSocketClient.Instance);
 
         // VIEWMODELS
         builder.Services.AddSingleton<ChefOrdersViewModel>();

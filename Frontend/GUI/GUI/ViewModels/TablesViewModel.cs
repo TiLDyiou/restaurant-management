@@ -84,18 +84,18 @@ namespace RestaurantManagementGUI.ViewModels
 
         public void SubscribeSocket()
         {
-            _ = SocketListener.Instance.ConnectAsync();
-            SocketListener.Instance.OnTableStatusChanged -= HandleTableUpdate;
-            SocketListener.Instance.OnTableStatusChanged += HandleTableUpdate;
+            _ = TCPSocketClient.Instance.ConnectAsync();
+            TCPSocketClient.Instance.OnTableStatusChanged -= HandleTableUpdate;
+            TCPSocketClient.Instance.OnTableStatusChanged += HandleTableUpdate;
 
-            SocketListener.Instance.OnDishDone -= HandleDishDone;
-            SocketListener.Instance.OnDishDone += HandleDishDone;
+            TCPSocketClient.Instance.OnDishDone -= HandleDishDone;
+            TCPSocketClient.Instance.OnDishDone += HandleDishDone;
         }
 
         public void UnsubscribeSocket()
         {
-            SocketListener.Instance.OnTableStatusChanged -= HandleTableUpdate;
-            SocketListener.Instance.OnDishDone -= HandleDishDone;
+            TCPSocketClient.Instance.OnTableStatusChanged -= HandleTableUpdate;
+            TCPSocketClient.Instance.OnDishDone -= HandleDishDone;
         }
 
         private void HandleTableUpdate(string json)
@@ -110,9 +110,9 @@ namespace RestaurantManagementGUI.ViewModels
                         var table = _allTables.FirstOrDefault(t => t.MaBan == updatePayload.MaBan);
                         if (table != null)
                         {
-                            table.TrangThai = updatePayload.TrangThai; // Cập nhật trạng thái mới
-                            FilterTables(_currentFilter); // Refresh UI
-                            DataUpdated?.Invoke(this, EventArgs.Empty); // Báo cho Flyout biết
+                            table.TrangThai = updatePayload.TrangThai;
+                            FilterTables(_currentFilter);
+                            DataUpdated?.Invoke(this, EventArgs.Empty);
                         }
                     });
                 }

@@ -83,14 +83,11 @@ namespace RestaurantManagementGUI
                         UserState.CurrentTenNV = data.Username;
                         UserState.CurrentRole = data.Role;
 
-                        // --- BƯỚC 2: KÍCH HOẠT SOCKET (CHỈ GỌI 1 LẦN DUY NHẤT TẠI ĐÂY) ---
                         // Gọi sau khi đã lưu xong current_ma_nv
                         if (!string.IsNullOrEmpty(data.MaNV))
                         {
-                            await Services.SocketListener.Instance.LoginAsync(data.MaNV);
+                            await Services.TCPSocketClient.Instance.LoginAsync(data.MaNV);
                         }
-
-                        // --- BƯỚC 3: ĐIỀU HƯỚNG TRANG ---
                         string role = data.Role?.Trim().ToLower() ?? "";
 
                         if (role == "admin")

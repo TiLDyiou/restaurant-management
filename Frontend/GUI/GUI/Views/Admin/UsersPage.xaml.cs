@@ -33,7 +33,7 @@ namespace RestaurantManagementGUI
             base.OnAppearing();
             await LoadUsersAsync();
 
-            MessagingCenter.Subscribe<Services.SocketListener, string>(this, "UpdateStatus", (sender, message) =>
+            MessagingCenter.Subscribe<Services.TCPSocketClient, string>(this, "UpdateStatus", (sender, message) =>
             {
                 // Format: STATUS|NV001|TRUE
                 var parts = message.Split('|');
@@ -47,11 +47,7 @@ namespace RestaurantManagementGUI
                         var user = _users.FirstOrDefault(u => u.MaNV == targetNV);
                         if (user != null)
                         {
-                            // 1. Cập nhật dữ liệu
                             user.Online = isOnline;
-
-                            // 2. MẸO: Ép giao diện vẽ lại bằng cách gán đè phần tử trong Collection
-                            // (Cách này hoạt động kể cả khi UserModel không có INotifyPropertyChanged)
                             int index = _users.IndexOf(user);
                             if (index >= 0)
                             {
@@ -66,7 +62,7 @@ namespace RestaurantManagementGUI
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-            MessagingCenter.Unsubscribe<Services.SocketListener, string>(this, "UpdateStatus");
+            MessagingCenter.Unsubscribe<Services.TCPSocketClient, string>(this, "UpdateStatus");
         }
 
 
@@ -176,7 +172,6 @@ namespace RestaurantManagementGUI
                     {
                         // Cập nhật UI ngay lập tức (Optimistic UI)
                         user.TrangThai = isWorking ? "Đã nghỉ" : "Đang làm";
-                        // Trick để refresh binding màu sắc nút bấm
                         var index = _users.IndexOf(user);
                         if (index >= 0)
                         {

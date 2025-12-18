@@ -17,7 +17,8 @@ namespace RestaurantManagementAPI.Infrastructure.Email
 
         public EmailService(IConfiguration config)
         {
-            _config = config;
+            // Lấy cấu hình từ appsettings.json
+            _config = config; 
             var emailSettings = _config.GetSection("EmailSettings");
             _senderEmail = emailSettings["SenderEmail"]!;
             _senderName = emailSettings["SenderName"] ?? "NoName";
@@ -33,15 +34,16 @@ namespace RestaurantManagementAPI.Infrastructure.Email
                 From = new MailAddress(_senderEmail, _senderName),
                 Subject = subject,
                 Body = body,
-                IsBodyHtml = true
+                IsBodyHtml = true 
             };
             mail.To.Add(new MailAddress(toEmail));
-            using var smtp = new SmtpClient(_host, _port)
+
+            using var smtp = new SmtpClient(_host, _port) 
             {
                 Credentials = new NetworkCredential(_senderEmail, _appPassword),
-                EnableSsl = true
+                EnableSsl = true // Sử dụng SSL để mã hóa kết nối giúp bảo mật
             };
-            await smtp.SendMailAsync(mail);
+            await smtp.SendMailAsync(mail); // Gửi email bất đồng bộ để server không bị block do quá trình gửi email có thể mất thời gian
         }
     }
 }

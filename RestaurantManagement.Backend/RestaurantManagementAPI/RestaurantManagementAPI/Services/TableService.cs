@@ -26,8 +26,6 @@ namespace RestaurantManagementAPI.Services
 
             ban.TrangThai = trangThai;
             await _context.SaveChangesAsync();
-
-            // Gửi Socket
             if (TcpSocketServer.Instance != null)
             {
                 var payload = new { MaBan = maBan, TrangThai = trangThai };

@@ -32,7 +32,6 @@ namespace RestaurantManagementGUI.Views.Staff
             bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
             if (!confirm) return;
 
-            // Xử lý UI cho nút bấm (Lấy từ sender để không cần sửa XAML)
             if (sender is Button btn)
             {
                 btn.IsEnabled = false;
@@ -41,13 +40,13 @@ namespace RestaurantManagementGUI.Views.Staff
 
             try
             {
-                // Bước 1: Ngắt Socket (Async) để Server báo Offline
-                if (SocketListener.Instance != null)
+                // Ngắt Socket (Async) để Server báo Offline
+                if (TCPSocketClient.Instance != null)
                 {
-                    await SocketListener.Instance.DisconnectAsync();
+                    await TCPSocketClient.Instance.DisconnectAsync();
                 }
 
-                // Bước 2: Gọi API Logout
+                // Gọi API Logout
                 var token = await SecureStorage.Default.GetAsync("auth_token");
                 if (!string.IsNullOrEmpty(token))
                 {
@@ -62,8 +61,6 @@ namespace RestaurantManagementGUI.Views.Staff
             {
                 Console.WriteLine($"Lỗi đăng xuất: {ex.Message}");
             }
-
-            // Bước 3: Xóa dữ liệu máy & Chuyển trang
             SecureStorage.RemoveAll();
             UserState.Clear();
             Application.Current.MainPage = new NavigationPage(new LoginPage());

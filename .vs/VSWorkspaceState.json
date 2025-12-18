@@ -1,13 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\RestaurantManagement.Backend",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Controllers",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Data",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\DTOs",
-    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services"
+    "\\Frontend",
+    "\\Frontend\\GUI"
   ],
+  "SelectedNode": "\\Frontend\\GUI\\RestaurantManagementGUI.slnx",
   "PreviewInSolutionExplorer": false
 }

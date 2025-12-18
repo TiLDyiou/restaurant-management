@@ -14,8 +14,6 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
         public static TcpSocketServer Instance { get; private set; }
         private TcpListener _listener;
         private readonly int _port = 9000;
-
-        // Key: MaNV, Value: Socket Client
         private ConcurrentDictionary<string, TcpClient> _clients = new();
         private readonly IServiceProvider _serviceProvider;
 
@@ -29,7 +27,6 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
         {
             try
             {
-                // 1. Reset toàn bộ trạng thái về Offline khi khởi động Server
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var context = scope.ServiceProvider.GetRequiredService<QLNHDbContext>();
@@ -48,50 +45,43 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     _ = HandleClientAsync(client, stoppingToken);
                 }
             }
-            catch (Exception ex) { Console.WriteLine($"[SOCKET ERROR] {ex.Message}"); }
+            catch (Exception ex) 
+            { 
+                Console.WriteLine($"[SOCKET ERROR] {ex.Message}"); 
+            }
         }
 
         private async Task HandleClientAsync(TcpClient client, CancellationToken token)
         {
             string maNV = "";
             NetworkStream stream = client.GetStream();
-
-            // SỬA ĐỔI: Dùng StreamReader để đọc theo dòng (Match với Frontend WriteLineAsync)
             using var reader = new StreamReader(stream, Encoding.UTF8);
 
             try
             {
                 while (client.Connected && !token.IsCancellationRequested)
                 {
-                    // Đọc từng dòng lệnh từ Client gửi lên
                     string message = await reader.ReadLineAsync();
-                    if (message == null) break; // Client ngắt kết nối
+                    if (message == null) 
+                        break;
 
-                    Console.WriteLine($"[RECV] {message}"); // Debug log
+                    Console.WriteLine($"[RECV] {message}");
 
-                    // Xử lý LOGIN
                     if (message.StartsWith("LOGIN|"))
                     {
                         var parts = message.Split('|');
                         if (parts.Length > 1)
                         {
                             maNV = parts[1].Trim();
-
-                            // 1. Lưu kết nối
                             _clients.AddOrUpdate(maNV, client, (k, v) => client);
                             Console.WriteLine($"-> User {maNV} Connected");
-
-                            // 2. Cập nhật DB
                             await UpdateUserStatusInDb(maNV, true);
-
-                            // 3. 🔥 QUAN TRỌNG: BẮN TIN CHO ADMIN BIẾT 🔥
                             await BroadcastAsync($"STATUS|{maNV}|TRUE");
                         }
                     }
-                    // Xử lý LOGOUT chủ động
                     else if (message.StartsWith("LOGOUT"))
                     {
-                        break; // Thoát vòng lặp để xuống finally xử lý
+                        break;
                     }
                     else if (message.StartsWith("ORDER") || message.StartsWith("TABLE") || message.StartsWith("KITCHEN"))
                     {
@@ -126,7 +116,10 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     await context.SaveChangesAsync();
                 }
             }
-            catch (Exception ex) { Console.WriteLine($"DB Error: {ex.Message}"); }
+            catch (Exception ex)
+            { 
+                Console.WriteLine($"DB Error: {ex.Message}"); 
+            }
         }
 
         public async Task BroadcastAsync(string message)
@@ -139,7 +132,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                 {
                     try
                     {
-                        await client.GetStream().WriteAsync(data);
+                        _ = client.GetStream().WriteAsync(data);
                     }
                     catch { }
                 }

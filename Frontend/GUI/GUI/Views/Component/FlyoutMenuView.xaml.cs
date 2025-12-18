@@ -73,8 +73,6 @@ namespace RestaurantManagementGUI
             SelectedTableName.Text = table.TenBan;
 
             string status = table.TrangThai;
-
-            // Logic hiển thị chuẩn theo SystemConstants
             if (status == SystemConstants.TableEmpty)
             {
                 SelectedTableStatus.Text = "Trống";
@@ -85,7 +83,7 @@ namespace RestaurantManagementGUI
                 SelectedTableStatus.Text = "Có khách";
                 SelectedTableStatus.TextColor = Colors.Red;
             }
-            else // Bàn đã đặt
+            else
             {
                 SelectedTableStatus.Text = "Đã đặt";
                 SelectedTableStatus.TextColor = Color.FromArgb("#FFBD59");
@@ -96,8 +94,6 @@ namespace RestaurantManagementGUI
         {
             if (tables == null) return;
             TotalTablesLabel.Text = tables.Count.ToString();
-
-            // Đếm chuẩn theo SystemConstants
             EmptyTablesLabel.Text = tables.Count(t => t.TrangThai == SystemConstants.TableEmpty).ToString();
             OccupiedTablesLabel.Text = tables.Count(t => t.TrangThai == SystemConstants.TableOccupied).ToString();
             ReservedTablesLabel.Text = tables.Count(t => t.TrangThai == SystemConstants.TableReserved).ToString();

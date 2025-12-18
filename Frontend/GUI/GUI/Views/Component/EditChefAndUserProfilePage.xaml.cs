@@ -77,7 +77,6 @@ namespace RestaurantManagementGUI
 
                 if (response.IsSuccessStatusCode && result != null && result.Success)
                 {
-                    // Check nếu đổi email thì bắt nhập OTP
                     if (!string.Equals(_currentEmail, newEmail, StringComparison.OrdinalIgnoreCase))
                     {
                         await HandleOtpFlow(newEmail);
@@ -104,7 +103,6 @@ namespace RestaurantManagementGUI
             }
         }
 
-        // Logic OTP (Giống hệt EditUserPage)
         private async Task HandleOtpFlow(string email)
         {
             bool verified = false;
@@ -128,7 +126,6 @@ namespace RestaurantManagementGUI
                     continue;
                 }
 
-                // Verify API
                 var verifyReq = new VerifyOtpDto { Email = email, OTP = otp };
                 var response = await _httpClient.PostAsJsonAsync(ApiConfig.VerifyEmailOtp, verifyReq);
                 var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);

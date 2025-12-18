@@ -7,10 +7,10 @@ using RestaurantManagementGUI.Models;
 
 namespace RestaurantManagementGUI.Services
 {
-    public class SocketListener
+    public class TCPSocketClient
     {
-        private static SocketListener _instance;
-        public static SocketListener Instance => _instance ??= new SocketListener();
+        private static TCPSocketClient _instance;
+        public static TCPSocketClient Instance => _instance ??= new TCPSocketClient();
 
         private TcpClient _client;
         private StreamReader _reader;
@@ -18,7 +18,6 @@ namespace RestaurantManagementGUI.Services
         private bool _isConnected;
         private CancellationTokenSource _cts;
 
-        // Events
         public event Action<string> OnNewOrderReceived;
         public event Action<string> OnTableStatusChanged;
         public event Action<string> OnDishDone;
@@ -38,25 +37,20 @@ namespace RestaurantManagementGUI.Services
             _ = Task.Run(() => ConnectLoop(_cts.Token));
         }
 
-        // Thay thế hàm LoginAsync cũ bằng hàm này:
         public async Task LoginAsync(string maNV)
         {
-            // 1. Nếu chưa kết nối thì kích hoạt
             if (!_isConnected || _client == null || !_client.Connected)
             {
                 await ConnectAsync();
             }
 
-            // 2. QUAN TRỌNG: Vòng lặp chờ kết nối sẵn sàng (Timeout 5 giây)
-            // Giúp đảm bảo không gửi tin khi Socket chưa handshake xong
             int retry = 0;
             while (!_isConnected && retry < 50)
             {
-                await Task.Delay(100); // Chờ 100ms mỗi lần
+                await Task.Delay(100);
                 retry++;
             }
 
-            // 3. Chỉ gửi khi đã kết nối thành công
             if (_isConnected)
             {
                 await SendMessageAsync($"LOGIN|{maNV}");
@@ -104,7 +98,6 @@ namespace RestaurantManagementGUI.Services
             {
                 while (_isConnected && _client.Connected)
                 {
-                    // Đọc từng dòng (Backend phải gửi kèm \n cuối mỗi tin)
                     string message = await _reader.ReadLineAsync();
                     if (message == null) break;
 
@@ -134,8 +127,6 @@ namespace RestaurantManagementGUI.Services
                     break;
 
                 case "TABLE":
-                    // Content là JSON: {"MaBan":"B01", "TrangThai":"Có khách"}
-                    // Bắn nguyên chuỗi JSON ra cho ViewModel xử lý
                     OnTableStatusChanged?.Invoke(content);
                     break;
 
@@ -146,10 +137,7 @@ namespace RestaurantManagementGUI.Services
                 case "CHAT":
                     OnChatReceived?.Invoke(content);
                     break;
-
-                // Trường hợp STATUS (User Online/Offline) - UserPage sẽ hứng
                 case "STATUS":
-                    // Format: STATUS|NV001|TRUE -> Gửi nguyên message để UserPage tự parse
                     MessagingCenter.Send(this, "UpdateStatus", message);
                     break;
             }
@@ -167,11 +155,7 @@ namespace RestaurantManagementGUI.Services
 
             try
             {
-                // Gửi tin nhắn báo server biết mình out
-                // (Hàm SendMessageAsync này bạn đã thêm ở bước trước khi mình gửi code SocketListener mới)
                 await SendMessageAsync("LOGOUT");
-
-                // QUAN TRỌNG: Chờ 0.2 giây để tin nhắn kịp đi qua đường truyền trước khi cắt dây
                 await Task.Delay(200);
             }
             catch (Exception ex)
@@ -180,7 +164,6 @@ namespace RestaurantManagementGUI.Services
             }
             finally
             {
-                // Đóng sạch sẽ các tài nguyên
                 try
                 {
                     _reader?.Close();

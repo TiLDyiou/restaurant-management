@@ -20,7 +20,6 @@ namespace RestaurantManagementGUI.Services
         {
             try
             {
-                // Dùng ApiResponse<List<Ban>> để hứng
                 var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<Ban>>>(ApiConfig.Tables, _jsonOptions);
                 return (response != null && response.Success) ? response.Data : new List<Ban>();
             }
@@ -35,12 +34,10 @@ namespace RestaurantManagementGUI.Services
         {
             try
             {
-                // Gửi string trực tiếp (Backend nhận [FromBody] string)
                 var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateTableStatus(maBan), trangThai);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Đọc kết quả để chắc chắn Success = true
                     var result = await response.Content.ReadFromJsonAsync<ApiResponse>(_jsonOptions);
                     return result != null && result.Success;
                 }

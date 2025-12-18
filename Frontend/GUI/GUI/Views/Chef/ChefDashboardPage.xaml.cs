@@ -2,19 +2,17 @@
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.Views;
-using System.Net.Http.Headers; // Quan trọng
+using System.Net.Http.Headers;
 
 namespace RestaurantManagementGUI
 {
     public partial class ChefDashboardPage : ContentPage
     {
-        private readonly HttpClient _httpClient; // 1. Thêm biến này
+        private readonly HttpClient _httpClient;
 
         public ChefDashboardPage()
         {
             InitializeComponent();
-
-            // 2. Khởi tạo HttpClient
             var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
             _httpClient = new HttpClient(handler);
 
@@ -32,13 +30,10 @@ namespace RestaurantManagementGUI
             catch { }
         }
 
-        // 3. Hàm Logout chuẩn
         private async void OnLogoutClicked(object sender, EventArgs e)
         {
             bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
             if (!confirm) return;
-
-            // Xử lý UI
             if (sender is Button btn)
             {
                 btn.IsEnabled = false;
@@ -47,13 +42,11 @@ namespace RestaurantManagementGUI
 
             try
             {
-                // Bước 1: Ngắt Socket
-                if (SocketListener.Instance != null)
+                if (TCPSocketClient.Instance != null)
                 {
-                    await SocketListener.Instance.DisconnectAsync();
+                    await TCPSocketClient.Instance.DisconnectAsync();
                 }
 
-                // Bước 2: Gọi API Logout
                 var token = await SecureStorage.Default.GetAsync("auth_token");
                 if (!string.IsNullOrEmpty(token))
                 {
@@ -68,8 +61,6 @@ namespace RestaurantManagementGUI
             {
                 Console.WriteLine($"Lỗi đăng xuất: {ex.Message}");
             }
-
-            // Bước 3: Cleanup & Redirect
             SecureStorage.RemoveAll();
             UserState.Clear();
             Application.Current.MainPage = new NavigationPage(new LoginPage());

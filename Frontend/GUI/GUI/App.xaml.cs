@@ -36,7 +36,7 @@ namespace RestaurantManagementGUI
             window.Destroying += (sender, e) =>
             {
                 // Ngắt kết nối Socket
-                SocketListener.Instance.DisconnectAsync();
+                TCPSocketClient.Instance.DisconnectAsync();
             };
 
             return window;

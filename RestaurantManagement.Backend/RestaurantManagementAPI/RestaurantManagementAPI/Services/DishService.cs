@@ -31,7 +31,6 @@ namespace RestaurantManagementAPI.Services
 
         public async Task<ServiceResult<MonAnDto>> CreateDishAsync(CreateMonAnDto dto)
         {
-            // Logic sinh mã món ăn
             string prefix = SanitizePrefix(dto.Loai!);
             var allMaMAs = await _context.MONAN.Where(m => m.MaMA.StartsWith(prefix)).Select(m => m.MaMA).ToListAsync();
             int maxSo = allMaMAs.Select(m => int.TryParse(m.Substring(prefix.Length), out int n) ? n : 0).DefaultIfEmpty(0).Max();

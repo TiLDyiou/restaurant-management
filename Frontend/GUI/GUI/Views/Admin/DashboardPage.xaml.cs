@@ -35,17 +35,15 @@ namespace RestaurantManagementGUI
         {
             bool confirm = await DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không");
             if (!confirm) return;
-
-            // Hiển thị loading nhẹ (tuỳ chọn)
             LogoutButton.IsEnabled = false;
             LogoutButton.Text = "Đang thoát...";
 
             try
             {
                 // 1. Gửi lệnh LOGOUT qua Socket để Server báo Offline ngay lập tức cho các máy khác
-                if (Services.SocketListener.Instance != null)
+                if (Services.TCPSocketClient.Instance != null)
                 {
-                    await Services.SocketListener.Instance.DisconnectAsync();
+                    await Services.TCPSocketClient.Instance.DisconnectAsync();
                 }
 
                 // 2. Gọi API Logout để Backend xóa Token/Cookie và cập nhật DB (Persistent)
@@ -62,14 +60,9 @@ namespace RestaurantManagementGUI
             catch (Exception ex)
             {
                 Console.WriteLine($"Lỗi đăng xuất: {ex.Message}");
-                // Vẫn cho đăng xuất dù lỗi mạng để user không bị kẹt
             }
-
-            // 3. Xóa dữ liệu local
             SecureStorage.RemoveAll();
             UserState.Clear();
-
-            // 4. Chuyển về trang đăng nhập
             Application.Current.MainPage = new NavigationPage(new LoginPage());
         }
 

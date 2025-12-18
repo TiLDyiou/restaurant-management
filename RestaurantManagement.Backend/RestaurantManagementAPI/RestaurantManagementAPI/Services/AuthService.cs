@@ -89,7 +89,6 @@ namespace RestaurantManagementAPI.Services
             }
             else
             {
-                // Dummy verify để chống Timing Attack
                 BCrypt.Net.BCrypt.Verify("dummy", "$2a$11$Ou9z/k/y...dummyhash...");
             }
 
@@ -97,11 +96,9 @@ namespace RestaurantManagementAPI.Services
             if (!user.IsVerified) return ServiceResult<object>.Fail("Tài khoản chưa xác thực email.");
             if (!user.IsActive) return ServiceResult<object>.Fail("Tài khoản đã bị vô hiệu hóa.");
 
-            // Cập nhật trạng thái Online
             user.Online = true;
             await _context.SaveChangesAsync();
 
-            // TẠO TOKEN TỪ GENERATOR ĐÃ TÁCH
             var token = _jwtGenerator.GenerateToken(user);
 
             return ServiceResult<object>.Ok(new
@@ -183,8 +180,6 @@ namespace RestaurantManagementAPI.Services
             await _context.SaveChangesAsync();
             return ServiceResult.Ok("Đổi mật khẩu thành công.");
         }
-
-        // --- Helper Methods ---
 
         private async Task<bool> SendOtpInternal(TaiKhoan user, string subject)
         {

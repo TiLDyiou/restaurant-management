@@ -44,10 +44,10 @@ namespace RestaurantManagementGUI.ViewModels
 
         private void InitializeSocket()
         {
-            Task.Run(async () => await SocketListener.Instance.ConnectAsync());
+            Task.Run(async () => await TCPSocketClient.Instance.ConnectAsync());
 
-            SocketListener.Instance.OnNewOrderReceived -= HandleNewOrder;
-            SocketListener.Instance.OnNewOrderReceived += HandleNewOrder;
+            TCPSocketClient.Instance.OnNewOrderReceived -= HandleNewOrder;
+            TCPSocketClient.Instance.OnNewOrderReceived += HandleNewOrder;
         }
 
         public async Task LoadInitialOrders()
