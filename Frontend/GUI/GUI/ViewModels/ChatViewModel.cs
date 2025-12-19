@@ -1,207 +1,351 @@
-﻿
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Models;
+using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Services;
 using System.Collections.ObjectModel;
 
 namespace RestaurantManagementGUI.ViewModels
 {
     public partial class ChatViewModel : ObservableObject
     {
-        // --- TRẠNG THÁI MODAL ---
-        [ObservableProperty] private bool showAddFriendModal;
-        [ObservableProperty] private bool showFriendRequestModal;
-        [ObservableProperty] private bool showCreateGroupModal;
-        [ObservableProperty] private bool showManageGroupModal;
-        [ObservableProperty] private bool showEmojiPicker;
-
-        // --- DỮ LIỆU ---
-        [ObservableProperty]
-        private bool isDirectTab = true;
-
-        // Khi đổi Tab -> Gọi hàm lọc lại danh sách
-        partial void OnIsDirectTabChanged(bool value) => RefreshConversationList();
-
-        // Kho dữ liệu gốc (Chứa tất cả)
+        private readonly ChatService _chatService;
         private List<ChatConversation> _allConversations = new();
+        private string _currentConversationId = string.Empty;
+        private bool _isHistoryLoading = false;
+        private bool _isUpdatingList = false;
 
-        // Danh sách hiển thị ra màn hình (Đã lọc)
+        [ObservableProperty] private bool isBusy;
+        [ObservableProperty] private bool isDirectTab = false;
+        [ObservableProperty] private string messageInput = string.Empty;
+        [ObservableProperty] private bool isUploadingImage = false;
+
         public ObservableCollection<ChatConversation> FilteredConversations { get; } = new();
-
-        // Danh sách tin nhắn hiện tại (Quan trọng)
         public ObservableCollection<ChatMessage> CurrentMessages { get; } = new();
 
-        // Hội thoại đang chọn
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CurrentChatName))]
-        private ChatConversation selectedConversation;
+        private ChatConversation? selectedConversation;
 
-        // Khi chọn hội thoại khác -> Nạp tin nhắn của hội thoại đó
-        partial void OnSelectedConversationChanged(ChatConversation value)
+        public string CurrentChatName => SelectedConversation?.Name ?? "Chọn cuộc hội thoại";
+
+        public ChatViewModel(ChatService chatService)
         {
-            CurrentMessages.Clear();
-            if (value != null)
-            {
-                foreach (var msg in value.Messages)
-                {
-                    CurrentMessages.Add(msg);
-                }
-            }
+            _chatService = chatService;
+
+            // Đăng ký sự kiện
+            _chatService.OnMessageReceived += HandleIncomingMessage;
+            _chatService.OnMessageSentConfirmed += HandleMessageSentConfirmed;
+            _chatService.OnUserRead += HandleUserRead;
+
+            // Gọi hàm khởi tạo
+            InitializeAsync();
         }
 
-        public string CurrentChatName => SelectedConversation?.Name ?? "Chat";
-        [ObservableProperty] private string messageInput;
-        [ObservableProperty] private string newGroupName;
-        [ObservableProperty] private string groupCountText;
-
-        // Dữ liệu Modal
-        public ObservableCollection<Employee> AvailableUsersToAdd { get; } = new();
-        public ObservableCollection<FriendRequest> PendingRequests { get; } = new();
-        public ObservableCollection<Employee> UsersForNewGroup { get; } = new();
-        public ObservableCollection<ChatConversation> GroupList { get; } = new();
-
-        public ChatViewModel()
+        private async void InitializeAsync()
         {
-            LoadDummyData();
-        }
+            // 1. Tải dữ liệu API trước (Ưu tiên hiển thị để App không trống trơn)
+            await LoadData();
 
-        private void LoadDummyData()
-        {
+            // 2. Kết nối SignalR sau (Tách biệt try/catch)
             try
             {
-                // Dữ liệu mẫu
-                var group = new ChatConversation { Name = "Bếp & Order", Type = "group", Avatar = "#FF9800", LastMessage = "Alo 123", LastMessageTime = DateTime.Now };
-                group.Messages.Add(new ChatMessage { SenderName = "A", Content = "Test tin nhắn", Timestamp = DateTime.Now, IsSentMessage = false, IsImage = false });
-
-                var friend = new ChatConversation { Name = "Nguyễn Văn A", Type = "direct", Avatar = "#2196F3", LastMessage = "Hi", LastMessageTime = DateTime.Now };
-
-                _allConversations.Add(group);
-                _allConversations.Add(friend);
-
-                // Modal data
-                AvailableUsersToAdd.Add(new Employee { Name = "User A", Username = "@a", Avatar = "user.png" });
-                foreach (var u in AvailableUsersToAdd) UsersForNewGroup.Add(new Employee { Name = u.Name, Username = u.Username, IsSelectedForGroup = false });
-
-                // Init
-                IsDirectTab = false;
-                SelectedConversation = group;
-                RefreshConversationList();
+                await _chatService.Connect();
+                Console.WriteLine("✅ SignalR Connected via ViewModel");
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SignalR Connection Failed: {ex.Message}");
+                // Có thể hiện Toast báo lỗi mạng nhẹ ở đây nếu muốn
+            }
         }
 
-        private void RefreshConversationList()
+        private async Task LoadData()
         {
-            MainThread.BeginInvokeOnMainThread(() => // BẮT BUỘC DÙNG CÁI NÀY
+            if (IsBusy) return;
+            IsBusy = true;
+            try
             {
-                FilteredConversations.Clear();
-                string targetType = IsDirectTab ? "direct" : "group";
-                var items = _allConversations.Where(c => c.Type == targetType).OrderByDescending(c => c.LastMessageTime);
-                foreach (var item in items) FilteredConversations.Add(item);
+                var data = await _chatService.GetInboxListAsync();
+                _allConversations = data ?? new List<ChatConversation>();
+                RefreshList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Load data error: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void HandleIncomingMessage(ChatMessage msg)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                try
+                {
+                    string incomingId = msg.ConversationId?.Trim() ?? "";
+                    string currentId = _currentConversationId?.Trim() ?? "";
+                    bool isChattingWithThisUser = !string.IsNullOrEmpty(currentId) &&
+                                                  string.Equals(currentId, incomingId, StringComparison.OrdinalIgnoreCase);
+                    var conv = _allConversations.FirstOrDefault(c => c.Id == incomingId);
+
+                    if (conv == null)
+                    {
+                        await LoadData();
+                        conv = _allConversations.FirstOrDefault(c => c.Id == incomingId);
+                    }
+
+                    if (conv != null)
+                    {
+                        conv.LastMessage = msg.IsImage ? "Hình ảnh" : msg.Content;
+                        conv.LastMessageTime = msg.Timestamp;
+
+                        if (isChattingWithThisUser)
+                        {
+                            var exists = CurrentMessages.Any(m => m.Id == msg.Id && msg.Id > 0) ||
+                                         CurrentMessages.Any(m => m.Timestamp == msg.Timestamp && m.Content == msg.Content);
+
+                            if (!exists)
+                            {
+                                CurrentMessages.Add(msg);
+                            }
+                            if (!_isHistoryLoading)
+                            {
+                                conv.UnreadCount = 0;
+                                conv.IsUnread = false;
+                                await _chatService.MarkAsReadAsync(incomingId);
+                            }
+                        }
+                        else
+                        {
+                            conv.UnreadCount++;
+                            conv.IsUnread = true;
+                        }
+                        RefreshListSilently();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Handle incoming error: {ex.Message}");
+                }
             });
         }
 
-        // --- COMMANDS ---
-        [RelayCommand] void SwitchToDirect() { IsDirectTab = true; }
-        [RelayCommand] void SwitchToGroup() { IsDirectTab = false; }
-
-        [RelayCommand]
-        void OpenManageGroup()
+        private void HandleMessageSentConfirmed(ChatMessage msg)
         {
-            GroupList.Clear();
-            var groups = _allConversations.Where(c => c.Type == "group").ToList();
-            foreach (var g in groups) GroupList.Add(g);
-            GroupCountText = $"Tổng cộng: {groups.Count} nhóm";
-            ShowManageGroupModal = true;
-        }
-        [RelayCommand] void CloseManageGroup() => ShowManageGroupModal = false;
-
-        [RelayCommand] void OpenAddFriend() => ShowAddFriendModal = true;
-        [RelayCommand] void CloseAddFriend() => ShowAddFriendModal = false;
-        [RelayCommand] void OpenFriendRequests() => ShowFriendRequestModal = true;
-        [RelayCommand] void CloseFriendRequests() => ShowFriendRequestModal = false;
-        [RelayCommand] void OpenCreateGroup() { ShowCreateGroupModal = true; NewGroupName = ""; }
-        [RelayCommand] void CloseCreateGroup() => ShowCreateGroupModal = false;
-        [RelayCommand] void ToggleEmoji() => ShowEmojiPicker = !ShowEmojiPicker;
-
-        // --- GỬI TIN NHẮN (FIX) ---
-        [RelayCommand]
-        void SendMessage()
-        {
-            if (string.IsNullOrWhiteSpace(MessageInput) || SelectedConversation == null) return;
-
-            var msg = new ChatMessage
-            {
-                Content = MessageInput,
-                SenderName = "Me",
-                Timestamp = DateTime.Now,
-                IsSentMessage = true,
-                IsImage = false
-            };
-
-            // Cập nhật dữ liệu
-            SelectedConversation.Messages.Add(msg);
-            SelectedConversation.LastMessage = $"Bạn: {MessageInput}";
-            SelectedConversation.LastMessageTime = DateTime.Now;
-
-            // Cập nhật UI ngay lập tức
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                CurrentMessages.Add(msg);
-                MessageInput = "";
-                RefreshConversationList(); // Đẩy chat lên đầu sidebar
+                var existingMsg = CurrentMessages.FirstOrDefault(m =>
+                    m.Content == msg.Content &&
+                    m.Timestamp == msg.Timestamp &&
+                    m.MaNV_Sender == msg.MaNV_Sender);
+
+                if (existingMsg != null)
+                {
+                    existingMsg.Id = msg.Id;
+                }
+            });
+        }
+
+        private void HandleUserRead(string conversationId, string userId)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (SelectedConversation?.Id == conversationId)
+                {
+                    foreach (var msg in CurrentMessages.Where(m => m.MaNV_Sender == UserState.CurrentMaNV && !m.IsRead))
+                    {
+                        msg.IsRead = true;
+                    }
+                }
+                var conv = _allConversations.FirstOrDefault(c => c.Id == conversationId);
+                if (conv != null && userId != UserState.CurrentMaNV)
+                {
+                    
+                }
             });
         }
 
         [RelayCommand]
-        async Task SendImage()
+        private async Task SendMessage()
         {
+            if (string.IsNullOrWhiteSpace(MessageInput) || SelectedConversation == null)
+                return;
+
             try
             {
-                var result = await FilePicker.PickAsync(new PickOptions { FileTypes = FilePickerFileType.Images });
-                if (result != null && SelectedConversation != null)
+                var msg = new ChatMessage
                 {
-                    var msg = new ChatMessage
-                    {
-                        Content = result.FullPath,
-                        SenderName = "Me",
-                        Timestamp = DateTime.Now,
-                        IsSentMessage = true,
-                        IsImage = true
-                    };
+                    Content = MessageInput.Trim(),
+                    MaNV_Sender = UserState.CurrentMaNV,
+                    SenderName = UserState.CurrentTenNV,
+                    MaNV_Receiver = SelectedConversation.IsGroup ? null : SelectedConversation.PartnerId,
+                    ConversationId = SelectedConversation.Id,
+                    Timestamp = DateTime.Now,
+                    IsImage = false,
+                    IsRead = false
+                };
 
-                    SelectedConversation.Messages.Add(msg);
-                    SelectedConversation.LastMessage = "Đã gửi 1 ảnh";
+                CurrentMessages.Add(msg);
+                SelectedConversation.LastMessage = MessageInput.Trim();
+                SelectedConversation.LastMessageTime = msg.Timestamp;
+                MessageInput = string.Empty;
+                await _chatService.SendMessageAsync(msg);
+                RefreshListSilently();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Send message error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", 
+                    "Không thể gửi tin nhắn. Vui lòng thử lại.", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task SendImage()
+        {
+            if (SelectedConversation == null || IsUploadingImage)
+                return;
+
+            try
+            {
+                var result = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
+                {
+                    Title = "Chọn ảnh"
+                });
+
+                if (result == null)
+                    return;
+
+                IsUploadingImage = true;
+                using var stream = await result.OpenReadAsync();
+                var imageUrl = await _chatService.UploadImageAsync(stream, result.FileName);
+
+                if (string.IsNullOrEmpty(imageUrl))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Lỗi", 
+                        "Không thể tải ảnh lên. Vui lòng thử lại.", "OK");
+                    return;
+                }
+                var msg = new ChatMessage
+                {
+                    Content = imageUrl,
+                    MaNV_Sender = UserState.CurrentMaNV,
+                    SenderName = UserState.CurrentTenNV,
+                    MaNV_Receiver = SelectedConversation.IsGroup ? null : SelectedConversation.PartnerId,
+                    ConversationId = SelectedConversation.Id,
+                    Timestamp = DateTime.Now,
+                    IsImage = true,
+                    IsRead = false
+                };
+
+                CurrentMessages.Add(msg);
+
+                SelectedConversation.LastMessage = "📷Hình ảnh";
+                SelectedConversation.LastMessageTime = msg.Timestamp;
+
+                await _chatService.SendMessageAsync(msg);
+
+                RefreshListSilently();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Send image error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", 
+                    "Không thể gửi ảnh. Vui lòng thử lại.", "OK");
+            }
+            finally
+            {
+                IsUploadingImage = false;
+            }
+        }
+
+        partial void OnSelectedConversationChanged(ChatConversation? value)
+        {
+            if (value == null || value.Id == _currentConversationId || _isUpdatingList) return;
+
+            _currentConversationId = value.Id;
+            value.UnreadCount = 0;
+            value.IsUnread = false;
+
+            CurrentMessages.Clear();
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await _chatService.Connect();
+                    var history = await _chatService.GetHistoryAsync(value.Id);
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        CurrentMessages.Add(msg);
-                        RefreshConversationList();
+                        _isHistoryLoading = true;
+                        foreach (var m in history) CurrentMessages.Add(m);
+                        _isHistoryLoading = false;
                     });
+
+                    await _chatService.JoinConversationAsync(value.Id);
+                    await _chatService.MarkAsReadAsync(value.Id);
                 }
-            }
-            catch { }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error switching chat: {ex.Message}");
+                }
+            });
         }
-
-        [RelayCommand] void AddEmoji(string emoji) => MessageInput += emoji;
-
-        [RelayCommand]
-        void ConfirmCreateGroup()
+        private void RefreshList()
         {
-            if (string.IsNullOrWhiteSpace(NewGroupName)) return;
-            var newGroup = new ChatConversation { Name = NewGroupName, Type = "group", Avatar = "#9C27B0", LastMessage = "Nhóm mới", LastMessageTime = DateTime.Now };
-            _allConversations.Insert(0, newGroup);
-
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                IsDirectTab = false;
-                SelectedConversation = newGroup;
-                RefreshConversationList();
-                ShowCreateGroupModal = false;
+                FilteredConversations.Clear();
+                var items = _allConversations
+                    .OrderByDescending(c => c.LastMessageTime)
+                    .ToList();
+
+                foreach (var item in items)
+                {
+                    FilteredConversations.Add(item);
+                }
             });
         }
 
-        [RelayCommand] async Task CallAudio() => await App.Current.MainPage.DisplayAlert("Call", "Calling...", "OK");
-        [RelayCommand] async Task CallVideo() => await App.Current.MainPage.DisplayAlert("Video", "Video Calling...", "OK");
+        private void RefreshListSilently()
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                _isUpdatingList = true;
+
+                var currentId = SelectedConversation?.Id;
+                var items = _allConversations
+                    .OrderByDescending(c => c.LastMessageTime)
+                    .ToList();
+
+                FilteredConversations.Clear();
+                foreach (var item in items)
+                {
+                    FilteredConversations.Add(item);
+                }
+                if (!string.IsNullOrEmpty(currentId))
+                {
+                    var found = FilteredConversations.FirstOrDefault(c => c.Id == currentId);
+                    if (found != null)
+                    {
+                        selectedConversation = found;
+                        OnPropertyChanged(nameof(SelectedConversation));
+                    }
+                }
+
+                _isUpdatingList = false;
+            });
+        }
+
+        public void ClearSelection()
+        {
+            SelectedConversation = null;
+            _currentConversationId = string.Empty;
+        }
     }
 }

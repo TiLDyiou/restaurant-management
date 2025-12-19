@@ -69,5 +69,26 @@ namespace RestaurantManagementGUI
         private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChefOrdersPage());
         private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
         private async void OnUsersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChefAndUserProfilePage());
+        private async void OnChatClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var chatPage = Handler.MauiContext.Services.GetService<ChatPage>();
+
+                if (chatPage != null)
+                {
+                    await Navigation.PushAsync(chatPage);
+                }
+                else
+                {
+                    await DisplayAlert("Lỗi", "Hệ thống chưa đăng ký ChatPage!", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Lỗi khởi tạo", ex.Message, "OK");
+                Console.WriteLine($"DEBUG: {ex.StackTrace}");
+            }
+        }
     }
 }

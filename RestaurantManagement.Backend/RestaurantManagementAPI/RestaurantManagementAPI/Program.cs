@@ -44,6 +44,17 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 // JWT Auth Configuration
 var jwt = configuration.GetSection("Jwt");
 var key = jwt.GetValue<string>("Key");
@@ -71,7 +82,8 @@ builder.Services.AddAuthorization();
 // Infrastructure
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-builder.Services.AddHostedService<TcpSocketServer>(); 
+builder.Services.AddHostedService<TcpSocketServer>();
+builder.Services.AddSignalR();
 
 // Business Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -81,10 +93,10 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 
 var app = builder.Build();
-
 try
 {
     using (var scope = app.Services.CreateScope())
@@ -103,9 +115,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
+app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<RestaurantChatHub>("/restaurantChatHub");
 app.Run();

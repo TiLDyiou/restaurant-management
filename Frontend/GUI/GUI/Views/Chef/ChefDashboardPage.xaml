@@ -13,7 +13,6 @@
             <Setter Property="BackgroundColor" Value="White"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="HeightRequest" Value="130"/>
-            <Setter Property="Shadow" Value="0,2,5,Black"/>
             <Setter Property="Margin" Value="0,0,10,15"/>
         </Style>
 
@@ -68,6 +67,16 @@
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
                         <Image Source="menu.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Label Text="TRA CỨU MENU" Style="{StaticResource DashboardLabelStyle}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnChatClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="chat_9374926.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="TIN NHẮN" Style="{StaticResource DashboardLabelStyle}"/>
                     </VerticalStackLayout>
                 </Border>
 

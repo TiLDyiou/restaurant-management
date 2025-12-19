@@ -10,7 +10,7 @@
         // Trạng thái Món (ChiTietHoaDon)
         public const string ItemWaiting = "Đang chờ";
         public const string ItemCooking = "Đang chế biến";
-        public const string ItemDone = "Đã xong"; // Khớp với ChefViewModel
+        public const string ItemDone = "Đã xong";
 
         // Trạng thái Hóa Đơn
         public const string OrderPending = "Chưa thanh toán";

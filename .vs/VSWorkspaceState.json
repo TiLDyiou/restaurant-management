@@ -1,9 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Frontend",
-    "\\Frontend\\GUI"
+    "\\RestaurantManagement.Backend",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Infrastructure",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Infrastructure\\Sockets"
   ],
-  "SelectedNode": "\\Frontend\\GUI\\RestaurantManagementGUI.slnx",
+  "SelectedNode": "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\appsettings.json",
   "PreviewInSolutionExplorer": false
 }

@@ -4,6 +4,8 @@ namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
     {
+        /*private const string DOMAIN = "http://qlnhnhom2.runasp.net";
+        public static string BaseUrl => $"{DOMAIN}/api/";*/
         public static string BaseUrl =>
             DeviceInfo.Platform == DevicePlatform.Android
                 ? "https://10.0.2.2:7004/api/"
@@ -69,5 +71,21 @@ namespace RestaurantManagementGUI.Helpers
         public static string Reservations => $"{BaseUrl}reservations";
 
         public static string Notifications = $"{BaseUrl}notifications";
+
+        // ----------------------- CHAT & REALTIME -----------------------
+
+        public static string ChatHubUrl => BaseUrl.Replace("/api/", "/restaurantChatHub");
+
+        // Lấy danh sách Inbox (Chứa tin nhắn cuối + UnreadCount để làm in đậm)
+        public static string GetInboxList(string maNV) => $"{BaseUrl}Chat/inbox-list/{maNV}";
+
+        // Lấy lịch sử chat
+        public static string GetChatHistory(string conversationId) => $"{BaseUrl}Chat/history/{conversationId}";
+
+        // Đánh dấu đã đọc
+        public static string MarkRead => $"{BaseUrl}Chat/mark-read";
+
+        // Upload ảnh
+        public static string UploadChatImage => $"{BaseUrl}Chat/upload-image";
     }
 }

@@ -93,7 +93,7 @@
                                 <Label FontSize="14" FontAttributes="Bold">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding Online}" Value="True">
-                                            <Setter Property="Text" Value="● Online (Đang hoạt động)" />
+                                            <Setter Property="Text" Value="● Online" />
                                             <Setter Property="TextColor" Value="#4CAF50" />
                                         </DataTrigger>
                                         <DataTrigger TargetType="Label" Binding="{Binding Online}" Value="False">

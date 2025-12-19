@@ -40,13 +40,10 @@ namespace RestaurantManagementGUI
 
             try
             {
-                // 1. Gửi lệnh LOGOUT qua Socket để Server báo Offline ngay lập tức cho các máy khác
                 if (Services.TCPSocketClient.Instance != null)
                 {
                     await Services.TCPSocketClient.Instance.DisconnectAsync();
                 }
-
-                // 2. Gọi API Logout để Backend xóa Token/Cookie và cập nhật DB (Persistent)
                 var token = await SecureStorage.Default.GetAsync("auth_token");
                 if (!string.IsNullOrEmpty(token))
                 {
@@ -73,6 +70,26 @@ namespace RestaurantManagementGUI
         private async void OnTablesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TablesPage());
         private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BillGenerationPage());
         private async void OnRevenueReportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new RevenueReportPage());
-        private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
+        private async void OnChatClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var chatPage = Handler.MauiContext.Services.GetService<ChatPage>();
+
+                if (chatPage != null)
+                {
+                    await Navigation.PushAsync(chatPage);
+                }
+                else
+                {
+                    await DisplayAlert("Lỗi", "Hệ thống chưa đăng ký ChatPage!", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Lỗi khởi tạo", ex.Message, "OK");
+                Console.WriteLine($"DEBUG: {ex.StackTrace}");
+            }
+        }
     }
 }

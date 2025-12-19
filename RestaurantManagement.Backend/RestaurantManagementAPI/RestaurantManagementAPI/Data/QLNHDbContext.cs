@@ -19,6 +19,7 @@ namespace RestaurantManagementAPI.Data
         public DbSet<DonHangOnline> DONHANG_ONLINE { get; set; }
         public DbSet<DatBan> DATBAN { get; set; }
         public DbSet<ThongBao> THONGBAO { get; set; }
+        public DbSet<Message> MESSAGES { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -139,6 +140,31 @@ namespace RestaurantManagementAPI.Data
                 .WithOne(db => db.Ban)
                 .HasForeignKey(db => db.MaBan)
                 .OnDelete(DeleteBehavior.Restrict); // Không cho xoá Bàn nếu còn lịch sử đặt
+
+
+            // Cấu hình cho bảng MESSAGES
+            modelBuilder.Entity<Message>(entity => {
+                entity.HasKey(m => m.Id);
+                entity.Property(m => m.Content).IsRequired();
+
+                // Quan hệ với người gửi (Sender)
+                entity.HasOne(m => m.Sender) 
+                      .WithMany()
+                      .HasForeignKey(m => m.MaNV_Sender)
+                      .OnDelete(DeleteBehavior.Cascade); // Xóa nhân viên thì xóa tin nhắn họ gửi
+
+                // Quan hệ với người nhận (Receiver) - QUAN TRỌNG CHO CHAT 1-1
+                entity.HasOne(m => m.Receiver)
+                      .WithMany()
+                      .HasForeignKey(m => m.MaNV_Receiver)
+                      .OnDelete(DeleteBehavior.Restrict); // Dùng Restrict để tránh lỗi Multiple Cascade Path
+
+                // Chỉ định độ dài cho ConversationId để tối ưu index
+                entity.Property(m => m.ConversationId).HasMaxLength(100);
+
+                // Thêm index cho ConversationId và Timestamp để load lịch sử chat nhanh hơn
+                entity.HasIndex(m => new { m.ConversationId, m.Timestamp });
+            });
         }
     }
 }

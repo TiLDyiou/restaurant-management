@@ -41,14 +41,25 @@ public static class MauiProgram
                 fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
             });
 
+        builder.Services.AddSingleton(sp =>
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
+            };
+            return new HttpClient(handler);
+        });
+
         // SERVICES
         builder.Services.AddSingleton(TCPSocketClient.Instance);
+        builder.Services.AddSingleton<ChatService>();
 
         // VIEWMODELS
         builder.Services.AddSingleton<ChefOrdersViewModel>();
         builder.Services.AddTransient<TablesViewModel>();
         builder.Services.AddTransient<FoodMenuViewModel>();
         builder.Services.AddTransient<BillGenerationViewModel>();
+        builder.Services.AddTransient<ChatViewModel>();
 
         // PAGES
         builder.Services.AddSingleton<ChefOrdersPage>();
@@ -61,6 +72,7 @@ public static class MauiProgram
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<ChefDashboardPage>();
         builder.Services.AddTransient<StaffDashboardPage>();
+        builder.Services.AddTransient<ChatPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

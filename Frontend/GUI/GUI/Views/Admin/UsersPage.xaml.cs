@@ -35,7 +35,6 @@ namespace RestaurantManagementGUI
 
             MessagingCenter.Subscribe<Services.TCPSocketClient, string>(this, "UpdateStatus", (sender, message) =>
             {
-                // Format: STATUS|NV001|TRUE
                 var parts = message.Split('|');
                 if (parts.Length == 3)
                 {
@@ -76,7 +75,6 @@ namespace RestaurantManagementGUI
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 // GỌI API GET ALL USERS
-                // Backend trả về: { success: true, data: [User1, User2...] }
                 var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<UserModel>>>(ApiConfig.GetAllUsers, _jsonOptions);
 
                 if (response != null && response.Success)
@@ -98,32 +96,24 @@ namespace RestaurantManagementGUI
 
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
-            // Lấy từ khóa, xóa khoảng trắng thừa, chuyển thường và BỎ DẤU ngay lập tức
             string originKeyword = e.NewTextValue?.Trim() ?? "";
             string keyword = RemoveSign4VietnameseString(originKeyword).ToLower();
 
             if (string.IsNullOrEmpty(keyword))
             {
-                // Nếu ô tìm kiếm rỗng, hiển thị lại toàn bộ danh sách gốc
                 _users = new ObservableCollection<UserModel>(_allUsers);
             }
             else
             {
-                // Lọc danh sách
                 var filtered = _allUsers.Where(u =>
                 {
-                    // Chuẩn hóa tên và mã của nhân viên về dạng KHÔNG DẤU + CHỮ THƯỜNG
                     string tenKhongDau = RemoveSign4VietnameseString(u.HoTen ?? "").ToLower();
                     string maKhongDau = (u.MaNV ?? "").ToLower();
-
-                    // So sánh: Chỉ cần chứa từ khóa là được
                     return tenKhongDau.Contains(keyword) || maKhongDau.Contains(keyword);
                 }).ToList();
 
                 _users = new ObservableCollection<UserModel>(filtered);
             }
-
-            // Cập nhật lên giao diện
             UsersCollectionView.ItemsSource = _users;
         }
 
@@ -165,12 +155,11 @@ namespace RestaurantManagementGUI
                 {
                     // Gọi API PUT: api/users/{id}/status
                     var url = ApiConfig.ToggleUserStatus(user.MaNV);
-                    var response = await _httpClient.PutAsync(url, null); // Body null vì ID đã ở trên URL
+                    var response = await _httpClient.PutAsync(url, null);
                     var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
 
                     if (result != null && result.Success)
                     {
-                        // Cập nhật UI ngay lập tức (Optimistic UI)
                         user.TrangThai = isWorking ? "Đã nghỉ" : "Đang làm";
                         var index = _users.IndexOf(user);
                         if (index >= 0)

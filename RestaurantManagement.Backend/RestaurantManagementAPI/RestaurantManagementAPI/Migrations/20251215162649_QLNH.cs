@@ -11,7 +11,7 @@ namespace RestaurantManagementAPI.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            /*migrationBuilder.CreateTable(
                 name: "BAN",
                 columns: table => new
                 {
@@ -287,13 +287,13 @@ namespace RestaurantManagementAPI.Migrations
                 name: "IX_TAIKHOAN_MaNV",
                 table: "TAIKHOAN",
                 column: "MaNV",
-                unique: true);
+                unique: true);*/
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            /*migrationBuilder.DropTable(
                 name: "CHITIETHOADON");
 
             migrationBuilder.DropTable(
@@ -327,7 +327,7 @@ namespace RestaurantManagementAPI.Migrations
                 name: "BAN");
 
             migrationBuilder.DropTable(
-                name: "NHANVIEN");
+                name: "NHANVIEN");*/
         }
     }
 }

@@ -82,6 +82,7 @@ namespace RestaurantManagementGUI
                         UserState.CurrentMaNV = data.MaNV;
                         UserState.CurrentTenNV = data.Username;
                         UserState.CurrentRole = data.Role;
+                        UserState.AccessToken = data.Token;
 
                         // Gọi sau khi đã lưu xong current_ma_nv
                         if (!string.IsNullOrEmpty(data.MaNV))

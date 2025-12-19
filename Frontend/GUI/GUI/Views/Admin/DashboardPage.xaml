@@ -99,7 +99,7 @@
                 <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="chat_9374926.png" HeightRequest="45" Aspect="AspectFit"/>
-                        <Button Text="Chat nội bộ" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnChatClicked"/>
+                        <Button Text="Chat" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnChatClicked"/>
                     </VerticalStackLayout>
                 </Border>
 

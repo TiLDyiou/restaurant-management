@@ -134,7 +134,6 @@ namespace RestaurantManagementGUI.Views
 
                 var stack = new VerticalStackLayout { Spacing = 5, VerticalOptions = LayoutOptions.End };
 
-                // Màu sắc cột: Nếu là ngày hiện tại/tháng hiện tại thì đổi màu cho nổi bật (Optional)
                 bool isCurrent = _currentPeriod == "year"
                     ? (item.Date.Month == DateTime.Now.Month && item.Date.Year == DateTime.Now.Year)
                     : (item.Date.Date == DateTime.Now.Date);
@@ -255,7 +254,7 @@ namespace RestaurantManagementGUI.Views
         {
             // Lấy ngày đầu năm nay
             var start = new DateTime(DateTime.Now.Year, 1, 1);
-            // Lấy ngày cuối năm nay (để Backend tạo đủ list 12 tháng)
+            // Lấy ngày cuối năm nay
             var end = new DateTime(DateTime.Now.Year, 12, 31);
 
             await UpdatePeriod("year", start, end);
