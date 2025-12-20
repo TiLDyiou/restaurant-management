@@ -157,6 +157,12 @@
 
                                     <HorizontalStackLayout Spacing="5" HorizontalOptions="End">
                                         <Label Text="{Binding TimeDisplay}" FontSize="10" TextColor="#B0B3B8"/>
+
+                                        <Label Text="{Binding StatusText}" 
+                                                TextColor="{Binding StatusColor}"
+                                                FontSize="10"
+                                                FontAttributes="Italic"
+                                                IsVisible="{Binding IsSentMessage}"/>
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>

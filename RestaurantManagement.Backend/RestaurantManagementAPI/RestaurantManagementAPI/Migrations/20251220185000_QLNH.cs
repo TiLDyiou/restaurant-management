@@ -11,7 +11,7 @@ namespace RestaurantManagementAPI.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            /*migrationBuilder.CreateTable(
+            migrationBuilder.CreateTable(
                 name: "BAN",
                 columns: table => new
                 {
@@ -155,6 +155,38 @@ namespace RestaurantManagementAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MESSAGES",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MaNV_Sender = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    SenderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MaNV_Receiver = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
+                    ConversationId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsImage = table.Column<bool>(type: "bit", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MESSAGES", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MESSAGES_NHANVIEN_MaNV_Receiver",
+                        column: x => x.MaNV_Receiver,
+                        principalTable: "NHANVIEN",
+                        principalColumn: "MaNV",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MESSAGES_NHANVIEN_MaNV_Sender",
+                        column: x => x.MaNV_Sender,
+                        principalTable: "NHANVIEN",
+                        principalColumn: "MaNV",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PHIEUNHAPKHO",
                 columns: table => new
                 {
@@ -279,6 +311,21 @@ namespace RestaurantManagementAPI.Migrations
                 column: "MaNV");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MESSAGES_ConversationId_Timestamp",
+                table: "MESSAGES",
+                columns: new[] { "ConversationId", "Timestamp" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MESSAGES_MaNV_Receiver",
+                table: "MESSAGES",
+                column: "MaNV_Receiver");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MESSAGES_MaNV_Sender",
+                table: "MESSAGES",
+                column: "MaNV_Sender");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PHIEUNHAPKHO_MaNV",
                 table: "PHIEUNHAPKHO",
                 column: "MaNV");
@@ -287,13 +334,13 @@ namespace RestaurantManagementAPI.Migrations
                 name: "IX_TAIKHOAN_MaNV",
                 table: "TAIKHOAN",
                 column: "MaNV",
-                unique: true);*/
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            /*migrationBuilder.DropTable(
+            migrationBuilder.DropTable(
                 name: "CHITIETHOADON");
 
             migrationBuilder.DropTable(
@@ -304,6 +351,9 @@ namespace RestaurantManagementAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "DONHANG_ONLINE");
+
+            migrationBuilder.DropTable(
+                name: "MESSAGES");
 
             migrationBuilder.DropTable(
                 name: "TAIKHOAN");
@@ -327,7 +377,7 @@ namespace RestaurantManagementAPI.Migrations
                 name: "BAN");
 
             migrationBuilder.DropTable(
-                name: "NHANVIEN");*/
+                name: "NHANVIEN");
         }
     }
 }

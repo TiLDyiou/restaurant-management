@@ -12,8 +12,8 @@ using RestaurantManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    [Migration("20251218110642_AddAttributeToTableMessage")]
-    partial class AddAttributeToTableMessage
+    [Migration("20251220185000_QLNH")]
+    partial class QLNH
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

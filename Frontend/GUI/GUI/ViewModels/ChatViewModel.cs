@@ -138,14 +138,21 @@ namespace RestaurantManagementGUI.ViewModels
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
+                // TÌM TIN NHẮN "ĐANG GỬI..."
+                // Sửa lỗi: So sánh thời gian cho phép lệch nhau 1-2 giây để tránh lỗi sai số giây/mili-giây
                 var existingMsg = CurrentMessages.FirstOrDefault(m =>
                     m.Content == msg.Content &&
-                    m.Timestamp == msg.Timestamp &&
-                    m.MaNV_Sender == msg.MaNV_Sender);
+                    m.MaNV_Sender == msg.MaNV_Sender &&
+                    Math.Abs((m.Timestamp - msg.Timestamp).TotalSeconds) < 5 && // Cho phép lệch 5 giây
+                    !m.IsSentConfirmed); // Chỉ tìm những cái chưa xác nhận
 
                 if (existingMsg != null)
                 {
-                    existingMsg.Id = msg.Id;
+                    existingMsg.Id = msg.Id; // Cập nhật ID thật từ server
+                    existingMsg.IsSentConfirmed = true; // <-- Chuyển trạng thái thành "Đã nhận"
+
+                    // Nếu tin nhắn này server báo về là "IsRead = true" (trường hợp hiếm) thì cập nhật luôn
+                    if (msg.IsRead) existingMsg.IsRead = true;
                 }
             });
         }
@@ -154,13 +161,19 @@ namespace RestaurantManagementGUI.ViewModels
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
+                // Kiểm tra xem có đang mở đúng cuộc hội thoại đó không
                 if (SelectedConversation?.Id == conversationId)
                 {
-                    foreach (var msg in CurrentMessages.Where(m => m.MaNV_Sender == UserState.CurrentMaNV && !m.IsRead))
+                    var myUnreadMessages = CurrentMessages
+                        .Where(m => m.MaNV_Sender == UserState.CurrentMaNV && !m.IsRead)
+                        .ToList();
+
+                    foreach (var msg in myUnreadMessages)
                     {
-                        msg.IsRead = true;
+                        msg.IsRead = true; 
                     }
                 }
+
                 var conv = _allConversations.FirstOrDefault(c => c.Id == conversationId);
                 if (conv != null && userId != UserState.CurrentMaNV)
                 {
@@ -186,7 +199,8 @@ namespace RestaurantManagementGUI.ViewModels
                     ConversationId = SelectedConversation.Id,
                     Timestamp = DateTime.Now,
                     IsImage = false,
-                    IsRead = false
+                    IsRead = false,
+                    IsSentConfirmed = false
                 };
 
                 CurrentMessages.Add(msg);
