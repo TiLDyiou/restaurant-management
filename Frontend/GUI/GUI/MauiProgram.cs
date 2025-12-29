@@ -1,11 +1,11 @@
-﻿
-using Microsoft.Extensions.Logging;
-using RestaurantManagementGUI;
-using RestaurantManagementGUI.Views;
+﻿using Microsoft.Extensions.Logging;
+using RestaurantManagementGUI.Helpers; // Để dùng HttpsClientHandlerService
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.ViewModels;
+using RestaurantManagementGUI.Views;
 using RestaurantManagementGUI.Views.Staff;
+using CommunityToolkit.Maui;
 
 namespace RestaurantManagementGUI;
 
@@ -26,7 +26,6 @@ public static class MauiProgram
                 appWindow.TitleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
                 appWindow.TitleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
             }
-
 #endif
         });
 
@@ -43,36 +42,50 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(sp =>
         {
-            var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
-            };
-            return new HttpClient(handler);
+            // Lấy Handler đã bypass SSL từ Bước 1
+            var handler = HttpsClientHandlerService.GetPlatformMessageHandler();
+            // Tự động gán BaseURL
+            return new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
         });
 
-        // SERVICES
+        // 3. ĐĂNG KÝ SERVICES
         builder.Services.AddSingleton(TCPSocketClient.Instance);
         builder.Services.AddSingleton<ChatService>();
+        builder.Services.AddSingleton<TableService>();
 
-        // VIEWMODELS
-        builder.Services.AddSingleton<ChefOrdersViewModel>();
+        // 4. ĐĂNG KÝ VIEWMODELS
+        builder.Services.AddTransient<ChefOrdersViewModel>();
         builder.Services.AddTransient<TablesViewModel>();
         builder.Services.AddTransient<FoodMenuViewModel>();
         builder.Services.AddTransient<BillGenerationViewModel>();
         builder.Services.AddTransient<ChatViewModel>();
+        builder.Services.AddTransient<MenuViewerViewModel>();
 
-        // PAGES
-        builder.Services.AddSingleton<ChefOrdersPage>();
-        builder.Services.AddTransient<TablesPage>();
-        builder.Services.AddTransient<FoodMenuPage>();
-        builder.Services.AddTransient<OrdersPage>();
-        builder.Services.AddTransient<BillGenerationPage>();
+        // 5. ĐĂNG KÝ PAGES (VIEWS)
+        // Auth & Main
         builder.Services.AddTransient<LoginPage>();
-        builder.Services.AddTransient<QuanLyMonAnPage>();
+        builder.Services.AddTransient<ForgotPasswordPage>();
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<ChefDashboardPage>();
         builder.Services.AddTransient<StaffDashboardPage>();
+
+        // Features
+        builder.Services.AddTransient<BillGenerationPage>();
         builder.Services.AddTransient<ChatPage>();
+        builder.Services.AddTransient<FoodMenuPage>();
+        builder.Services.AddTransient<ChefOrdersPage>();
+        builder.Services.AddTransient<OrdersPage>();
+        builder.Services.AddTransient<TablesPage>();
+        builder.Services.AddTransient<QuanLyMonAnPage>();
+        builder.Services.AddTransient<UsersPage>();
+        builder.Services.AddTransient<RevenueReportPage>();
+        builder.Services.AddTransient<ChefAndUserProfilePage>();
+
+        // Các trang Edit/Add (Đăng ký để dùng DI bên trong nó)
+        builder.Services.AddTransient<EditMonAnPage>();
+        builder.Services.AddTransient<EditUserPage>();
+        builder.Services.AddTransient<AddUserPage>();
+        builder.Services.AddTransient<EditChefAndUserProfilePage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

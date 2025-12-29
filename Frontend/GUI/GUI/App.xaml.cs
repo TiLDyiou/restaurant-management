@@ -1,14 +1,19 @@
-﻿
+﻿using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Services;
 using RestaurantManagementGUI.Views;
+using RestaurantManagementGUI.Views.Staff;
 
 namespace RestaurantManagementGUI
 {
     public partial class App : Application
     {
-        public App()
+        private readonly IServiceProvider _serviceProvider;
+
+        public App(IServiceProvider serviceProvider)
         {
             InitializeComponent();
+            _serviceProvider = serviceProvider;
             Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping("NoTitleBar", (handler, view) =>
             {
 #if WINDOWS
@@ -29,19 +34,16 @@ namespace RestaurantManagementGUI
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            // Tạo Window khởi đầu với trang Login
-            var window = new Window(new NavigationPage(new LoginPage()));
+            var loginPage = _serviceProvider.GetRequiredService<LoginPage>();
+            var window = new Window(new NavigationPage(loginPage));
 
-            // Khi người dùng bấm X hoặc tắt App
+            // Logic ngắt kết nối an toàn khi tắt ứng dụng
             window.Destroying += (sender, e) =>
             {
-                // Ngắt kết nối Socket
-                TCPSocketClient.Instance.DisconnectAsync();
+                _ = TCPSocketClient.Instance.DisconnectAsync();
             };
 
             return window;
         }
-
-
     }
 }

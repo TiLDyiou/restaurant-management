@@ -14,7 +14,6 @@
             <Setter Property="BackgroundColor" Value="White"/>
             <Setter Property="Padding" Value="10"/>
             <Setter Property="HeightRequest" Value="130"/>
-            <Setter Property="Shadow" Value="0,2,5,Black"/>
         </Style>
 
         <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
@@ -70,13 +69,6 @@
 
                 <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
-                        <Image Source="orders.png" HeightRequest="45" Aspect="AspectFit"/>
-                        <Button Text="Đặt món" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="tables.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Button Text="Đặt bàn" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnTablesClicked"/>
                     </VerticalStackLayout>
@@ -108,7 +100,6 @@
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="LayoutStates">
-
                 <VisualState x:Name="Phone">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0" />
@@ -116,10 +107,8 @@
                     <VisualState.Setters>
                         <Setter TargetName="MainLayout" Property="RowDefinitions" Value="Auto, *" />
                         <Setter TargetName="MainLayout" Property="ColumnDefinitions" Value="*" />
-
                         <Setter TargetName="UserInfoPanel" Property="Grid.Row" Value="0" />
                         <Setter TargetName="UserInfoPanel" Property="Grid.Column" Value="0" />
-
                         <Setter TargetName="ContentScroll" Property="Grid.Row" Value="1" />
                         <Setter TargetName="ContentScroll" Property="Grid.Column" Value="0" />
                     </VisualState.Setters>
@@ -134,7 +123,6 @@
                         <Setter TargetName="MainLayout" Property="ColumnDefinitions" Value="280, *" />
                         <Setter TargetName="UserInfoPanel" Property="Grid.Row" Value="0" />
                         <Setter TargetName="UserInfoPanel" Property="Grid.Column" Value="0" />
-
                         <Setter TargetName="ContentScroll" Property="Grid.Row" Value="0" />
                         <Setter TargetName="ContentScroll" Property="Grid.Column" Value="1" />
                     </VisualState.Setters>

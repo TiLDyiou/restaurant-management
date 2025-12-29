@@ -11,8 +11,8 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
 {
     public class TcpSocketServer : BackgroundService
     {
-        public static TcpSocketServer Instance { get; private set; }
-        private TcpListener _listener;
+        public static TcpSocketServer? Instance { get; private set; }
+        private TcpListener? _listener;
         private readonly int _port = 9000;
         private ConcurrentDictionary<string, TcpClient> _clients = new();
         private readonly IServiceProvider _serviceProvider;

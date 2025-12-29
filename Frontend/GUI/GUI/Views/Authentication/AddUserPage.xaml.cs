@@ -13,15 +13,12 @@ namespace RestaurantManagementGUI
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public AddUserPage()
+        public AddUserPage(HttpClient httpClient)
         {
             InitializeComponent();
 
-#if DEBUG
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-            _httpClient = new HttpClient();
-#endif
+            _httpClient = httpClient;
+
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
@@ -153,13 +150,6 @@ namespace RestaurantManagementGUI
             HoTenEntry.Text = UsernameEntry.Text = PasswordEntry.Text = ConfirmPassword.Text = "";
             SDTEntry.Text = EmailEntry.Text = ChucVuEntry.Text = "";
             QuyenPicker.SelectedIndex = -1;
-        }
-
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-            return handler;
         }
     }
 }

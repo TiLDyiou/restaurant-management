@@ -2,12 +2,15 @@
 using RestaurantManagementAPI.Models.DTOs;
 using RestaurantManagementAPI.Models.Entities;
 
-public interface IChatService
+namespace RestaurantManagementAPI.Interfaces
 {
-    Task<ServiceResult<List<Message>>> GetHistory(string conversationId, int limit = 50);
-    Task<ServiceResult> SaveMessage(Message message);
+    public interface IChatService
+    {
+        Task<ServiceResult<List<Message>>> GetHistory(string conversationId, int limit = 50);
+        Task<ServiceResult> SaveMessage(Message message);
 
-    Task<ServiceResult> MarkAsRead(string conversationId, string currentUserId);
+        Task<ServiceResult> MarkAsRead(string conversationId, string currentUserId);
 
-    Task<ServiceResult<List<InboxItemDto>>> GetInboxList(string currentUserId);
+        Task<ServiceResult<List<InboxItemDto>>> GetInboxList(string currentUserId);
+    }
 }

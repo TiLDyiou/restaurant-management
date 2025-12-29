@@ -14,15 +14,12 @@ public partial class QuanLyMonAnPage : ContentPage
     private readonly JsonSerializerOptions _jsonOptions;
     public ObservableCollection<FoodModel> FoodItems { get; set; } = new();
 
-    public QuanLyMonAnPage()
+    public QuanLyMonAnPage(HttpClient httpClient)
     {
         InitializeComponent();
 
-#if DEBUG
-        _httpClient = new HttpClient(GetInsecureHandler());
-#else
-        _httpClient = new HttpClient();
-#endif
+        _httpClient = httpClient;
+
         _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         DishesCollectionView.ItemsSource = FoodItems;
     }
@@ -152,7 +149,7 @@ public partial class QuanLyMonAnPage : ContentPage
     {
         if (sender is Button btn && btn.BindingContext is FoodModel food)
         {
-            await Navigation.PushAsync(new EditMonAnPage(food));
+            await Navigation.PushAsync(new EditMonAnPage(_httpClient, food));
         }
     }
 
@@ -164,12 +161,5 @@ public partial class QuanLyMonAnPage : ContentPage
             if (result != null) NewHinhAnh.Text = result.FullPath;
         }
         catch { }
-    }
-
-    private HttpClientHandler GetInsecureHandler()
-    {
-        var handler = new HttpClientHandler();
-        handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-        return handler;
     }
 }

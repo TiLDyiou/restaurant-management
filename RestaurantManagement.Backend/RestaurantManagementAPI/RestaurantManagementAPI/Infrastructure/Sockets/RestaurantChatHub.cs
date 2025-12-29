@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using RestaurantManagementAPI.Models.Entities;
 using RestaurantManagementAPI.Models.DTOs;
+using RestaurantManagementAPI.Interfaces;
 
 namespace RestaurantManagementAPI.Infrastructure.Sockets
 {

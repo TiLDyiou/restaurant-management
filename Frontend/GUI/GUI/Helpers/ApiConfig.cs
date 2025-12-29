@@ -4,8 +4,6 @@ namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
     {
-        /*private const string DOMAIN = "http://qlnhnhom2.runasp.net";
-        public static string BaseUrl => $"{DOMAIN}/api/";*/
         public static string BaseUrl =>
             DeviceInfo.Platform == DevicePlatform.Android
                 ? "https://10.0.2.2:7004/api/"
@@ -29,7 +27,7 @@ namespace RestaurantManagementGUI.Helpers
         public static string GetAllUsers => $"{BaseUrl}users";
         public static string UpdateUser(string? id = null)
             => string.IsNullOrEmpty(id)
-                ? $"{BaseUrl}users" 
+                ? $"{BaseUrl}users"
                 : $"{BaseUrl}users/{id}";
 
         public static string VerifyEmailOtp => $"{BaseUrl}users/email/verify";

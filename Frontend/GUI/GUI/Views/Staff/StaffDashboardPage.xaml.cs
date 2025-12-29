@@ -8,11 +8,11 @@ namespace RestaurantManagementGUI.Views.Staff
     public partial class StaffDashboardPage : ContentPage
     {
         private readonly HttpClient _httpClient;
-        public StaffDashboardPage()
+        public StaffDashboardPage(HttpClient httpClient)
         {
             InitializeComponent();
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
-            _httpClient = new HttpClient(handler);
+            _httpClient = httpClient;
+
             LoadUserInfo();
         }
 
@@ -61,14 +61,14 @@ namespace RestaurantManagementGUI.Views.Staff
             }
             SecureStorage.RemoveAll();
             UserState.Clear();
-            Application.Current.MainPage = new NavigationPage(new LoginPage());
+            Application.Current.MainPage = new NavigationPage(Handler.MauiContext.Services.GetService<LoginPage>());
         }
 
-        private async void OnUserProfileClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChefAndUserProfilePage());
-        private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FoodMenuPage());
-        private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(new OrdersPage());
-        private async void OnTablesClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TablesPage());
-        private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BillGenerationPage());
+        private async void OnUserProfileClicked(object sender, EventArgs e) => await Navigation.PushAsync(Handler.MauiContext.Services.GetService<ChefAndUserProfilePage>());
+        private async void OnFoodMenuClicked(object sender, EventArgs e) => await Navigation.PushAsync(Handler.MauiContext.Services.GetService<FoodMenuPage>());
+        private async void OnOrdersClicked(object sender, EventArgs e) => await Navigation.PushAsync(Handler.MauiContext.Services.GetService<OrdersPage>());
+        private async void OnTablesClicked(object sender, EventArgs e) => await Navigation.PushAsync(Handler.MauiContext.Services.GetService<TablesPage>());
+        private async void OnBillGenerationClicked(object sender, EventArgs e) => await Navigation.PushAsync(Handler.MauiContext.Services.GetService<BillGenerationPage>());
         private async void OnChatClicked(object sender, EventArgs e)
         {
             try

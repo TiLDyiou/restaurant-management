@@ -19,10 +19,9 @@ namespace RestaurantManagementGUI.ViewModels
         [ObservableProperty]
         private bool isLoading;
 
-        public MenuViewerViewModel()
+        public MenuViewerViewModel(HttpClient httpClient)
         {
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
+            _httpClient = httpClient;
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 

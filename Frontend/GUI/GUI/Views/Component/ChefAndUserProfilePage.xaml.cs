@@ -13,15 +13,12 @@ namespace RestaurantManagementGUI
         private readonly JsonSerializerOptions _jsonOptions;
         private UserModel _user = new();
 
-        public ChefAndUserProfilePage()
+        public ChefAndUserProfilePage(HttpClient httpClient)
         {
             InitializeComponent();
 
-#if DEBUG
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-            _httpClient = new HttpClient();
-#endif
+            _httpClient = httpClient;
+
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
@@ -72,14 +69,7 @@ namespace RestaurantManagementGUI
 
         private async void OnEditProfileClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new EditChefAndUserProfilePage(_user));
-        }
-
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-            return handler;
+            await Navigation.PushAsync(new EditChefAndUserProfilePage(_httpClient, _user));
         }
     }
 }

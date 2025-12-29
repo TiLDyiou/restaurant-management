@@ -17,36 +17,30 @@ namespace RestaurantManagementGUI.Services
         public ChatService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
+            if (!_httpClient.DefaultRequestHeaders.Accept.Any(h => h.MediaType == "application/json"))
+            {
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
 
             InitializeSignalR();
         }
 
         private void InitializeSignalR()
         {
-            string hubUrl = ApiConfig.ChatHubUrl;
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
 
-            var builder = new HubConnectionBuilder()
-                .WithUrl(hubUrl, options =>
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(ApiConfig.ChatHubUrl, options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult(UserState.AccessToken);
-                    if (DeviceInfo.Platform == DevicePlatform.Android)
-                    {
-                        options.HttpMessageHandlerFactory = (handler) =>
-                        {
-                            if (handler is HttpClientHandler clientHandler)
-                            {
-                                clientHandler.ServerCertificateCustomValidationCallback =
-                                    (sender, cert, chain, sslPolicyErrors) => true;
-                            }
-                            return handler;
-                        };
-                    }
+                    options.HttpMessageHandlerFactory = _ => handler;
                 })
-                .WithAutomaticReconnect();
+                .WithAutomaticReconnect()
+                .Build();
 
-            _hubConnection = builder.Build();
             RegisterHandlers();
         }
 

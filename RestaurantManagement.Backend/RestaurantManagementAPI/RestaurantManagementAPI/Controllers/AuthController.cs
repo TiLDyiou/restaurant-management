@@ -63,7 +63,6 @@ namespace RestaurantManagementAPI.Controllers
                     }
                 });
             }
-
             return BadRequest(new { success = false, message = result.Message });
         }
 

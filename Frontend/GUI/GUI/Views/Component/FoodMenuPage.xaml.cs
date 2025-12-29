@@ -5,11 +5,10 @@ namespace RestaurantManagementGUI.Views
     public partial class FoodMenuPage : ContentPage
     {
         private readonly MenuViewerViewModel _viewModel;
-
-        public FoodMenuPage()
+        public FoodMenuPage(MenuViewerViewModel viewModel)
         {
             InitializeComponent();
-            _viewModel = new MenuViewerViewModel();
+            _viewModel = viewModel;
             BindingContext = _viewModel;
         }
 

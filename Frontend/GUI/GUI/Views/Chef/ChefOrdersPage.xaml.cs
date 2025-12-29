@@ -4,10 +4,10 @@ namespace RestaurantManagementGUI
 {
     public partial class ChefOrdersPage : ContentPage
     {
-        public ChefOrdersPage()
+        public ChefOrdersPage(ChefOrdersViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new ChefOrdersViewModel();
+            BindingContext = viewModel;
         }
     }
 }

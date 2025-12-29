@@ -13,7 +13,6 @@
             <Setter Property="BackgroundColor" Value="White"/>
             <Setter Property="Padding" Value="10"/>
             <Setter Property="HeightRequest" Value="130"/>
-            <Setter Property="Shadow" Value="0,2,5,Black"/>
         </Style>
 
         <Style x:Key="DashboardButtonInnerStyle" TargetType="Button">
@@ -37,44 +36,49 @@
         </Grid>
 
         <ScrollView x:Name="ContentScroll" Padding="20">
-            <FlexLayout Wrap="Wrap" JustifyContent="SpaceBetween" AlignContent="Start">
+            <FlexLayout Wrap="Wrap" 
+                        JustifyContent="Start" 
+                        AlignContent="Start">
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='31%'}" Margin="0,0,0,15">
+                <Border Style="{StaticResource DashboardButtonStyle}" 
+                        FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}" 
+                        Margin="0,0,15,15">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="users.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Button Text="Hồ sơ cá nhân" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnUserProfileClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='31%'}" Margin="0,0,0,15">
+                <Border Style="{StaticResource DashboardButtonStyle}" 
+                        FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}" 
+                        Margin="0,0,15,15">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="menu.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Button Text="Menu món" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnFoodMenuClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='31%'}" Margin="0,0,0,15">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
-                        <Image Source="orders.png" HeightRequest="45" Aspect="AspectFit"/>
-                        <Button Text="Đặt món" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnOrdersClicked"/>
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='31%'}" Margin="0,0,0,15">
+                <Border Style="{StaticResource DashboardButtonStyle}" 
+                        FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}" 
+                        Margin="0,0,15,15">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="tables.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Button Text="Đặt bàn" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnTablesClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='31%'}" Margin="0,0,0,15">
+                <Border Style="{StaticResource DashboardButtonStyle}" 
+                        FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}" 
+                        Margin="0,0,15,15">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="bill.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Button Text="Thanh toán" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnBillGenerationClicked"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='31%'}" Margin="0,0,0,15">
+                <Border Style="{StaticResource DashboardButtonStyle}" 
+                        FlexLayout.Basis="{OnIdiom Phone='47%', Default='30%'}" 
+                        Margin="0,0,15,15">
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
                         <Image Source="chat_9374926.png" HeightRequest="45" Aspect="AspectFit"/>
                         <Button Text="Chat" Style="{StaticResource DashboardButtonInnerStyle}" Clicked="OnChatClicked"/>
@@ -86,6 +90,7 @@
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="LayoutStates">
+
                 <VisualState x:Name="Phone">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0" />
@@ -99,6 +104,7 @@
                         <Setter TargetName="ContentScroll" Property="Grid.Column" Value="0" />
                     </VisualState.Setters>
                 </VisualState>
+
                 <VisualState x:Name="Desktop">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="800" />
@@ -112,7 +118,9 @@
                         <Setter TargetName="ContentScroll" Property="Grid.Column" Value="1" />
                     </VisualState.Setters>
                 </VisualState>
+
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
+
     </Grid>
 </ContentPage>

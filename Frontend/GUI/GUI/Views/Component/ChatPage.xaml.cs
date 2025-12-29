@@ -14,6 +14,7 @@ namespace RestaurantManagementGUI
             BindingContext = _viewModel;
             _viewModel.CurrentMessages.CollectionChanged += OnCurrentMessagesChanged;
         }
+
         private void OnCurrentMessagesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -51,12 +52,7 @@ namespace RestaurantManagementGUI
                 if (sender is Image image && image.Source is UriImageSource uriSource)
                 {
                     string url = uriSource.Uri.ToString();
-                    if (DeviceInfo.Platform == DevicePlatform.Android)
-                    {
-                        url = url.Replace("localhost", "10.0.2.2");
-                    }
-
-                    await DisplayAlert("Ảnh", "URL ảnh: " + url, "Đóng");
+                    await DisplayAlert("Xem ảnh", "Đường dẫn: " + url, "Đóng");
                 }
             }
             catch (Exception ex)

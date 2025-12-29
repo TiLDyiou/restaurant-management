@@ -16,15 +16,12 @@ namespace RestaurantManagementGUI
         private ObservableCollection<UserModel> _users = new();
         private List<UserModel> _allUsers = new();
 
-        public UsersPage()
+        public UsersPage(HttpClient httpClient)
         {
             InitializeComponent();
 
-#if DEBUG
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-            _httpClient = new HttpClient();
-#endif
+            _httpClient = httpClient;
+
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
@@ -134,12 +131,18 @@ namespace RestaurantManagementGUI
             return str;
         }
 
-        private async void OnAddUserClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AddUserPage());
+        private async void OnAddUserClicked(object sender, EventArgs e)
+        {
+            var addUserPage = Handler.MauiContext.Services.GetService<AddUserPage>();
+            await Navigation.PushAsync(addUserPage);
+        }
 
         private async void OnEditClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.BindingContext is UserModel user)
-                await Navigation.PushAsync(new EditUserPage(user));
+            {
+                await Navigation.PushAsync(new EditUserPage(_httpClient, user));
+            }
         }
         private async void OnToggleStatusClicked(object sender, EventArgs e)
         {
@@ -208,13 +211,6 @@ namespace RestaurantManagementGUI
                     await DisplayAlert("Lỗi", ex.Message, "OK");
                 }
             }
-        }
-
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-            return handler;
         }
     }
 }

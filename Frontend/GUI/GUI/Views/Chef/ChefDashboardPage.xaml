@@ -76,7 +76,7 @@
                     </Border.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
                         <Image Source="chat_9374926.png" HeightRequest="45" Aspect="AspectFit"/>
-                        <Label Text="TIN NHẮN" Style="{StaticResource DashboardLabelStyle}"/>
+                        <Label Text="CHAT" Style="{StaticResource DashboardLabelStyle}"/>
                     </VerticalStackLayout>
                 </Border>
 

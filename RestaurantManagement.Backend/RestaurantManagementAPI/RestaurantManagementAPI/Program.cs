@@ -46,12 +46,16 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
+    options.AddPolicy("Production",
         builder =>
         {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
+            builder.WithOrigins(
+                    "https://qlnhnhom2.me",
+                    "https://localhost:7004",
+                    "http://localhost:5276"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader();
         });
 });
 
@@ -117,6 +121,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors("Production");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

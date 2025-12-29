@@ -1,12 +1,13 @@
-﻿
+﻿using RestaurantManagementGUI.ViewModels;
+
 namespace RestaurantManagementGUI
 {
     public partial class BillGenerationPage : ContentPage
     {
-        public BillGenerationPage()
+        public BillGenerationPage(BillGenerationViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new ViewModels.BillGenerationViewModel();
+            BindingContext = viewModel;
         }
     }
 }

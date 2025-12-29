@@ -54,10 +54,9 @@ namespace RestaurantManagementGUI.ViewModels
 
         public decimal Total => Subtotal;
 
-        public FoodMenuViewModel()
+        public FoodMenuViewModel(HttpClient httpClient)
         {
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
+            _httpClient = httpClient;
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 

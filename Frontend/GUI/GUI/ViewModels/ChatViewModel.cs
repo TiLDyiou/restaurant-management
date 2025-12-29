@@ -9,6 +9,7 @@ namespace RestaurantManagementGUI.ViewModels
 {
     public partial class ChatViewModel : ObservableObject
     {
+        private readonly HttpClient _httpClient;
         private readonly ChatService _chatService;
         private List<ChatConversation> _allConversations = new();
         private string _currentConversationId = string.Empty;
@@ -29,8 +30,9 @@ namespace RestaurantManagementGUI.ViewModels
 
         public string CurrentChatName => SelectedConversation?.Name ?? "Chọn cuộc hội thoại";
 
-        public ChatViewModel(ChatService chatService)
+        public ChatViewModel(HttpClient httpClient, ChatService chatService)
         {
+            _httpClient = httpClient;
             _chatService = chatService;
 
             // Đăng ký sự kiện
@@ -44,20 +46,26 @@ namespace RestaurantManagementGUI.ViewModels
 
         private async void InitializeAsync()
         {
-            // 1. Tải dữ liệu API trước (Ưu tiên hiển thị để App không trống trơn)
+            // 1. Tải dữ liệu API trước
             await LoadData();
 
-            // 2. Kết nối SignalR sau (Tách biệt try/catch)
-            try
+            // 2. Kết nối SignalR
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                await _chatService.Connect();
-                Console.WriteLine("✅ SignalR Connected via ViewModel");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"SignalR Connection Failed: {ex.Message}");
-                // Có thể hiện Toast báo lỗi mạng nhẹ ở đây nếu muốn
-            }
+                try
+                {
+                    // Đảm bảo AccessToken đã sẵn sàng trước khi kết nối
+                    if (!string.IsNullOrEmpty(UserState.AccessToken))
+                    {
+                        await _chatService.Connect();
+                        Console.WriteLine("✅ SignalR Connected via ViewModel");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ SignalR Connection Failed: {ex.Message}");
+                }
+            });
         }
 
         private async Task LoadData()
@@ -187,7 +195,7 @@ namespace RestaurantManagementGUI.ViewModels
         {
             if (string.IsNullOrWhiteSpace(MessageInput) || SelectedConversation == null)
                 return;
-
+            await _chatService.Connect();
             try
             {
                 var msg = new ChatMessage
@@ -202,7 +210,7 @@ namespace RestaurantManagementGUI.ViewModels
                     IsRead = false,
                     IsSentConfirmed = false
                 };
-
+                
                 CurrentMessages.Add(msg);
                 SelectedConversation.LastMessage = MessageInput.Trim();
                 SelectedConversation.LastMessageTime = msg.Timestamp;
@@ -212,9 +220,8 @@ namespace RestaurantManagementGUI.ViewModels
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Send message error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", 
-                    "Không thể gửi tin nhắn. Vui lòng thử lại.", "OK");
+                Console.WriteLine($"❌ Send message error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Kết nối máy chủ bị gián đoạn. Không thể gửi tin nhắn.", "OK");
             }
         }
 

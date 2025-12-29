@@ -14,18 +14,10 @@ namespace RestaurantManagementGUI
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly string _maNV;
         private readonly string _currentEmail;
-        public EditUserPage(UserModel user)
+        public EditUserPage(HttpClient httpClient, UserModel user)
         {
+            _httpClient = httpClient;
             InitializeComponent();
-
-#if DEBUG
-
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-
-            _httpClient = new HttpClient();
-#endif
-
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             _maNV = user.MaNV;
             _currentEmail = user.Email;
@@ -157,12 +149,6 @@ namespace RestaurantManagementGUI
                 await DisplayAlert("Đã gửi lại", result.Message, "OK");
             else
                 await DisplayAlert("Lỗi", result?.Message ?? "Không thể gửi lại OTP", "OK");
-        }
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-            return handler;
         }
     }
 }

@@ -13,15 +13,12 @@ namespace RestaurantManagementGUI
         private string _email;
         private string _otp;
 
-        public ForgotPasswordPage()
+        public ForgotPasswordPage(HttpClient httpClient)
         {
             InitializeComponent();
 
-#if DEBUG
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-            _httpClient = new HttpClient();
-#endif
+            _httpClient = httpClient;
+
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
         private async void OnSendOtpClicked(object sender, EventArgs e)
@@ -180,21 +177,6 @@ namespace RestaurantManagementGUI
         {
             btn.IsEnabled = !isLoading;
             btn.Text = text;
-        }
-
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) =>
-            {
-                if (sender is HttpRequestMessage request)
-                {
-                    return request.RequestUri.IsLoopback ||
-                           (DeviceInfo.Platform == DevicePlatform.Android && request.RequestUri.Host == "10.0.2.2");
-                }
-                return errors == System.Net.Security.SslPolicyErrors.None;
-            };
-            return handler;
         }
     }
 }

@@ -16,21 +16,18 @@ namespace RestaurantManagementGUI.Views
         private bool _isAdmin = false;
         private string _currentMaNV = "";
 
-        public RevenueReportPage()
+        public RevenueReportPage(HttpClient httpClient)
         {
             InitializeComponent();
 
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
+            _httpClient = httpClient;
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             _endDate = DateTime.Now;
             _startDate = DateTime.Now.Date;
             PaymentEventService.PaymentCompleted += OnPaymentCompleted;
-
             CheckUserRole();
         }
-
         private async void OnPaymentCompleted(object sender, PaymentCompletedEventArgs e)
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>

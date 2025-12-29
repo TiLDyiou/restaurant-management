@@ -11,16 +11,14 @@ namespace RestaurantManagementGUI
         private readonly TablesViewModel _viewModel;
         private readonly HttpClient _httpClient;
 
-        public TablesPage()
+        public TablesPage(TablesViewModel viewModel, HttpClient httpClient)
         {
             InitializeComponent();
 
-            _viewModel = new TablesViewModel();
+            _viewModel = viewModel;
+            _httpClient = httpClient;
+
             BindingContext = _viewModel;
-
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (m, c, ch, e) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
-
             _viewModel.DataUpdated += (s, e) => FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
         }
 
@@ -79,13 +77,15 @@ namespace RestaurantManagementGUI
         private async void OnFlyoutViewAddOrderRequested(object sender, Ban table)
         {
             await FlyoutMenu.CloseAsync();
-            await Navigation.PushAsync(new OrdersPage(table));
+            var vm = Handler.MauiContext.Services.GetService<FoodMenuViewModel>();
+            var ordersPage = new OrdersPage(vm, table);
+            await Navigation.PushAsync(ordersPage);
         }
 
         private async void OnFlyoutPaymentRequested(object sender, Ban table)
         {
-            await FlyoutMenu.CloseAsync();
-            await Navigation.PushAsync(new BillGenerationPage());
+            var billPage = Handler.MauiContext.Services.GetService<BillGenerationPage>();
+            await Navigation.PushAsync(billPage);
         }
 
         private async void OnFlyoutRefreshRequested(object sender, EventArgs e)

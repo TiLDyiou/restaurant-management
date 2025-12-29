@@ -13,19 +13,12 @@ namespace RestaurantManagementGUI
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly string _currentEmail;
 
-        public EditChefAndUserProfilePage(UserModel user)
+        public EditChefAndUserProfilePage(HttpClient httpClient, UserModel user)
         {
             InitializeComponent();
-
-#if DEBUG
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-            _httpClient = new HttpClient();
-#endif
+            _httpClient = httpClient;
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             _currentEmail = user.Email;
-
-
             MaNVLabel.Text = user.MaNV;
             HoTenEntry.Text = user.HoTen;
             SDTEntry.Text = user.SDT;
@@ -153,13 +146,6 @@ namespace RestaurantManagementGUI
                 await DisplayAlert("Thông báo", result.Message, "OK");
             else
                 await DisplayAlert("Lỗi", result?.Message ?? "Gửi lại thất bại", "OK");
-        }
-
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-            return handler;
         }
     }
 }

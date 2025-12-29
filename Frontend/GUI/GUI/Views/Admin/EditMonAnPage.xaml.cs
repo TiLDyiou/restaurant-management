@@ -13,19 +13,12 @@ namespace RestaurantManagementGUI
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly FoodModel _foodItem;
 
-        public EditMonAnPage(FoodModel foodItemToEdit)
+        public EditMonAnPage(HttpClient httpCLient, FoodModel foodItemToEdit)
         {
             InitializeComponent();
-
+            _httpClient = httpCLient;
             _foodItem = foodItemToEdit;
-
-#if DEBUG
-            _httpClient = new HttpClient(GetInsecureHandler());
-#else
-            _httpClient = new HttpClient();
-#endif
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
             EntryTenMA.Text = _foodItem.Name;
             EntryDonGia.Text = _foodItem.Price.ToString("0.##");
             EntryLoai.Text = _foodItem.Category;
@@ -120,13 +113,6 @@ namespace RestaurantManagementGUI
         private async void Cancel_Clicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
-        }
-
-        private HttpClientHandler GetInsecureHandler()
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) => true;
-            return handler;
         }
     }
 }

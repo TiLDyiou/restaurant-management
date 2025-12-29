@@ -9,10 +9,6 @@
              BackgroundColor="#F6F6F6"
              NavigationPage.HasNavigationBar="False">
 
-    <ContentPage.BindingContext>
-        <vm:FoodMenuViewModel/>
-    </ContentPage.BindingContext>
-
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:NoteButtonTextConverter x:Key="NoteButtonTextConverter"/>
