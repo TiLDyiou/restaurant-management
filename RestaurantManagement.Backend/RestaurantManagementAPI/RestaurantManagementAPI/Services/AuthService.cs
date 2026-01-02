@@ -101,7 +101,9 @@ namespace RestaurantManagementAPI.Services
 
             var token = _jwtGenerator.GenerateToken(user);
 
+
             
+
             return ServiceResult<object>.Ok(new
             {
                 token,

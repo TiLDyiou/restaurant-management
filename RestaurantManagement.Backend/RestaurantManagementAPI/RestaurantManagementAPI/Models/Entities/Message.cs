@@ -10,14 +10,14 @@ namespace RestaurantManagementAPI.Models.Entities
         public int Id { get; set; }
 
         [Required]
+
         public string MaNV_Sender { get; set; } = string.Empty;
 
         [Required]
         public string SenderName { get; set; } = string.Empty;
 
-        // Thêm MaNV_Receiver: 
-        // Nếu là chat 1-1: Lưu mã nhân viên người nhận.
-        // Nếu là chat Group Public: Để null hoặc giá trị rỗng.
+
+
         public string? MaNV_Receiver { get; set; }
 
         [Required]

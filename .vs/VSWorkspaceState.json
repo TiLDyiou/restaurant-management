@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\RestaurantManagement.Backend",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Infrastructure",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Infrastructure\\Sockets",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Interfaces",
+    "\\RestaurantManagement.Backend\\RestaurantManagementAPI\\RestaurantManagementAPI\\Services"
+  ],
+  "PreviewInSolutionExplorer": false
+}

@@ -12,8 +12,8 @@ using RestaurantManagementAPI.Data;
 namespace RestaurantManagementAPI.Migrations
 {
     [DbContext(typeof(QLNHDbContext))]
-    [Migration("20260101113213_Update")]
-    partial class Update
+    [Migration("20260102105448_PULLCODE")]
+    partial class PULLCODE
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

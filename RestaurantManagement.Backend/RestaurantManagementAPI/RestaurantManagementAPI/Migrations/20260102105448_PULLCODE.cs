@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RestaurantManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class QLNH : Migration
+    public partial class PULLCODE : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -160,9 +160,9 @@ namespace RestaurantManagementAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaNV_Sender = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    MaNV_Sender = table.Column<string>(type: "nvarchar(5)", nullable: false),
                     SenderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MaNV_Receiver = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
+                    MaNV_Receiver = table.Column<string>(type: "nvarchar(5)", nullable: true),
                     ConversationId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
