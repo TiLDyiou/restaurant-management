@@ -14,8 +14,12 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> GetNotifications([FromQuery] string? loai = null)
     {
         var query = _context.THONGBAO.AsQueryable();
-        if (!string.IsNullOrEmpty(loai)) query = query.Where(x => x.Loai == loai);
-        var list = await query.OrderByDescending(x => x.ThoiGian).Take(30).ToListAsync();
+        if (!string.IsNullOrEmpty(loai)) 
+            query = query.Where(x => x.Loai == loai);
+        var list = await query
+            .OrderByDescending(x => x.ThoiGian)
+            .Take(30)
+            .ToListAsync();
         return Ok(ServiceResult<object>.Ok(list));
     }
 
@@ -23,7 +27,8 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> ClearNotifications([FromQuery] string? loai = null)
     {
         var query = _context.THONGBAO.AsQueryable();
-        if (!string.IsNullOrEmpty(loai)) query = query.Where(x => x.Loai == loai);
+        if (!string.IsNullOrEmpty(loai)) 
+            query = query.Where(x => x.Loai == loai);
         var list = await query.ToListAsync();
         if (list.Any())
         {

@@ -24,7 +24,8 @@ namespace RestaurantManagementAPI.Controllers
         public async Task<IActionResult> GetHistory(string conversationId)
         {
             var result = await _chatService.GetHistory(conversationId);
-            if (!result.Success) return BadRequest(result);
+            if (!result.Success) 
+                return Ok(ServiceResult<List<ChatMessageDto>>.Fail(result.Message));
 
             var dtos = result.Data.Select(m => new ChatMessageDto
             {
@@ -59,17 +60,20 @@ namespace RestaurantManagementAPI.Controllers
         [HttpPost("upload-image")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
-            if (file == null || file.Length == 0) return BadRequest("File trống");
+            if (file == null || file.Length == 0) 
+                return BadRequest("File trống");
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             var extension = Path.GetExtension(file.FileName).ToLower();
             if (!allowedExtensions.Contains(extension))
-            {
                 return BadRequest("Chỉ cho phép định dạng ảnh (.jpg, .png, .gif)");
-            }
+
+            if (file.Length > 5 * 1024 * 1024)
+                return BadRequest("File quá lớn (tối đa 5MB)");
 
             var webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             var chatFolder = Path.Combine(webRootPath, "uploads", "chat");
-            if (!Directory.Exists(chatFolder)) Directory.CreateDirectory(chatFolder);
+            if (!Directory.Exists(chatFolder)) 
+                Directory.CreateDirectory(chatFolder);
             var fileName = $"{Guid.NewGuid()}{extension}";
             var fullPath = Path.Combine(chatFolder, fileName);
 

@@ -19,11 +19,11 @@ namespace RestaurantManagementAPI.Services
         {
             try
             {
-                // 1. Chuẩn hóa thời gian
-                var start = startDate.Date;
-                var end = endDate.Date.AddDays(1).AddTicks(-1);
+                // Chuẩn hóa thời gian
+                var start = startDate.Date; // 00:00:00 của ngày bắt đầu
+                var end = endDate.Date.AddDays(1).AddTicks(-1); // 23:59:59.9999999 của ngày kết thúc
 
-                // 2. Lấy dữ liệu thô (Raw Data)
+                // Lấy dữ liệu thô (Raw Data)
                 var ordersInRange = await _context.HOADON
                     .Where(o => o.NgayLap.HasValue &&
                                 o.NgayLap.Value >= start &&
@@ -32,12 +32,12 @@ namespace RestaurantManagementAPI.Services
                     .Include(o => o.NhanVien)
                     .ToListAsync();
 
-                // 3. Tính toán tổng quan
+                // Tính toán tổng quan
                 var totalRevenue = ordersInRange.Sum(o => o.TongTien);
                 var totalOrders = ordersInRange.Count;
                 var avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-                // 4. Tính Trend
+                // Tính Trend
                 var rangeDuration = end - start;
                 var prevStart = start.Subtract(rangeDuration);
                 var prevEnd = start.AddTicks(-1);
@@ -55,7 +55,8 @@ namespace RestaurantManagementAPI.Services
                 else if (totalRevenue > 0)
                     trend = 100;
 
-                // 5. Xử lý Biểu đồ (Daily/Monthly Revenues)
+
+                // Xử lý Biểu đồ (Daily/Monthly Revenues)
                 List<DailyRevenueDto> chartData = new();
 
                 if (groupBy.ToLower() == "month")
@@ -102,7 +103,7 @@ namespace RestaurantManagementAPI.Services
                     ).OrderBy(d => d.Date).ToList();
                 }
 
-                // 6. Tính Top Nhân viên & Giao dịch gần đây
+                // Tính Top Nhân viên & Giao dịch gần đây
                 var topEmployees = ordersInRange
                     .GroupBy(o => o.NhanVien != null ? o.NhanVien.HoTen : "Không xác định")
                     .Select(g => new EmployeePerformanceDto
@@ -137,8 +138,6 @@ namespace RestaurantManagementAPI.Services
                     TopEmployees = topEmployees,
                     RecentTransactions = recentTransactions
                 };
-
-                // WRAP KẾT QUẢ VÀO SERVICERESULT
                 return ServiceResult<RevenueReportResponse>.Ok(response);
             }
             catch (Exception ex)

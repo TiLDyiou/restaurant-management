@@ -39,7 +39,6 @@ namespace RestaurantManagementAPI.Models.Entities
 
         [Column("IsVerified")]
         public bool IsVerified { get; set; } = false;
-
         public NhanVien NhanVien { get; set; } = null!;
     }
 }

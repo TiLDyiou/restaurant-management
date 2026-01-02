@@ -9,7 +9,7 @@ using System.Text;
 
 namespace RestaurantManagementAPI.Infrastructure.Sockets
 {
-    public class TcpSocketServer : BackgroundService
+    public class TcpSocketServer : BackgroundService // TcpSocketServer kế thừa từ BackgroundService để chạy ngầm
     {
         public static TcpSocketServer? Instance { get; private set; }
         private TcpListener? _listener;
@@ -37,24 +37,24 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
 
                 _listener = new TcpListener(IPAddress.Any, _port);
                 _listener.Start();
-                Console.WriteLine($"[SOCKET] Server started on port {_port}");
+                Console.WriteLine($"[SOCKET]: Server started on port {_port}");
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var client = await _listener.AcceptTcpClientAsync(stoppingToken);
-                    _ = HandleClientAsync(client, stoppingToken);
+                    _ = HandleClientAsync(client, stoppingToken); // Fire-and-forget, không chờ client trước xử lý xong mà tiếp tục lắng nghe client khác
                 }
             }
             catch (Exception ex) 
             { 
-                Console.WriteLine($"[SOCKET ERROR] {ex.Message}"); 
+                Console.WriteLine($"[SOCKET ERROR]: {ex.Message}"); 
             }
         }
 
         private async Task HandleClientAsync(TcpClient client, CancellationToken token)
         {
             string maNV = "";
-            NetworkStream stream = client.GetStream();
+            NetworkStream stream = client.GetStream(); // Lấy luồng dữ liệu từ client
             using var reader = new StreamReader(stream, Encoding.UTF8);
 
             try
@@ -65,9 +65,9 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     if (message == null) 
                         break;
 
-                    Console.WriteLine($"[RECV] {message}");
+                    Console.WriteLine($"[RECV]: {message}");
 
-                    if (message.StartsWith("LOGIN|"))
+                    if (message.StartsWith("LOGIN|")) // Định dạng : LOGIN|MaNV
                     {
                         var parts = message.Split('|');
                         if (parts.Length > 1)
@@ -75,8 +75,8 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                             maNV = parts[1].Trim();
                             _clients.AddOrUpdate(maNV, client, (k, v) => client);
                             Console.WriteLine($"-> User {maNV} Connected");
-                            await UpdateUserStatusInDb(maNV, true);
-                            await BroadcastAsync($"STATUS|{maNV}|TRUE");
+                            await UpdateUserStatusInDb(maNV, true); // Cập nhật trạng thái online trong DB
+                            await BroadcastAsync($"STATUS|{maNV}|TRUE"); // Thông báo cho tất cả client biết user đã online
                         }
                     }
                     else if (message.StartsWith("LOGOUT"))
@@ -89,7 +89,10 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SOCKET ERROR]: {ex.Message}");
+            }
             finally
             {
                 if (!string.IsNullOrEmpty(maNV))
@@ -118,7 +121,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
             }
             catch (Exception ex)
             { 
-                Console.WriteLine($"DB Error: {ex.Message}"); 
+                Console.WriteLine($"[DB Error]: {ex.Message}"); 
             }
         }
 
@@ -134,7 +137,10 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     {
                         _ = client.GetStream().WriteAsync(data);
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[SOCKET ERROR]: {ex.Message}");
+                    }
                 }
             }
         }

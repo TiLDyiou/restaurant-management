@@ -17,6 +17,24 @@ namespace RestaurantManagementAPI.Controllers
             _authService = authService;
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var result = await _authService.LoginAsync(dto);
+
+            if (result.Success)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = result.Message,
+                    data = result.Data
+                });
+            }
+
+            return Unauthorized(new { success = false, message = result.Message });
+        }
+
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
@@ -52,7 +70,7 @@ namespace RestaurantManagementAPI.Controllers
 
             if (result.Success)
             {
-                return Ok(new
+                return Created("", new
                 {
                     success = true,
                     message = result.Message,
@@ -64,24 +82,6 @@ namespace RestaurantManagementAPI.Controllers
                 });
             }
             return BadRequest(new { success = false, message = result.Message });
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
-        {
-            var result = await _authService.LoginAsync(dto);
-
-            if (result.Success)
-            {
-                return Ok(new
-                {
-                    success = true,
-                    message = result.Message,
-                    data = result.Data
-                });
-            }
-
-            return Unauthorized(new { success = false, message = result.Message });
         }
 
         [HttpPost("otp/register")]

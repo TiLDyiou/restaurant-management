@@ -33,7 +33,12 @@ namespace RestaurantManagementAPI.Controllers
         public async Task<IActionResult> PostDish([FromBody] CreateMonAnDto dto)
         {
             var result = await _dishService.CreateDishAsync(dto);
-            return Ok(result);
+            if (!result.Success)
+                return BadRequest(result);
+            return CreatedAtAction(
+                nameof(GetDish), 
+                new { id = result.Data }, 
+            result);
         }
 
         [HttpPut("{id}")]

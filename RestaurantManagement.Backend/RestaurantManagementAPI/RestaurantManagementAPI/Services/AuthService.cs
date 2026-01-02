@@ -4,6 +4,8 @@ using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs;
 using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace RestaurantManagementAPI.Services
 {
@@ -22,6 +24,12 @@ namespace RestaurantManagementAPI.Services
 
         public async Task<ServiceResult<string>> RegisterAsync(RegisterDto dto)
         {
+            if (!string.IsNullOrWhiteSpace(dto.Email) && !IsValidEmail(dto.Email))
+                return ServiceResult<string>.Fail("Email không đúng định dạng.");
+
+            if (!string.IsNullOrWhiteSpace(dto.SDT) && !IsValidPhoneNumber(dto.SDT))
+                return ServiceResult<string>.Fail("Số điện thoại không hợp lệ (phải có 10-11 số, bắt đầu bằng 0).");
+
             if (await _context.TAIKHOAN.AnyAsync(t => t.TenDangNhap == dto.TenDangNhap))
                 return ServiceResult<string>.Fail("Tên đăng nhập đã tồn tại.");
 
@@ -42,7 +50,7 @@ namespace RestaurantManagementAPI.Services
                     NgayVaoLam = DateTime.Now,
                     TrangThai = "Đang làm"
                 };
-                _context.NHANVIEN.Add(nv);
+                _context.NHANVIEN.Add(nv); // Đánh dấu để thêm mới, chưa lưu ngay vào DB
 
                 var tk = new TaiKhoan
                 {
@@ -55,7 +63,7 @@ namespace RestaurantManagementAPI.Services
                     IsVerified = false
                 };
                 _context.TAIKHOAN.Add(tk);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Lưu thay đổi vào DB
 
                 if (!string.IsNullOrWhiteSpace(dto.Email))
                 {
@@ -66,12 +74,12 @@ namespace RestaurantManagementAPI.Services
                         return ServiceResult<string>.Fail("Lỗi gửi email xác thực.");
                     }
                 }
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(); // Xác nhận thay đổi, ghi dữ liệu vào DB
                 return ServiceResult<string>.Ok(newMaNV, "Đăng ký thành công, vui lòng kiểm tra email.");
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(); // Loại bỏ thay đổi nếu có lỗi
                 return ServiceResult<string>.Fail("Lỗi hệ thống: " + ex.Message);
             }
         }
@@ -84,17 +92,26 @@ namespace RestaurantManagementAPI.Services
             bool matched = false;
             if (user != null)
             {
-                try { matched = BCrypt.Net.BCrypt.Verify(dto.MatKhau, user.MatKhau); }
-                catch { matched = false; }
+                try 
+                { 
+                    matched = BCrypt.Net.BCrypt.Verify(dto.MatKhau, user.MatKhau);
+                }
+                catch 
+                { 
+                    matched = false; 
+                }
             }
             else
             {
-                BCrypt.Net.BCrypt.Verify("dummy", "$2a$11$Ou9z/k/y...dummyhash...");
+                BCrypt.Net.BCrypt.Verify("dummy", "$2a$11$Ou9z/k/y...dummyhash..."); // Phòng chống Timing Attack
             }
 
-            if (user == null || !matched) return ServiceResult<object>.Fail("Sai tài khoản hoặc mật khẩu.");
-            if (!user.IsVerified) return ServiceResult<object>.Fail("Tài khoản chưa xác thực email.");
-            if (!user.IsActive) return ServiceResult<object>.Fail("Tài khoản đã bị vô hiệu hóa.");
+            if (user == null || !matched) 
+                return ServiceResult<object>.Fail("Sai tài khoản hoặc mật khẩu.");
+            if (!user.IsVerified) 
+                return ServiceResult<object>.Fail("Tài khoản chưa xác thực email.");
+            if (!user.IsActive) 
+                return ServiceResult<object>.Fail("Tài khoản đã bị vô hiệu hóa.");
 
             user.Online = true;
             await _context.SaveChangesAsync();
@@ -113,7 +130,8 @@ namespace RestaurantManagementAPI.Services
         public async Task<ServiceResult> LogoutAsync(string maNV)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.MaNV == maNV);
-            if (user == null) return ServiceResult.Fail("Không tìm thấy người dùng.");
+            if (user == null) 
+                return ServiceResult.Fail("Không tìm thấy người dùng.");
 
             user.Online = false;
             await _context.SaveChangesAsync();
@@ -123,8 +141,10 @@ namespace RestaurantManagementAPI.Services
         public async Task<ServiceResult> SendRegisterOtpAsync(string email)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return ServiceResult.Fail("Email không tồn tại.");
-            if (user.IsVerified) return ServiceResult.Fail("Tài khoản này đã xác thực rồi.");
+            if (user == null) 
+                return ServiceResult.Fail("Email không tồn tại.");
+            if (user.IsVerified) 
+                return ServiceResult.Fail("Tài khoản này đã xác thực rồi.");
 
             bool sent = await SendOtpInternal(user, "OTP Xác Thực Email");
             return sent ? ServiceResult.Ok("OTP đã được gửi.") : ServiceResult.Fail("Gửi email thất bại.");
@@ -133,7 +153,8 @@ namespace RestaurantManagementAPI.Services
         public async Task<ServiceResult> VerifyRegisterOtpAsync(string email, string otp)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return ServiceResult.Fail("Email không tồn tại.");
+            if (user == null) 
+                return ServiceResult.Fail("Email không tồn tại.");
 
             if (user.OTP?.Trim() != otp.Trim() || user.OTPExpireTime < DateTime.UtcNow)
                 return ServiceResult.Fail("OTP sai hoặc hết hạn.");
@@ -149,7 +170,8 @@ namespace RestaurantManagementAPI.Services
         public async Task<ServiceResult> ForgotPasswordAsync(string email)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return ServiceResult.Fail("Email không tồn tại.");
+            if (user == null) 
+                return ServiceResult.Fail("Email không tồn tại.");
 
             bool sent = await SendOtpInternal(user, "OTP Đổi Mật Khẩu");
             return sent ? ServiceResult.Ok("OTP đã được gửi.") : ServiceResult.Fail("Gửi email thất bại.");
@@ -158,18 +180,19 @@ namespace RestaurantManagementAPI.Services
         public async Task<ServiceResult> VerifyForgotOtpAsync(string email, string otp)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return ServiceResult.Fail("Email không tồn tại.");
+            if (user == null) 
+                return ServiceResult.Fail("Email không tồn tại.");
 
             if (user.OTP?.Trim() != otp.Trim() || user.OTPExpireTime < DateTime.UtcNow)
                 return ServiceResult.Fail("OTP sai hoặc hết hạn.");
-
             return ServiceResult.Ok("OTP hợp lệ.");
         }
 
         public async Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto)
         {
             var user = await _context.TAIKHOAN.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null) return ServiceResult.Fail("Email không tồn tại.");
+            if (user == null) 
+                return ServiceResult.Fail("Email không tồn tại.");
 
             if (user.OTP?.Trim() != dto.OTP.Trim() || user.OTPExpireTime < DateTime.UtcNow)
                 return ServiceResult.Fail("OTP sai hoặc hết hạn.");
@@ -183,7 +206,7 @@ namespace RestaurantManagementAPI.Services
 
         private async Task<bool> SendOtpInternal(TaiKhoan user, string subject)
         {
-            var otp = new Random().Next(100000, 999999).ToString();
+            var otp = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
             user.OTP = otp;
             user.OTPExpireTime = DateTime.UtcNow.AddMinutes(5);
             await _context.SaveChangesAsync();
@@ -201,19 +224,46 @@ namespace RestaurantManagementAPI.Services
 
         private async Task<string> GenerateNewMaNV()
         {
-            var lastNv = await _context.NHANVIEN
-                .Where(nv => nv.MaNV.StartsWith("NV"))
-                .OrderByDescending(nv => nv.MaNV.Length)
-                .ThenByDescending(nv => nv.MaNV)
-                .Select(nv => nv.MaNV)
-                .FirstOrDefaultAsync();
-
-            int nextNumber = 1;
-            if (lastNv != null && lastNv.Length > 2 && int.TryParse(lastNv.Substring(2), out int lastNum))
+            const int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                nextNumber = lastNum + 1;
+                var lastNv = await _context.NHANVIEN
+                    .Where(nv => nv.MaNV.StartsWith("NV"))
+                    .OrderByDescending(nv => nv.MaNV.Length)
+                    .ThenByDescending(nv => nv.MaNV)
+                    .Select(nv => nv.MaNV)
+                    .FirstOrDefaultAsync();
+
+                int nextNumber = 1;
+                if (lastNv != null && lastNv.Length > 2 && 
+                    int.TryParse(lastNv.Substring(2), out int lastNum))
+                {
+                    nextNumber = lastNum + 1;
+                }
+                
+                var newMaNV = $"NV{nextNumber:D3}";
+                
+                // Kiểm tra xem đã tồn tại chưa
+                if (!await _context.NHANVIEN.AnyAsync(nv => nv.MaNV == newMaNV))
+                    return newMaNV;
             }
-            return $"NV{nextNumber:D3}";
+            throw new InvalidOperationException("Không thể tạo mã nhân viên mới.");
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+            var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+
+        private static bool IsValidPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return false;
+            var phonePattern = @"^0\d{9,10}$";
+            return Regex.IsMatch(phoneNumber, phonePattern);
         }
     }
 }

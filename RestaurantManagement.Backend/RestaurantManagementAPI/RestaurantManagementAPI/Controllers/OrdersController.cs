@@ -19,7 +19,7 @@ namespace RestaurantManagementAPI.Controllers
         public async Task<IActionResult> GetOrders()
         {
             var result = await _orderService.GetOrdersAsync();
-            return result.Success ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -34,7 +34,15 @@ namespace RestaurantManagementAPI.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var result = await _orderService.CreateOrderAsync(createDto);
-            return result.Success ? Ok(result) : BadRequest(result);
+            
+            if (!result.Success)
+                return BadRequest(result);
+            return CreatedAtAction
+            (
+                nameof(GetOrderById), 
+                new { id = result.Data?.MaHD }, 
+                result
+            );
         }
 
         [HttpPut("{maHD}/items/{maMA}/status")]
