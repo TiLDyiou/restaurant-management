@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.Views.RevenueReportPage"
+             Title="Báo cáo doanh thu"
+             BackgroundColor="#F5F5F5">
+
+    <Grid Padding="20" RowDefinitions="Auto,Auto,Auto,*">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                <Label x:Name="PageTitleLabel" Text="Báo Cáo Doanh Thu" FontSize="20" FontAttributes="Bold" TextColor="#263238" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <Border Grid.Row="1" BackgroundColor="White" Padding="5" Margin="0,10,0,20" StrokeShape="RoundRectangle 25">
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="5">
+                <Button Grid.Column="0" x:Name="DayButton" Text="NGÀY" BackgroundColor="#FFBD59" TextColor="#263238" FontAttributes="Bold" CornerRadius="20" HeightRequest="40" Clicked="OnDayClicked"/>
+                <Button Grid.Column="1" x:Name="WeekButton" Text="TUẦN" BackgroundColor="White" TextColor="#666" CornerRadius="20" HeightRequest="40" Clicked="OnWeekClicked"/>
+                <Button Grid.Column="2" x:Name="MonthButton" Text="THÁNG" BackgroundColor="White" TextColor="#666" CornerRadius="20" HeightRequest="40" Clicked="OnMonthClicked"/>
+                <Button Grid.Column="3" x:Name="YearButton" Text="NĂM" BackgroundColor="White" TextColor="#666" CornerRadius="20" HeightRequest="40" Clicked="OnYearClicked"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="15" Margin="0,0,0,20">
+
+            <Border Grid.Column="0" BackgroundColor="White" Padding="15" StrokeShape="RoundRectangle 15">
+                <VerticalStackLayout Spacing="5">
+                    <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#FFF3E0" HorizontalOptions="Start" StrokeThickness="0">
+                        <Label Text="₫" TextColor="#FF9800" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+
+                    <Label Text="Doanh Thu" FontSize="12" TextColor="#999" Margin="0,5,0,0"/>
+                    <Label x:Name="TotalRevenueLabel" Text="0 ₫" FontSize="18" FontAttributes="Bold" TextColor="#263238"/>
+                    <Label x:Name="RevenueTrendLabel" Text="--" FontSize="11" TextColor="#4CAF50"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1" BackgroundColor="White" Padding="15" StrokeShape="RoundRectangle 15">
+                <VerticalStackLayout Spacing="5">
+                    <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#E3F2FD" HorizontalOptions="Start" StrokeThickness="0">
+                        <Label Text="📄" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+
+                    <Label Text="Số Đơn Hàng" FontSize="12" TextColor="#999" Margin="0,5,0,0"/>
+                    <Label x:Name="TotalOrdersLabel" Text="0" FontSize="18" FontAttributes="Bold" TextColor="#263238"/>
+                    <Label Text="Đã thanh toán" FontSize="11" TextColor="#2196F3"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="2" BackgroundColor="White" Padding="15" StrokeShape="RoundRectangle 15">
+                <VerticalStackLayout Spacing="5">
+                    <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#F3E5F5" HorizontalOptions="Start" StrokeThickness="0">
+                        <Label Text="📊" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+
+                    <Label Text="TB Giá Trị Đơn" FontSize="12" TextColor="#999" Margin="0,5,0,0"/>
+                    <Label x:Name="AverageOrderLabel" Text="0 ₫" FontSize="18" FontAttributes="Bold" TextColor="#263238"/>
+                    <Label Text="Trung bình/đơn" FontSize="11" TextColor="#9C27B0"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="20">
+
+            <Border Grid.Column="0" BackgroundColor="White" Padding="20" StrokeShape="RoundRectangle 15" VerticalOptions="Start">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📊 Biểu đồ Doanh Thu" FontSize="16" FontAttributes="Bold" TextColor="#263238"/>
+
+                    <ScrollView Orientation="Horizontal" VerticalOptions="Fill" HeightRequest="320">
+                        <Grid x:Name="RevenueChartContainer"
+                  RowDefinitions="*,Auto,Auto"
+                  ColumnSpacing="8"
+                  Padding="10,20,10,30"
+                  MinimumWidthRequest="600">
+                            <VerticalStackLayout x:Name="EmptyChartState" Grid.RowSpan="3" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="True">
+                                <Label Text="📊" FontSize="48" HorizontalOptions="Center" Opacity="0.3"/>
+                                <Label Text="Không có dữ liệu" FontSize="14" TextColor="#999"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1" BackgroundColor="White" Padding="20" StrokeShape="RoundRectangle 15">
+                <VerticalStackLayout Spacing="10">
+
+                    <Label x:Name="RightPanelTitle" Text="Chi Tiết" FontSize="16" FontAttributes="Bold" TextColor="#263238"/>
+
+                    <ScrollView VerticalOptions="FillAndExpand">
+                        <VerticalStackLayout x:Name="RightPanelContent" Spacing="10"/>
+                    </ScrollView>
+
+                    <VerticalStackLayout x:Name="EmptyRightPanelState" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="True">
+                        <Label Text="👤" FontSize="48" HorizontalOptions="Center" Opacity="0.3"/>
+                        <Label Text="Không có thông tin" FontSize="14" TextColor="#999" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

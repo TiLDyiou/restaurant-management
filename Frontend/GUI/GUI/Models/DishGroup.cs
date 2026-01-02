@@ -1,0 +1,14 @@
+﻿using System.Collections.Generic;
+
+namespace RestaurantManagementGUI.Models
+{
+    public class DishGroup : List<FoodModel>
+    {
+        public string Category { get; private set; }
+
+        public DishGroup(string category, List<FoodModel> dishes) : base(dishes)
+        {
+            Category = category;
+        }
+    }
+}

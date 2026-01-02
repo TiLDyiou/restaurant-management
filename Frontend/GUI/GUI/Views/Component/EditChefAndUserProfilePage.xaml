@@ -1,0 +1,36 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.EditChefAndUserProfilePage"
+             BackgroundColor="White"
+             Title="Cập nhật thông tin">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="Mã nhân viên:" FontAttributes="Bold"/>
+            <Label x:Name="MaNVLabel"/>
+
+            <Label Text="Họ tên:" FontAttributes="Bold"/>
+            <Entry x:Name="HoTenEntry" Placeholder="Nhập họ tên"/>
+
+            <Label Text="Số điện thoại:" FontAttributes="Bold"/>
+            <Entry x:Name="SDTEntry" Placeholder="Nhập số điện thoại" Keyboard="Telephone"/>
+
+            <Label Text="Email:" FontAttributes="Bold"/>
+            <Entry x:Name="EmailEntry" Placeholder="Nhập email" Keyboard="Email"/>
+
+            <Label Text="Mật khẩu mới:" FontAttributes="Bold"/>
+            <Entry x:Name="MatKhauEntry" Placeholder="Nhập mật khẩu mới" IsPassword="True"/>
+            <Label Text="Xác nhận mật khẩu:" FontAttributes="Bold"/>
+            <Entry x:Name="ConfirmPasswordEntry" Placeholder="Xác nhận mật khẩu" IsPassword="True" />
+            <Button x:Name="UpdateButton"
+                    Text="Cập nhật thông tin"
+                    BackgroundColor="#FFBD59"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="12"
+                    HeightRequest="50"
+                    Clicked="OnUpdateUserClicked"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

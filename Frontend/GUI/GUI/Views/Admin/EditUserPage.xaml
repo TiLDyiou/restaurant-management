@@ -1,0 +1,29 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.EditUserPage"
+             Title="Chỉnh sửa nhân viên">
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="15">
+            <Label x:Name="MaNVLabel" FontAttributes="Bold" />
+            <Entry x:Name="HoTenEntry" Placeholder="Họ tên" />
+            <Entry x:Name="ChucVuEntry" Placeholder="Chức vụ" />
+            <Entry x:Name="SDTEntry" Placeholder="Số điện thoại" Keyboard="Telephone" />
+            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
+            <Entry x:Name="MatKhauEntry" Placeholder="Mật khẩu mới" IsPassword="True" />
+            <Entry x:Name="ConfirmPasswordEntry" Placeholder="Xác nhận mật khẩu mới" IsPassword="True" />
+            <Picker x:Name="QuyenPicker" Title="Quyền">
+                <Picker.Items>
+                    <x:String>NhanVien</x:String>
+                    <x:String>Admin</x:String>
+                    <x:String>DauBep</x:String>
+                </Picker.Items>
+            </Picker>
+            <Button x:Name="UpdateButton"
+                    Text="Cập nhật nhân viên"
+                    Clicked="OnUpdateUserClicked"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="10" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

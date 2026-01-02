@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.ChefDashboardPage"
+             BackgroundColor="White"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <Style x:Key="DashboardButtonStyle" TargetType="Border">
+            <Setter Property="Stroke" Value="#E0E0E0"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape" Value="RoundRectangle 15"/>
+            <Setter Property="BackgroundColor" Value="White"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="HeightRequest" Value="130"/>
+            <Setter Property="Margin" Value="0,0,10,15"/>
+        </Style>
+
+        <Style x:Key="DashboardLabelStyle" TargetType="Label">
+            <Setter Property="TextColor" Value="#263238"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+            <Setter Property="VerticalTextAlignment" Value="Center"/>
+            <Setter Property="LineBreakMode" Value="WordWrap"/>
+            <Setter Property="MaxLines" Value="2"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid x:Name="MainLayout" BackgroundColor="White">
+
+        <Grid x:Name="UserInfoPanel" BackgroundColor="#263238" Padding="20">
+            <VerticalStackLayout VerticalOptions="Center" Spacing="10">
+                <Label Text="ĐẦU BẾP" TextColor="#FFBD59" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="Kitchen Portal" TextColor="White" FontSize="14" HorizontalOptions="Center" Opacity="0.8"/>
+
+                <BoxView HeightRequest="2" Color="#FFBD59" Opacity="0.5" WidthRequest="100"/>
+
+                <Label x:Name="WelcomeLabel" Text="Xin chào, Chef" FontSize="16" TextColor="White" FontAttributes="Bold" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+
+                <Button Text="Đăng xuất" 
+                        TextColor="#263238" BackgroundColor="#FFBD59" FontAttributes="Bold"
+                        CornerRadius="20" HeightRequest="45" WidthRequest="140"
+                        Margin="0,20,0,0"
+                        Clicked="OnLogoutClicked"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <ScrollView x:Name="ContentScroll" Padding="{OnIdiom Phone='15', Default='30'}">
+
+            <FlexLayout Wrap="Wrap" JustifyContent="SpaceBetween" AlignContent="Start">
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOrdersClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="orders.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="QUẢN LÝ ĐƠN MÓN" Style="{StaticResource DashboardLabelStyle}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFoodMenuClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="menu.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="TRA CỨU MENU" Style="{StaticResource DashboardLabelStyle}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnChatClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="chat_9374926.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="CHAT" Style="{StaticResource DashboardLabelStyle}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource DashboardButtonStyle}" FlexLayout.Basis="{OnIdiom Phone='48%', Default='30%'}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnUsersClicked"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Image Source="users.png" HeightRequest="45" Aspect="AspectFit"/>
+                        <Label Text="HỒ SƠ CÁ NHÂN" Style="{StaticResource DashboardLabelStyle}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </FlexLayout>
+        </ScrollView>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="LayoutStates">
+                <VisualState x:Name="Phone">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="MainLayout" Property="RowDefinitions" Value="Auto, *" />
+                        <Setter TargetName="MainLayout" Property="ColumnDefinitions" Value="*" />
+
+                        <Setter TargetName="UserInfoPanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="UserInfoPanel" Property="Grid.Column" Value="0" />
+
+                        <Setter TargetName="ContentScroll" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="ContentScroll" Property="Grid.Column" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Desktop">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="800" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="MainLayout" Property="RowDefinitions" Value="*" />
+                        <Setter TargetName="MainLayout" Property="ColumnDefinitions" Value="280, *" />
+
+                        <Setter TargetName="UserInfoPanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="UserInfoPanel" Property="Grid.Column" Value="0" />
+
+                        <Setter TargetName="ContentScroll" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ContentScroll" Property="Grid.Column" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</ContentPage>

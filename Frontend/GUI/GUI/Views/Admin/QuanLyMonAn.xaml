@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.QuanLyMonAnPage" 
+             xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
+             xmlns:converters="clr-namespace:RestaurantManagementGUI.Converters"
+             Title="Quản Lý Món Ăn"
+             BackgroundColor="#F5F7FA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Border Grid.Row="0" StrokeShape="RoundRectangle 10" BackgroundColor="White" Padding="15" Margin="10">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Thêm món ăn mới" FontAttributes="Bold" FontSize="18" TextColor="#263238"/>
+
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto, Auto" 
+                      ColumnSpacing="10" RowSpacing="5">
+
+                    <Entry x:Name="NewTenMA" Grid.Row="0" Grid.Column="0" Placeholder="Tên món ăn" />
+                    <Entry x:Name="NewDonGia" Grid.Row="0" Grid.Column="1" Placeholder="Giá tiền" Keyboard="Numeric"/>
+                    <Entry x:Name="NewLoai" Grid.Row="1" Grid.Column="0" Placeholder="Loại món" />
+
+                    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                        <Entry Grid.Column="0" x:Name="NewHinhAnh" Placeholder="Link ảnh hoặc chọn file" />
+                        <Button Grid.Column="1" Text="..." Clicked="PickImage_Clicked" 
+                                HeightRequest="45" WidthRequest="50" Padding="0"/>
+                    </Grid>
+                </Grid>
+
+                <Button x:Name="AddButton"
+                        Text="THÊM MÓN MỚI" 
+                        Clicked="AddDish_Clicked" 
+                        BackgroundColor="#FFBD59"
+                        TextColor="#263238"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="45"/>
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1" Padding="10">
+            <CollectionView x:Name="DishesCollectionView" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:FoodModel">
+                        <Border StrokeShape="RoundRectangle 10" Padding="10" Margin="0,5" BackgroundColor="White" Stroke="#E0E0E0">
+                            <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="10">
+
+                                <Image Grid.Column="0" Source="{Binding DisplayImageUrl}" 
+                                       HeightRequest="60" WidthRequest="60" Aspect="AspectFill" />
+
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" TextColor="Black" />
+                                    <Label Text="{Binding FormattedPrice}" TextColor="Gray" />
+                                    <Label Text="ĐANG ẨN" TextColor="Red" FontSize="10" FontAttributes="Bold" 
+                                           IsVisible="{Binding TrangThai, Converter={StaticResource InvertedBoolConverter}}" />
+                                </VerticalStackLayout>
+
+                                <Button Grid.Column="2" Text="Sửa"
+                                        Clicked="EditDish_Clicked" BindingContext="{Binding .}" 
+                                        BackgroundColor="#3B5998" TextColor="White"
+                                        CornerRadius="5" HeightRequest="35" FontSize="12" Margin="0,0,5,0"/>
+
+                                <Button Grid.Column="3" Text="Xóa"
+                                        Clicked="DeleteDish_Clicked" BindingContext="{Binding .}" 
+                                        BackgroundColor="#D32F2F" TextColor="White"
+                                        CornerRadius="5" HeightRequest="35" FontSize="12"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+    </Grid>
+</ContentPage>

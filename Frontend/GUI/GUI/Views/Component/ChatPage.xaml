@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:RestaurantManagementGUI.Converters"
+             x:Class="RestaurantManagementGUI.ChatPage"
+             Title="Hệ thống tin nhắn"
+             BackgroundColor="White"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <conv:IsMineToAlignmentConverter x:Key="AlignmentConverter" />
+            <conv:IsMineToColorConverter x:Key="BubbleColorConverter" />
+            <conv:IsMineToTextColorConverter x:Key="IsMineToTextColorConverter" />
+            <conv:IsNullConverter x:Key="IsNullConverter" />
+            <conv:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <conv:ImageUrlConverter x:Key="ImageUrlConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{OnIdiom Phone=*, Default=350}" />
+            <ColumnDefinition Width="{OnIdiom Phone=0, Default=*}" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" RowDefinitions="Auto,*" BackgroundColor="White"
+              IsVisible="{OnIdiom Phone={Binding SelectedConversation, Converter={StaticResource IsNullConverter}}, Default=True}">
+
+            <BoxView Grid.RowSpan="2" HorizontalOptions="End" WidthRequest="1" Color="#E4E6EB"/>
+
+            <Label Grid.Row="0" Text="Đoạn chat" FontAttributes="Bold" FontSize="24" 
+                   Padding="20,20,20,10" TextColor="Black"/>
+
+            <CollectionView Grid.Row="1" 
+                            x:Name="ConversationsList"
+                            ItemsSource="{Binding FilteredConversations}"
+                            SelectedItem="{Binding SelectedConversation}" 
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="15,12" ColumnDefinitions="55,*,Auto">
+                            <Frame WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" 
+                                   BackgroundColor="{Binding Avatar}" BorderColor="Transparent">
+                                <Label Text="{Binding InitialLetter}" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center" 
+                                       TextColor="White" 
+                                       FontAttributes="Bold" 
+                                       FontSize="18"/>
+                            </Frame>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="12,0">
+                                <HorizontalStackLayout Spacing="5">
+                                    <Label Text="{Binding Name}" FontSize="15" TextColor="Black" LineBreakMode="TailTruncation" MaxLines="1">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsUnread}" Value="True">
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Text="👥" FontSize="12" VerticalOptions="Center" IsVisible="{Binding IsGroup}"/>
+                                </HorizontalStackLayout>
+
+                                <Label Text="{Binding LastMessage}" 
+                                       FontSize="13" 
+                                       TextColor="#65676B" 
+                                       MaxLines="1" 
+                                       LineBreakMode="TailTruncation">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsUnread}" Value="True">
+                                            <Setter Property="FontAttributes" Value="Bold" />
+                                            <Setter Property="TextColor" Value="Black" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </VerticalStackLayout>
+
+                            <Grid Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End" Margin="0,0,10,0">
+                                <Ellipse WidthRequest="20" HeightRequest="20" Fill="#0084FF" IsVisible="{Binding HasUnread}"/>
+                                <Label Text="{Binding UnreadCount}" TextColor="White" FontSize="11" FontAttributes="Bold"
+                                       HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasUnread}"/>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <Grid Grid.Column="{OnIdiom Phone=0, Default=1}" 
+              Grid.RowDefinitions="Auto,*,Auto" 
+              BackgroundColor="White"
+              IsVisible="{OnIdiom Phone={Binding SelectedConversation, Converter={StaticResource IsNotNullConverter}}, Default=True}">
+
+            <Grid Grid.Row="0" Padding="10" ColumnDefinitions="Auto,*,Auto" BackgroundColor="White">
+                <Button Text="←" 
+                        IsVisible="{OnIdiom Phone=True, Default=False}" 
+                        Clicked="OnBackToSidebarClicked" 
+                        BackgroundColor="Transparent" 
+                        TextColor="#0084FF" 
+                        FontSize="20"/>
+
+                <Label Grid.Column="1" 
+                       Text="{Binding CurrentChatName}" 
+                       FontAttributes="Bold" 
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Start" 
+                       FontSize="17" 
+                       TextColor="Black" 
+                       Margin="10,0"/>
+
+                <BoxView Grid.Row="1" HeightRequest="1" Color="#E4E6EB" VerticalOptions="End" Grid.ColumnSpan="3"/>
+            </Grid>
+
+            <VerticalStackLayout Grid.Row="1" 
+                                 VerticalOptions="Center" 
+                                 HorizontalOptions="Center" 
+                                 Spacing="15"
+                                 IsVisible="{Binding SelectedConversation, Converter={StaticResource IsNullConverter}}">
+                <Label Text="💬" FontSize="80" HorizontalOptions="Center"/>
+                <Label Text="Chọn một đoạn hội thoại để bắt đầu" TextColor="Gray" FontSize="16"/>
+            </VerticalStackLayout>
+
+            <ScrollView Grid.Row="1" 
+                        x:Name="MessageScrollView" 
+                        Padding="20" 
+                        VerticalOptions="FillAndExpand"
+                        IsVisible="{Binding SelectedConversation, Converter={StaticResource IsNotNullConverter}}">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CurrentMessages}" 
+                                     Spacing="15" 
+                                     VerticalOptions="End">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalOptions="{Binding IsSentMessage, Converter={StaticResource AlignmentConverter}}">
+                                <VerticalStackLayout Spacing="4" MaximumWidthRequest="400">
+                                    <Label Text="{Binding SenderName}" FontSize="11" TextColor="#65676B" Margin="5,0"
+                                           IsVisible="{Binding IsSentMessage, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                                    <Frame BackgroundColor="{Binding IsSentMessage, Converter={StaticResource BubbleColorConverter}}" 
+                                           Padding="12,10" CornerRadius="18" HasShadow="False" BorderColor="Transparent">
+                                        <Grid>
+                                            <Label Text="{Binding Content}" FontSize="15" 
+                                                   TextColor="{Binding IsSentMessage, Converter={StaticResource IsMineToTextColorConverter}}"
+                                                   IsVisible="{Binding IsImage, Converter={StaticResource InverseBooleanConverter}}"/>
+                                            <Image Source="{Binding Content, Converter={StaticResource ImageUrlConverter}}" 
+                                                    Aspect="AspectFill" 
+                                                    WidthRequest="200"
+                                                    HeightRequest="200"
+                                                    IsVisible="{Binding IsImage}">
+                                                <Image.GestureRecognizers>
+                                                    <TapGestureRecognizer Tapped="OnImageTapped"/>
+                                                </Image.GestureRecognizers>
+                                            </Image>
+                                        </Grid>
+                                    </Frame>
+
+                                    <HorizontalStackLayout Spacing="5" HorizontalOptions="End">
+                                        <Label Text="{Binding TimeDisplay}" FontSize="10" TextColor="#B0B3B8"/>
+
+                                        <Label Text="{Binding StatusText}" 
+                                                TextColor="{Binding StatusColor}"
+                                                FontSize="10"
+                                                FontAttributes="Italic"
+                                                IsVisible="{Binding IsSentMessage}"/>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Padding="15" ColumnSpacing="10"
+                  IsVisible="{Binding SelectedConversation, Converter={StaticResource IsNotNullConverter}}">
+
+                <Button Text="📷" Command="{Binding SendImageCommand}" BackgroundColor="Transparent" TextColor="#0084FF" FontSize="22" 
+                        IsEnabled="{Binding IsUploadingImage, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                <Frame Grid.Column="1" CornerRadius="20" BackgroundColor="#F0F2F5" Padding="15,0" HeightRequest="40" HasShadow="False" BorderColor="Transparent">
+                    <Entry Text="{Binding MessageInput}" Placeholder="Nhập tin nhắn..." TextColor="Black" VerticalOptions="Center" 
+                           ReturnCommand="{Binding SendMessageCommand}" 
+                           IsEnabled="{Binding IsUploadingImage, Converter={StaticResource InverseBooleanConverter}}"/>
+                </Frame>
+
+                <Button Grid.Column="2" Text="➤" Command="{Binding SendMessageCommand}" BackgroundColor="Transparent" TextColor="#0084FF" FontSize="22" FontAttributes="Bold" 
+                        IsEnabled="{Binding IsUploadingImage, Converter={StaticResource InverseBooleanConverter}}"/>
+            </Grid>
+
+            <ActivityIndicator Grid.Row="2" IsRunning="{Binding IsUploadingImage}" IsVisible="{Binding IsUploadingImage}" 
+                               Color="#0084FF" VerticalOptions="Center" HorizontalOptions="Center"/>
+        </Grid>
+    </Grid>
+</ContentPage>

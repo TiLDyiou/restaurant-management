@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.EditMonAnPage"
+             Title="Sửa Món Ăn"
+             BackgroundColor="#F5F7FA">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="20">
+            <Label Text="Cập nhật thông tin món ăn" FontSize="20" FontAttributes="Bold" TextColor="#263238"/>
+
+            <Label Text="Tên món ăn" TextColor="#263238"/>
+            <Entry x:Name="EntryTenMA" />
+
+            <Label Text="Giá tiền" TextColor="#263238"/>
+            <Entry x:Name="EntryDonGia" Keyboard="Numeric" />
+
+            <Label Text="Loại" TextColor="#263238"/>
+            <Entry x:Name="EntryLoai" />
+
+            <Label Text="Hình ảnh (Link hoặc chọn file)" TextColor="#263238"/>
+            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                <Entry Grid.Column="0" 
+                       x:Name="EntryHinhAnh" 
+                       Placeholder="Nhập link ảnh hoặc chọn file..." 
+                       Unfocused="EntryHinhAnh_Unfocused"
+                       Completed="EntryHinhAnh_Completed"/>
+
+                <Button Grid.Column="1" 
+                        Text="..." 
+                        Clicked="PickImage_Clicked"
+                        HeightRequest="45"
+                        WidthRequest="50"
+                        VerticalOptions="Center" />
+            </Grid>
+
+            <Frame BorderColor="Gray" CornerRadius="5" Padding="0" HeightRequest="200" HasShadow="False">
+                <Image x:Name="ImgPreview" 
+                       Aspect="AspectFit" 
+                       BackgroundColor="#EEEEEE"
+                       HeightRequest="200" />
+            </Frame>
+
+            <Label Text="Trạng thái (Bật = Đang bán, Tắt = Ngừng bán)" TextColor="#263238"/>
+            <Switch x:Name="SwitchTrangThai" />
+
+            <Button Text="LƯU THAY ĐỔI" 
+                    Clicked="Save_Clicked" 
+                    BackgroundColor="#4CAF50" 
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    Margin="0,20,0,0" />
+
+            <Button Text="HỦY" 
+                    Clicked="Cancel_Clicked" 
+                    BackgroundColor="#E0E0E0" 
+                    TextColor="Black"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

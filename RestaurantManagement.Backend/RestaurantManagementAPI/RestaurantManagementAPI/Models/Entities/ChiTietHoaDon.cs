@@ -1,0 +1,32 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RestaurantManagementAPI.Models.Entities
+{
+    [Table("CHITIETHOADON")]
+    public class ChiTietHoaDon
+    {
+        [Column("MaHD")]
+        [StringLength(20)]
+        public string MaHD { get; set; } = string.Empty;
+
+        [Column("MaMA")]
+        [StringLength(20)]
+        public string MaMA { get; set; } = string.Empty;
+
+        [Column("SoLuong")]
+        public int SoLuong { get; set; }
+
+        [Column("DonGia")]
+        public decimal DonGia { get; set; }
+
+        [Column("ThanhTien")]
+        public decimal ThanhTien { get; set; }
+
+        [Column("TrangThai")]
+        [StringLength(50)]
+        public string? TrangThai { get; set; }
+        public HoaDon? HoaDon { get; set; }
+        public MonAn? MonAn { get; set; }
+    }
+}

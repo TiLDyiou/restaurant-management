@@ -1,0 +1,59 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.ChefAndUserProfilePage"
+             BackgroundColor="White"
+             Title="Thông tin cá nhân">
+
+    <ContentPage.Resources>
+        <!-- Màu chủ đề -->
+        <Color x:Key="PrimaryColor">White</Color>
+        <Color x:Key="AccentColor">#FFBD59</Color>
+        <!-- vàng -->
+        <Color x:Key="TextPrimary">#263238</Color>
+        <!-- chữ chính tối -->
+        <Color x:Key="TextSecondary">#546E7A</Color>
+        <!-- chữ phụ tối nhạt -->
+        <Color x:Key="CardBackground">#FFF8E1</Color>
+        <!-- nền nhạt cho card -->
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            <Frame BackgroundColor="{StaticResource CardBackground}" 
+                   CornerRadius="12" Padding="15" HasShadow="True">
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Mã nhân viên:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="MaNVLabel" TextColor="{StaticResource TextSecondary}"/>
+
+                    <Label Text="Họ tên:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="HoTenLabel" TextColor="{StaticResource TextSecondary}"/>
+
+                    <Label Text="Chức vụ:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="ChucVuLabel" TextColor="{StaticResource TextSecondary}"/>
+
+                    <Label Text="Quyền:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="QuyenLabel" TextColor="{StaticResource TextSecondary}"/>
+
+                    <Label Text="Tên đăng nhập:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="TenDangNhapLabel" TextColor="{StaticResource TextSecondary}"/>
+
+                    <Label Text="Email:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="EmailLabel" TextColor="{StaticResource TextSecondary}"/>
+
+                    <Label Text="Số điện thoại:" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                    <Label x:Name="SDTLabel" TextColor="{StaticResource TextSecondary}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Nút cập nhật thông tin -->
+            <Button Text="Cập nhật thông tin"
+                    BackgroundColor="{StaticResource AccentColor}"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="12"
+                    HeightRequest="50"
+                    Clicked="OnEditProfileClicked"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

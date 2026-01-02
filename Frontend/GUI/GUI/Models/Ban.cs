@@ -1,0 +1,23 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Text.Json.Serialization;
+
+namespace RestaurantManagementGUI.Models
+{
+    public partial class Ban : ObservableObject
+    {
+        [JsonPropertyName("maBan")]
+        public string MaBan { get; set; }
+
+        [JsonPropertyName("tenBan")]
+        public string TenBan { get; set; }
+        [ObservableProperty]
+        [JsonPropertyName("trangThai")]
+        private string _trangThai;
+    }
+
+    public class TableUpdatePayload
+    {
+        public string MaBan { get; set; }
+        public string TrangThai { get; set; }
+    }
+}

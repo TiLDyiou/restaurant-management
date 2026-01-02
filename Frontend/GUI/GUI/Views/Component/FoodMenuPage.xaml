@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.Views.FoodMenuPage"
+             xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
+             xmlns:viewmodels="clr-namespace:RestaurantManagementGUI.ViewModels"
+             Title="Thực Đơn Nhà Hàng"
+             BackgroundColor="#f0f0f0">
+
+    <Grid>
+        <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                           IsVisible="{Binding IsLoading}" 
+                           Color="#004d40"
+                           VerticalOptions="Center" 
+                           HorizontalOptions="Center"
+                           ZIndex="99"/>
+
+        <ScrollView x:Name="MainScroll">
+            <StackLayout x:Name="MainStack" BindableLayout.ItemsSource="{Binding GroupedDishes}" Spacing="15" Padding="10">
+
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState x:Name="Desktop">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="800" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter TargetName="MainScroll" Property="ScrollView.Orientation" Value="Horizontal" />
+                                <Setter TargetName="MainStack" Property="StackLayout.Orientation" Value="Horizontal" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Phone">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter TargetName="MainScroll" Property="ScrollView.Orientation" Value="Vertical" />
+                                <Setter TargetName="MainStack" Property="StackLayout.Orientation" Value="Vertical" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:DishGroup">
+
+                        <Border StrokeShape="RoundRectangle 15" StrokeThickness="0" BackgroundColor="#e0f2f1" Padding="10"
+                                VerticalOptions="{OnIdiom Desktop='Fill', Phone='Start'}">
+
+                            <Border.WidthRequest>
+                                <OnIdiom x:TypeArguments="x:Double" Desktop="320" Phone="-1" />
+                            </Border.WidthRequest>
+
+                            <Grid RowDefinitions="Auto, *" RowSpacing="10">
+
+                                <Frame Grid.Row="0" BackgroundColor="#004d40" CornerRadius="10" Padding="10" HasShadow="True">
+                                    <Label Text="{Binding Category}" FontSize="18" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+                                </Frame>
+
+                                <ScrollView Grid.Row="1" VerticalScrollBarVisibility="{OnIdiom Desktop='Default', Phone='Never'}">
+                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding .}" Spacing="10">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="models:FoodModel">
+                                                <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="White" Padding="0">
+                                                    <Border.Shadow>
+                                                        <Shadow Brush="Black" Offset="2,2" Radius="5" Opacity="0.1"/>
+                                                    </Border.Shadow>
+
+                                                    <Grid ColumnDefinitions="90, *" Padding="5" ColumnSpacing="10">
+                                                        <Image Grid.Column="0" Source="{Binding DisplayImageUrl}" Aspect="AspectFill" HeightRequest="80" WidthRequest="80" VerticalOptions="Center" HorizontalOptions="Center">
+                                                            <Image.Clip>
+                                                                <EllipseGeometry Center="40,40" RadiusX="40" RadiusY="40" />
+                                                            </Image.Clip>
+                                                        </Image>
+
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="#004d40" LineBreakMode="TailTruncation" MaxLines="2"/>
+                                                            <Label Text="{Binding FormattedPrice}" FontSize="15" TextColor="#d32f2f" FontAttributes="Bold"/>
+                                                        </VerticalStackLayout>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+                                </ScrollView>
+                            </Grid>
+                        </Border>
+
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </StackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
