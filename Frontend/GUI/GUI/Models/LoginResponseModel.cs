@@ -16,5 +16,7 @@ namespace RestaurantManagementGUI.Models
 
         [JsonPropertyName("maNV")]
         public string MaNV { get; set; }
+        [JsonPropertyName("hoTen")]
+        public string hoTen { get; set; }
     }
 }

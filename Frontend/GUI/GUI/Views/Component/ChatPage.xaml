@@ -3,12 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:conv="clr-namespace:RestaurantManagementGUI.Converters"
              x:Class="RestaurantManagementGUI.ChatPage"
-             Title="Hệ thống tin nhắn"
              BackgroundColor="White"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <!-- Enhanced Color Palette -->
+            <Color x:Key="PrimaryBrandColor">#1A1F2E</Color>
+            <Color x:Key="SecondaryBrandColor">#2D3748</Color>
+            <Color x:Key="SidebarGradientEnd">#0F1419</Color>
+            <Color x:Key="AccentColor">#FFB347</Color>
+            <Color x:Key="AccentRipple">#FFC870</Color>
+            <Color x:Key="TextPrimary">#1A1F2E</Color>
+            <Color x:Key="TextSecondary">#64748B</Color>
+            <Color x:Key="TextWhiteMuted">#94A3B8</Color>
+            <Color x:Key="IncomingBubble">#F8FAFC</Color>
+            <Color x:Key="OutgoingBubble">#FFB347</Color>
+            <Color x:Key="OnlineStatusColor">#10B981</Color>
+            <Color x:Key="BackgroundLight">#F8FAFC</Color>
+            <Color x:Key="BorderLight">#E2E8F0</Color>
+
             <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <conv:IsMineToAlignmentConverter x:Key="AlignmentConverter" />
             <conv:IsMineToColorConverter x:Key="BubbleColorConverter" />
@@ -16,154 +31,327 @@
             <conv:IsNullConverter x:Key="IsNullConverter" />
             <conv:IsNotNullConverter x:Key="IsNotNullConverter" />
             <conv:ImageUrlConverter x:Key="ImageUrlConverter" />
+
+            <Style x:Key="MessageBubbleStyle" TargetType="Border">
+                <Setter Property="Padding" Value="16,12"/>
+                <Setter Property="StrokeThickness" Value="0"/>
+                <Setter Property="Shadow">
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.08"/>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ModernButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="BorderColor" Value="Transparent"/>
+                <Setter Property="Padding" Value="0"/>
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{OnIdiom Phone=*, Default=350}" />
+            <ColumnDefinition Width="{OnIdiom Phone=*, Default=380}" />
             <ColumnDefinition Width="{OnIdiom Phone=0, Default=*}" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" RowDefinitions="Auto,*" BackgroundColor="White"
+        <!-- Sidebar -->
+        <Grid Grid.Column="0" RowDefinitions="Auto,*" 
               IsVisible="{OnIdiom Phone={Binding SelectedConversation, Converter={StaticResource IsNullConverter}}, Default=True}">
 
-            <BoxView Grid.RowSpan="2" HorizontalOptions="End" WidthRequest="1" Color="#E4E6EB"/>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0.2,1">
+                    <GradientStop Color="{StaticResource PrimaryBrandColor}" Offset="0.0" />
+                    <GradientStop Color="{StaticResource SidebarGradientEnd}" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
 
-            <Label Grid.Row="0" Text="Đoạn chat" FontAttributes="Bold" FontSize="24" 
-                   Padding="20,20,20,10" TextColor="Black"/>
+            <!-- Header Section -->
+            <VerticalStackLayout Grid.Row="0" Padding="24,40,24,20" Spacing="20">
+                <HorizontalStackLayout Spacing="12">
+                    <Label Text="💬" FontSize="32"/>
+                    <Label Text="Tin nhắn" 
+                           FontAttributes="Bold" 
+                           FontSize="30" 
+                           TextColor="White"
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
 
+                <!-- Modern Search Bar -->
+                <Border BackgroundColor="#1FFFFFFF"
+                        StrokeThickness="1"
+                        Stroke="#33FFFFFF"
+                        HeightRequest="48"
+                        Padding="16,0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24"/>
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Text="🔍" 
+                               FontSize="16" 
+                               TextColor="{StaticResource TextWhiteMuted}" 
+                               VerticalOptions="Center"/>
+                        <Entry Grid.Column="1" 
+                               Placeholder="Tìm kiếm cuộc trò chuyện..." 
+                               PlaceholderColor="{StaticResource TextWhiteMuted}"
+                               TextColor="White"
+                               FontSize="14"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="2" 
+                               Text="⚙️" 
+                               FontSize="16" 
+                               TextColor="{StaticResource TextWhiteMuted}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Conversations List -->
             <CollectionView Grid.Row="1" 
                             x:Name="ConversationsList"
                             ItemsSource="{Binding FilteredConversations}"
                             SelectedItem="{Binding SelectedConversation}" 
-                            SelectionMode="Single">
+                            SelectionMode="Single"
+                            BackgroundColor="Transparent">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Padding="15,12" ColumnDefinitions="55,*,Auto">
-                            <Frame WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" 
-                                   BackgroundColor="{Binding Avatar}" BorderColor="Transparent">
-                                <Label Text="{Binding InitialLetter}" 
-                                       HorizontalOptions="Center" 
-                                       VerticalOptions="Center" 
-                                       TextColor="White" 
-                                       FontAttributes="Bold" 
-                                       FontSize="18"/>
-                            </Frame>
+                        <Grid Padding="12,6">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal" />
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter TargetName="ItemContainer" Property="BackgroundColor" Value="#25FFFFFF" />
+                                            <Setter TargetName="ItemContainer" Property="Scale" Value="0.98" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
 
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="12,0">
-                                <HorizontalStackLayout Spacing="5">
-                                    <Label Text="{Binding Name}" FontSize="15" TextColor="Black" LineBreakMode="TailTruncation" MaxLines="1">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding IsUnread}" Value="True">
-                                                <Setter Property="FontAttributes" Value="Bold" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                    <Label Text="👥" FontSize="12" VerticalOptions="Center" IsVisible="{Binding IsGroup}"/>
-                                </HorizontalStackLayout>
+                            <Border x:Name="ItemContainer"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0"
+                                    Padding="12"
+                                    HeightRequest="80">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16"/>
+                                </Border.StrokeShape>
 
-                                <Label Text="{Binding LastMessage}" 
-                                       FontSize="13" 
-                                       TextColor="#65676B" 
-                                       MaxLines="1" 
-                                       LineBreakMode="TailTruncation">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsUnread}" Value="True">
-                                            <Setter Property="FontAttributes" Value="Bold" />
-                                            <Setter Property="TextColor" Value="Black" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </VerticalStackLayout>
+                                <Grid ColumnDefinitions="56,*,Auto" ColumnSpacing="14">
+                                    <!-- Avatar with Online Status -->
+                                    <Grid Grid.Column="0" VerticalOptions="Center">
+                                        <Frame WidthRequest="56" HeightRequest="56" CornerRadius="28" Padding="0" 
+                                               BackgroundColor="{Binding Avatar}" BorderColor="Transparent" IsClippedToBounds="True">
+                                            <Frame.Shadow>
+                                                <Shadow Brush="Black" Offset="0,4" Radius="8" Opacity="0.15"/>
+                                            </Frame.Shadow>
+                                            <Label Text="{Binding InitialLetter}" 
+                                                   HorizontalOptions="Center" 
+                                                   VerticalOptions="Center" 
+                                                   TextColor="White" 
+                                                   FontAttributes="Bold" 
+                                                   FontSize="20"/>
+                                        </Frame>
+                                        <Ellipse WidthRequest="14" HeightRequest="14" 
+                                                 Fill="{StaticResource OnlineStatusColor}" 
+                                                 Stroke="White" 
+                                                 StrokeThickness="3"
+                                                 HorizontalOptions="End" 
+                                                 VerticalOptions="End" 
+                                                 IsVisible="{Binding IsOnline}"/>
+                                    </Grid>
 
-                            <Grid Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End" Margin="0,0,10,0">
-                                <Ellipse WidthRequest="20" HeightRequest="20" Fill="#0084FF" IsVisible="{Binding HasUnread}"/>
-                                <Label Text="{Binding UnreadCount}" TextColor="White" FontSize="11" FontAttributes="Bold"
-                                       HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasUnread}"/>
-                            </Grid>
+                                    <!-- Content -->
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                        <Label Text="{Binding Name}" 
+                                               FontSize="16" 
+                                               TextColor="White" 
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsUnread}" Value="True">
+                                                    <Setter Property="FontAttributes" Value="Bold" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+
+                                        <Label Text="{Binding LastMessage}" 
+                                               FontSize="13" 
+                                               TextColor="{StaticResource TextWhiteMuted}" 
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               Opacity="0.8">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsUnread}" Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource AccentColor}" />
+                                                    <Setter Property="FontAttributes" Value="Bold" />
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </VerticalStackLayout>
+
+                                    <!-- Time & Badge -->
+                                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="8" HorizontalOptions="End">
+                                        <Label Text="{Binding LastMessageTime}" 
+                                               FontSize="11" 
+                                               TextColor="{StaticResource TextWhiteMuted}"
+                                               HorizontalOptions="End"/>
+
+                                        <Border BackgroundColor="{StaticResource AccentColor}" 
+                                                StrokeThickness="0" 
+                                                HeightRequest="22" 
+                                                MinimumWidthRequest="22"
+                                                HorizontalOptions="End"
+                                                Padding="8,0"
+                                                IsVisible="{Binding HasUnread}">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="11"/>
+                                            </Border.StrokeShape>
+                                            <Border.Shadow>
+                                                <Shadow Brush="{StaticResource AccentColor}" Offset="0,2" Radius="6" Opacity="0.4"/>
+                                            </Border.Shadow>
+                                            <Label Text="{Binding UnreadCount}" 
+                                                   TextColor="White" 
+                                                   FontSize="11" 
+                                                   FontAttributes="Bold" 
+                                                   HorizontalOptions="Center" 
+                                                   VerticalOptions="Center"/>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
 
+        <!-- Chat Area -->
         <Grid Grid.Column="{OnIdiom Phone=0, Default=1}" 
               Grid.RowDefinitions="Auto,*,Auto" 
-              BackgroundColor="White"
+              BackgroundColor="{StaticResource BackgroundLight}"
               IsVisible="{OnIdiom Phone={Binding SelectedConversation, Converter={StaticResource IsNotNullConverter}}, Default=True}">
 
-            <Grid Grid.Row="0" Padding="10" ColumnDefinitions="Auto,*,Auto" BackgroundColor="White">
+            <!-- Chat Header -->
+            <Grid Grid.Row="0" Padding="24,12" ColumnDefinitions="Auto,Auto,*,Auto,Auto" BackgroundColor="White" HeightRequest="76">
+                <Grid.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="12" Opacity="0.06"/>
+                </Grid.Shadow>
+
                 <Button Text="←" 
                         IsVisible="{OnIdiom Phone=True, Default=False}" 
                         Clicked="OnBackToSidebarClicked" 
-                        BackgroundColor="Transparent" 
-                        TextColor="#0084FF" 
-                        FontSize="20"/>
+                        Style="{StaticResource ModernButtonStyle}"
+                        TextColor="{StaticResource PrimaryBrandColor}" 
+                        FontSize="28" 
+                        WidthRequest="40"
+                        Margin="0,0,8,0"/>
 
-                <Label Grid.Column="1" 
-                       Text="{Binding CurrentChatName}" 
-                       FontAttributes="Bold" 
-                       VerticalOptions="Center" 
-                       HorizontalOptions="Start" 
-                       FontSize="17" 
-                       TextColor="Black" 
-                       Margin="10,0"/>
+                <Frame Grid.Column="1" 
+                       WidthRequest="48" 
+                       HeightRequest="48" 
+                       CornerRadius="24" 
+                       Padding="0" 
+                       Margin="0,0,14,0"
+                       BackgroundColor="{Binding SelectedConversation.Avatar}" 
+                       BorderColor="Transparent">
+                    <Frame.Shadow>
+                        <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.1"/>
+                    </Frame.Shadow>
+                    <Label Text="{Binding SelectedConversation.InitialLetter}" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" 
+                           TextColor="White" 
+                           FontAttributes="Bold"
+                           FontSize="18"/>
+                </Frame>
 
-                <BoxView Grid.Row="1" HeightRequest="1" Color="#E4E6EB" VerticalOptions="End" Grid.ColumnSpan="3"/>
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="2">
+                    <Label Text="{Binding CurrentChatName}" 
+                           FontAttributes="Bold" 
+                           FontSize="17" 
+                           TextColor="{StaticResource TextPrimary}"/>
+                    <HorizontalStackLayout Spacing="6">
+                        <Ellipse WidthRequest="8" 
+                                 HeightRequest="8" 
+                                 Fill="{StaticResource OnlineStatusColor}"
+                                 VerticalOptions="Center"
+                                 IsVisible="{Binding SelectedConversation.IsOnline}"/>
+                        <Label Text="{Binding SelectedConversation.Role}" 
+                               FontSize="13" 
+                               TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+               
+
+                <Button Grid.Column="4" 
+                        Text="⋮" 
+                        FontSize="28" 
+                        Style="{StaticResource ModernButtonStyle}"
+                        TextColor="{StaticResource TextSecondary}"
+                        WidthRequest="44"
+                        HeightRequest="44"/>
             </Grid>
 
-            <VerticalStackLayout Grid.Row="1" 
-                                 VerticalOptions="Center" 
-                                 HorizontalOptions="Center" 
-                                 Spacing="15"
-                                 IsVisible="{Binding SelectedConversation, Converter={StaticResource IsNullConverter}}">
-                <Label Text="💬" FontSize="80" HorizontalOptions="Center"/>
-                <Label Text="Chọn một đoạn hội thoại để bắt đầu" TextColor="Gray" FontSize="16"/>
-            </VerticalStackLayout>
-
-            <ScrollView Grid.Row="1" 
-                        x:Name="MessageScrollView" 
-                        Padding="20" 
-                        VerticalOptions="FillAndExpand"
-                        IsVisible="{Binding SelectedConversation, Converter={StaticResource IsNotNullConverter}}">
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CurrentMessages}" 
-                                     Spacing="15" 
-                                     VerticalOptions="End">
+            <!-- Messages Area -->
+            <ScrollView Grid.Row="1" x:Name="MessageScrollView" Padding="24,16" VerticalOptions="FillAndExpand">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CurrentMessages}" Spacing="16" VerticalOptions="End">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <Grid HorizontalOptions="{Binding IsSentMessage, Converter={StaticResource AlignmentConverter}}">
-                                <VerticalStackLayout Spacing="4" MaximumWidthRequest="400">
-                                    <Label Text="{Binding SenderName}" FontSize="11" TextColor="#65676B" Margin="5,0"
+                                <VerticalStackLayout Spacing="4" MaximumWidthRequest="520">
+                                    <Label Text="{Binding SenderName}" 
+                                           FontSize="12" 
+                                           TextColor="{StaticResource TextSecondary}" 
+                                           Margin="16,0"
+                                           FontAttributes="Bold"
                                            IsVisible="{Binding IsSentMessage, Converter={StaticResource InverseBooleanConverter}}"/>
 
-                                    <Frame BackgroundColor="{Binding IsSentMessage, Converter={StaticResource BubbleColorConverter}}" 
-                                           Padding="12,10" CornerRadius="18" HasShadow="False" BorderColor="Transparent">
+                                    <Border Style="{StaticResource MessageBubbleStyle}"
+                                            BackgroundColor="{Binding IsSentMessage, Converter={StaticResource BubbleColorConverter}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="20,20,20,4">
+                                                <RoundRectangle.Triggers>
+                                                    <DataTrigger TargetType="RoundRectangle" Binding="{Binding IsSentMessage}" Value="True">
+                                                        <Setter Property="CornerRadius" Value="20,20,4,20"/>
+                                                    </DataTrigger>
+                                                </RoundRectangle.Triggers>
+                                            </RoundRectangle>
+                                        </Border.StrokeShape>
+
                                         <Grid>
-                                            <Label Text="{Binding Content}" FontSize="15" 
+                                            <Label Text="{Binding Content}" 
+                                                   FontSize="15" 
+                                                   LineHeight="1.4"
                                                    TextColor="{Binding IsSentMessage, Converter={StaticResource IsMineToTextColorConverter}}"
                                                    IsVisible="{Binding IsImage, Converter={StaticResource InverseBooleanConverter}}"/>
-                                            <Image Source="{Binding Content, Converter={StaticResource ImageUrlConverter}}" 
-                                                    Aspect="AspectFill" 
-                                                    WidthRequest="200"
-                                                    HeightRequest="200"
+
+                                            <Border BackgroundColor="Transparent" 
+                                                    StrokeThickness="0"
                                                     IsVisible="{Binding IsImage}">
-                                                <Image.GestureRecognizers>
-                                                    <TapGestureRecognizer Tapped="OnImageTapped"/>
-                                                </Image.GestureRecognizers>
-                                            </Image>
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="14"/>
+                                                </Border.StrokeShape>
+                                                <Image Source="{Binding Content, Converter={StaticResource ImageUrlConverter}}" 
+                                                       Aspect="AspectFill" 
+                                                       WidthRequest="240" 
+                                                       HeightRequest="240">
+                                                    <Image.Clip>
+                                                        <RoundRectangleGeometry CornerRadius="14" Rect="0,0,240,240"/>
+                                                    </Image.Clip>
+                                                </Image>
+                                            </Border>
                                         </Grid>
-                                    </Frame>
+                                    </Border>
 
-                                    <HorizontalStackLayout Spacing="5" HorizontalOptions="End">
-                                        <Label Text="{Binding TimeDisplay}" FontSize="10" TextColor="#B0B3B8"/>
-
-                                        <Label Text="{Binding StatusText}" 
-                                                TextColor="{Binding StatusColor}"
-                                                FontSize="10"
-                                                FontAttributes="Italic"
-                                                IsVisible="{Binding IsSentMessage}"/>
-                                    </HorizontalStackLayout>
+                                    <Label Text="{Binding TimeDisplay}" 
+                                           FontSize="11" 
+                                           TextColor="#94A3B8" 
+                                           HorizontalOptions="{Binding IsSentMessage, Converter={StaticResource AlignmentConverter}}"
+                                           Margin="8,0"/>
                                 </VerticalStackLayout>
                             </Grid>
                         </DataTemplate>
@@ -171,24 +359,104 @@
                 </VerticalStackLayout>
             </ScrollView>
 
-            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Padding="15" ColumnSpacing="10"
-                  IsVisible="{Binding SelectedConversation, Converter={StaticResource IsNotNullConverter}}">
+            <!-- Input Area -->
+            <Grid Grid.Row="2" Padding="24,16,24,24" BackgroundColor="White" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Grid.Shadow>
+                    <Shadow Brush="Black" Offset="0,-2" Radius="12" Opacity="0.06"/>
+                </Grid.Shadow>
 
-                <Button Text="📷" Command="{Binding SendImageCommand}" BackgroundColor="Transparent" TextColor="#0084FF" FontSize="22" 
-                        IsEnabled="{Binding IsUploadingImage, Converter={StaticResource InverseBooleanConverter}}"/>
+                <Border BackgroundColor="{StaticResource BackgroundLight}"
+                        StrokeThickness="0"
+                        WidthRequest="48"
+                        HeightRequest="48"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24"/>
+                    </Border.StrokeShape>
+                    <Button Text="📷" 
+                            Command="{Binding SendImageCommand}" 
+                            Style="{StaticResource ModernButtonStyle}"
+                            TextColor="{StaticResource PrimaryBrandColor}" 
+                            FontSize="18"/>
+                </Border>
 
-                <Frame Grid.Column="1" CornerRadius="20" BackgroundColor="#F0F2F5" Padding="15,0" HeightRequest="40" HasShadow="False" BorderColor="Transparent">
-                    <Entry Text="{Binding MessageInput}" Placeholder="Nhập tin nhắn..." TextColor="Black" VerticalOptions="Center" 
-                           ReturnCommand="{Binding SendMessageCommand}" 
-                           IsEnabled="{Binding IsUploadingImage, Converter={StaticResource InverseBooleanConverter}}"/>
-                </Frame>
+                <Border Grid.Column="1" 
+                        BackgroundColor="White" 
+                        StrokeThickness="2" 
+                        Stroke="{StaticResource BorderLight}" 
+                        Padding="18,0" 
+                        HeightRequest="52"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26"/>
+                    </Border.StrokeShape>
 
-                <Button Grid.Column="2" Text="➤" Command="{Binding SendMessageCommand}" BackgroundColor="Transparent" TextColor="#0084FF" FontSize="22" FontAttributes="Bold" 
-                        IsEnabled="{Binding IsUploadingImage, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding MessageInput}" 
+                               Placeholder="Nhập tin nhắn của bạn..." 
+                               PlaceholderColor="#94A3B8"
+                               TextColor="{StaticResource TextPrimary}" 
+                               BackgroundColor="Transparent" 
+                               VerticalOptions="Center"
+                               FontSize="15"
+                               ReturnCommand="{Binding SendMessageCommand}"/>
+                        <Label Grid.Column="1" 
+                               Text="😊" 
+                               FontSize="20" 
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="2"
+                        BackgroundColor="{StaticResource AccentColor}"
+                        StrokeThickness="0"
+                        WidthRequest="52"
+                        HeightRequest="52"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26"/>
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="{StaticResource AccentColor}" Offset="0,4" Radius="12" Opacity="0.35"/>
+                    </Border.Shadow>
+                    <Button Text="➤" 
+                            Command="{Binding SendMessageCommand}" 
+                            Style="{StaticResource ModernButtonStyle}"
+                            TextColor="White"
+                            FontSize="22" 
+                            FontAttributes="Bold"/>
+                </Border>
             </Grid>
+        </Grid>
 
-            <ActivityIndicator Grid.Row="2" IsRunning="{Binding IsUploadingImage}" IsVisible="{Binding IsUploadingImage}" 
-                               Color="#0084FF" VerticalOptions="Center" HorizontalOptions="Center"/>
+        <!-- Loading Overlay -->
+        <Grid Grid.ColumnSpan="2" 
+              BackgroundColor="#90000000" 
+              IsVisible="{Binding IsUploadingImage}" 
+              ZIndex="99">
+            <Border BackgroundColor="White" 
+                    WidthRequest="120" 
+                    HeightRequest="120" 
+                    HorizontalOptions="Center" 
+                    VerticalOptions="Center"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="24"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,8" Radius="24" Opacity="0.2"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Center" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="True" 
+                                       Color="{StaticResource AccentColor}" 
+                                       WidthRequest="40" 
+                                       HeightRequest="40"/>
+                    <Label Text="Đang tải..." 
+                           TextColor="{StaticResource TextSecondary}" 
+                           FontSize="13"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
         </Grid>
     </Grid>
 </ContentPage>
