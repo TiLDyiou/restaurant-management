@@ -1,9 +1,7 @@
-﻿using Microsoft.Maui.Storage;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Maui.Storage;
 using RestaurantManagementGUI.Helpers;
-using RestaurantManagementGUI.Models;
 using System.Diagnostics;
-using System.Net.Sockets;
-using System.Text;
 using System.Text.Json;
 
 namespace RestaurantManagementGUI.Services
@@ -13,185 +11,132 @@ namespace RestaurantManagementGUI.Services
         private static TCPSocketClient _instance;
         public static TCPSocketClient Instance => _instance ??= new TCPSocketClient();
 
-        private TcpClient _client;
-        private StreamReader _reader;
-        private StreamWriter _writer;
+        private HubConnection? _hubConnection;
         private bool _isConnected;
-        private CancellationTokenSource _cts;
 
-        public event Action<string> OnNewOrderReceived;
-        public event Action<string> OnTableStatusChanged;
-        public event Action<string> OnDishDone;
-        public event Action<string> OnChatReceived;
+        public event Action<string>? OnNewOrderReceived;
+        public event Action<string>? OnTableStatusChanged;
+        public event Action<string>? OnDishDone;
+        public event Action<string>? OnChatReceived; // Kept for backward compatibility
 
-        private static string GetServerHost()
+        private TCPSocketClient()
         {
-            try
-            {
-                var uri = new Uri(ApiConfig.DomainUrl);
-                return uri.Host;
-            }
-            catch
-            {
-                return "localhost";
-            }
+            InitializeSignalR();
         }
 
-        private static string SERVER_IP => GetServerHost();
-        private const int SERVER_PORT = 9000;
+        private void InitializeSignalR()
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(ApiConfig.RestaurantHubUrl, options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(UserState.AccessToken);
+                    options.HttpMessageHandlerFactory = _ => handler;
+                })
+                .WithAutomaticReconnect()
+                .Build();
+
+            RegisterHandlers();
+        }
+
+        private void RegisterHandlers()
+        {
+            if (_hubConnection == null) return;
+
+            // 1. Table status changed event
+            _hubConnection.On<object>("TableStatusChanged", (payload) =>
+            {
+                try
+                {
+                    string jsonStr = JsonSerializer.Serialize(payload);
+                    Debug.WriteLine($"[SignalR RECV TableStatusChanged]: {jsonStr}");
+                    OnTableStatusChanged?.Invoke(jsonStr);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error parsing TableStatusChanged: {ex.Message}");
+                }
+            });
+
+            // 2. Order created event
+            _hubConnection.On<string>("OrderCreated", (maHD) =>
+            {
+                Debug.WriteLine($"[SignalR RECV OrderCreated]: {maHD}");
+                OnNewOrderReceived?.Invoke(maHD);
+            });
+
+            // 3. Kitchen item ready event
+            _hubConnection.On<string>("KitchenItemReady", (msg) =>
+            {
+                Debug.WriteLine($"[SignalR RECV KitchenItemReady]: {msg}");
+                OnDishDone?.Invoke(msg);
+            });
+
+            // 4. User status changed event
+            _hubConnection.On<string, bool>("UserStatusChanged", (maNV, isOnline) =>
+            {
+                string statusStr = isOnline ? "TRUE" : "FALSE";
+                string message = $"STATUS|{maNV}|{statusStr}";
+                Debug.WriteLine($"[SignalR RECV UserStatusChanged]: {message}");
+                MessagingCenter.Send(this, "UpdateStatus", message);
+            });
+        }
 
         public async Task ConnectAsync()
         {
-            if (_isConnected) return;
-            _cts = new CancellationTokenSource();
-            _ = Task.Run(() => ConnectLoop(_cts.Token));
+            if (_isConnected || _hubConnection == null) return;
+
+            if (_hubConnection.State == HubConnectionState.Disconnected)
+            {
+                try
+                {
+                    Debug.WriteLine($"Connecting SignalR RestaurantHub to {ApiConfig.RestaurantHubUrl}...");
+                    await _hubConnection.StartAsync();
+                    _isConnected = true;
+                    Debug.WriteLine("SignalR RestaurantHub Connected Successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SignalR RestaurantHub Connection Error: {ex.Message}");
+                    _isConnected = false;
+                }
+            }
         }
 
         public async Task LoginAsync(string maNV)
         {
-            if (!_isConnected || _client == null || !_client.Connected)
-            {
-                await ConnectAsync();
-            }
-
-            int retry = 0;
-            while (!_isConnected && retry < 50)
-            {
-                await Task.Delay(100);
-                retry++;
-            }
-
-            if (_isConnected)
-            {
-                await SendMessageAsync($"LOGIN|{maNV}");
-                System.Diagnostics.Debug.WriteLine($"[SOCKET] Đã gửi LOGIN cho {maNV}");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("[SOCKET] Không thể kết nối để gửi Login.");
-            }
-        }
-        private async Task ConnectLoop(CancellationToken token)
-        {
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    if (_client == null || !_client.Connected)
-                    {
-                        _client = new TcpClient();
-                        await _client.ConnectAsync(SERVER_IP, SERVER_PORT);
-
-                        var stream = _client.GetStream();
-                        _reader = new StreamReader(stream, Encoding.UTF8);
-                        _writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
-                        _isConnected = true;
-                        string maNV = await SecureStorage.GetAsync("current_ma_nv");
-                        if (!string.IsNullOrEmpty(maNV))
-                        {
-                            await SendMessageAsync($"LOGIN|{maNV}");
-                        }
-                        await ListenLoop();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _isConnected = false;
-                }
-                await Task.Delay(3000, token);
-            }
-        }
-
-        private async Task ListenLoop()
-        {
-            try
-            {
-                while (_isConnected && _client.Connected)
-                {
-                    string message = await _reader.ReadLineAsync();
-                    if (message == null) break;
-
-                    Debug.WriteLine($"[SOCKET RECV]: {message}");
-                    ProcessMessage(message);
-                }
-            }
-            catch
-            {
-                _isConnected = false;
-                _client?.Close();
-            }
-        }
-
-        private void ProcessMessage(string message)
-        {
-            if (string.IsNullOrWhiteSpace(message)) return;
-
-            var parts = message.Split('|', 2);
-            string header = parts[0];
-            string content = parts.Length > 1 ? parts[1] : "";
-
-            switch (header)
-            {
-                case "ORDER":
-                    OnNewOrderReceived?.Invoke(content);
-                    break;
-
-                case "TABLE":
-                    OnTableStatusChanged?.Invoke(content);
-                    break;
-
-                case "KITCHEN_DONE":
-                    OnDishDone?.Invoke(content);
-                    break;
-
-                case "CHAT":
-                    OnChatReceived?.Invoke(content);
-                    break;
-                case "STATUS":
-                    MessagingCenter.Send(this, "UpdateStatus", message);
-                    break;
-            }
+            // Backward compatibility helper
+            // We just ensure ConnectAsync is executed, auth is automatically managed via JWT Token Provider
+            await ConnectAsync();
         }
 
         public async Task SendChatAsync(string message)
         {
-            await SendMessageAsync($"CHAT|{message}");
+            // Chat is now fully processed through ChatService and RestaurantChatHub
+            await Task.CompletedTask;
         }
 
         public async Task DisconnectAsync()
         {
-            _cts?.Cancel();
-            _isConnected = false;
-
-            try
-            {
-                await SendMessageAsync("LOGOUT");
-                await Task.Delay(200);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Lỗi gửi Logout: {ex.Message}");
-            }
-            finally
+            if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
             {
                 try
                 {
-                    _reader?.Close();
-                    _writer?.Close();
-                    _client?.Close();
+                    await _hubConnection.StopAsync();
+                    Debug.WriteLine("SignalR RestaurantHub Disconnected Safely.");
                 }
-                catch { }
-
-                _client = null;
-                System.Diagnostics.Debug.WriteLine("Đã ngắt kết nối Socket an toàn.");
-            }
-        }
-
-        private async Task SendMessageAsync(string msg)
-        {
-            if (_isConnected && _writer != null)
-            {
-                await _writer.WriteLineAsync(msg);
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error stopping SignalR connection: {ex.Message}");
+                }
+                finally
+                {
+                    _isConnected = false;
+                }
             }
         }
     }

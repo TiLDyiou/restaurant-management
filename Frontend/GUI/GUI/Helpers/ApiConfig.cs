@@ -71,6 +71,7 @@ namespace RestaurantManagementGUI.Helpers
         // ----------------------- CHAT & REALTIME -----------------------
 
         public static string ChatHubUrl => $"{DomainUrl}restaurantChatHub";
+        public static string RestaurantHubUrl => $"{DomainUrl}restaurantHub";
 
         // Lấy danh sách Inbox (Chứa tin nhắn cuối + UnreadCount để làm in đậm)
         public static string GetInboxList(string maNV) => $"{BaseUrl}Chat/inbox-list/{maNV}";
