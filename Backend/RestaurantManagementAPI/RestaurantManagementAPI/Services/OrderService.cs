@@ -16,11 +16,13 @@ namespace RestaurantManagementAPI.Services
     {
         private readonly QLNHDbContext _context;
         private readonly ILogger<OrderService> _logger;
+        private readonly IRealtimeNotifier _notifier;
 
-        public OrderService(QLNHDbContext context, ILogger<OrderService> logger)
+        public OrderService(QLNHDbContext context, ILogger<OrderService> logger, IRealtimeNotifier notifier)
         {
             _context = context;
             _logger = logger;
+            _notifier = notifier;
         }
 
         public async Task<ServiceResult<List<HoaDonDto>>> GetOrdersAsync()
@@ -148,20 +150,12 @@ namespace RestaurantManagementAPI.Services
 
                 try
                 {
-                    if (TcpSocketServer.Instance != null)
-                    {
-                        var tablePayload = JsonSerializer.Serialize(new 
-                        { 
-                            MaBan = dto.MaBan, 
-                            TrangThai = SystemConstants.TableOccupied 
-                        });
-                        await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{tablePayload}");
-                        await TcpSocketServer.Instance.BroadcastAsync($"ORDER|{maHD}");
-                    }
+                    await _notifier.NotifyTableStatusChangedAsync(dto.MaBan, SystemConstants.TableOccupied);
+                    await _notifier.NotifyOrderCreatedAsync(maHD);
                 }
                 catch (Exception ex) 
                 { 
-                    _logger.LogError(ex, "Lỗi Socket khi phát thông tin bàn/hóa đơn"); 
+                    _logger.LogError(ex, "Lỗi khi phát thông tin bàn/hóa đơn qua notifier"); 
                 }
 
                 var resultDto = (await GetOrderByIdAsync(maHD)).Data; // dùng query lại để lấy đầy đủ thông tin vì Entity HoaDon mới chỉ có dữ liệu cơ bản
@@ -199,10 +193,7 @@ namespace RestaurantManagementAPI.Services
                 _context.THONGBAO.Add(thongBao);
                 await _context.SaveChangesAsync();
 
-                if (TcpSocketServer.Instance != null)
-                {
-                    await TcpSocketServer.Instance.BroadcastAsync($"KITCHEN_DONE|{msg}");
-                }
+                await _notifier.NotifyKitchenItemReadyAsync(msg);
             }
             else
             {
@@ -244,14 +235,9 @@ namespace RestaurantManagementAPI.Services
 
             await _context.SaveChangesAsync();
 
-            if (TcpSocketServer.Instance != null && ban != null)
+            if (ban != null)
             {
-                var payload = JsonSerializer.Serialize(new 
-                { 
-                    MaBan = ban.MaBan, 
-                    TrangThai = SystemConstants.TableEmpty 
-                });
-                await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{payload}");
+                await _notifier.NotifyTableStatusChangedAsync(ban.MaBan, SystemConstants.TableEmpty);
             }
 
             var resultDto = (await GetOrderByIdAsync(maHD)).Data;

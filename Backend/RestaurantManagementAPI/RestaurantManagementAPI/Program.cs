@@ -143,6 +143,7 @@ builder.Services.AddRateLimiter(options =>
 // Infrastructure
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddSingleton<IRealtimeNotifier, SignalRNotifier>();
 builder.Services.AddHostedService<TcpSocketServer>();
 builder.Services.AddSignalR();
 
@@ -186,5 +187,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<RestaurantChatHub>("/restaurantChatHub");
+app.MapHub<RestaurantHub>("/restaurantHub");
 app.MapHealthChecks("/health");
 app.Run();

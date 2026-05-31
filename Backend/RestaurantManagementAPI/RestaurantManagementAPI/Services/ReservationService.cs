@@ -1,19 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RestaurantManagementAPI.Common.Constants;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs.BanDtos;
-using RestaurantManagementAPI.Infrastructure.Sockets;
 using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
-using System.Text.Json;
 
 namespace RestaurantManagementAPI.Services
 {
     public class ReservationService : IReservationService
     {
         private readonly QLNHDbContext _context;
-        public ReservationService(QLNHDbContext context) { _context = context; }
+        private readonly IRealtimeNotifier _notifier;
+
+        public ReservationService(QLNHDbContext context, IRealtimeNotifier notifier)
+        {
+            _context = context;
+            _notifier = notifier;
+        }
 
         public async Task<ServiceResult<DatBan>> CreateReservationAsync(CreateDatBanDto dto)
         {
@@ -45,10 +49,9 @@ namespace RestaurantManagementAPI.Services
                 await _context.SaveChangesAsync();
                 await trans.CommitAsync();
 
-                if (isUpdated && TcpSocketServer.Instance != null)
+                if (isUpdated)
                 {
-                    var payload = new { MaBan = dto.MaBan, TrangThai = SystemConstants.TableReserved };
-                    await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{JsonSerializer.Serialize(payload)}");
+                    await _notifier.NotifyTableStatusChangedAsync(dto.MaBan, SystemConstants.TableReserved);
                 }
 
                 return ServiceResult<DatBan>.Ok(datBan, "Đặt bàn thành công");

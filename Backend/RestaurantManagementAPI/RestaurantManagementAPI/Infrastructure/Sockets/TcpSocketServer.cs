@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Net;
@@ -18,12 +19,14 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
         private ConcurrentDictionary<string, TcpClient> _clients = new();
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<TcpSocketServer> _logger;
+        private readonly IRealtimeNotifier _notifier;
 
-        public TcpSocketServer(IServiceProvider serviceProvider, ILogger<TcpSocketServer> logger)
+        public TcpSocketServer(IServiceProvider serviceProvider, ILogger<TcpSocketServer> logger, IRealtimeNotifier notifier)
         {
             Instance = this;
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _notifier = notifier;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -79,7 +82,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                             _clients.AddOrUpdate(maNV, client, (k, v) => client);
                             _logger.LogInformation("User {MaNV} Connected", maNV);
                             await UpdateUserStatusInDb(maNV, true); // Cập nhật trạng thái online trong DB
-                            await BroadcastAsync($"STATUS|{maNV}|TRUE"); // Thông báo cho tất cả client biết user đã online
+                            await _notifier.NotifyUserStatusChangedAsync(maNV, true);
                         }
                     }
                     else if (message.StartsWith("LOGOUT"))
@@ -103,7 +106,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     _clients.TryRemove(maNV, out _);
                     _logger.LogInformation("User {MaNV} Disconnected", maNV);
                     await UpdateUserStatusInDb(maNV, false);
-                    await BroadcastAsync($"STATUS|{maNV}|FALSE");
+                    await _notifier.NotifyUserStatusChangedAsync(maNV, false);
                 }
                 client.Close();
             }

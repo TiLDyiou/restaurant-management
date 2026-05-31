@@ -138,9 +138,9 @@ Branch: `refactor/phase-2-observability`
 
 ---
 
-## Phase 3 — TCP → SignalR — TODO
+## Phase 3 — TCP → SignalR — DONE
 
-Branch dự kiến: `refactor/phase-3-signalr`
+Branch: `refactor/phase-3-signalr`
 
 ### 3.1 RestaurantHub mới
 - File: `Infrastructure/Sockets/RestaurantHub.cs`
@@ -256,7 +256,7 @@ Branch dự kiến: `refactor/phase-6-docker`
 |-------|--------|--------|-----|
 | 1. Security Hardening | DONE | `refactor/phase-1-security` | — |
 | 2. Logging & Error Handling | DONE | `refactor/phase-2-observability` | — |
-| 3. TCP → SignalR | TODO | — | — |
+| 3. TCP → SignalR | DONE | `refactor/phase-3-signalr` | — |
 | 4. Table CRUD | TODO | — | — |
 | 5. Infrastructure | TODO | — | — |
 | 6. Docker + Deploy | TODO | — | — |

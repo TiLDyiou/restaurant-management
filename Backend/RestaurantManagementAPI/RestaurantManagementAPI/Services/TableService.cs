@@ -1,17 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
-using RestaurantManagementAPI.Infrastructure.Sockets;
 using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
-using System.Text.Json;
 
 namespace RestaurantManagementAPI.Services
 {
     public class TableService : ITableService
     {
         private readonly QLNHDbContext _context;
-        public TableService(QLNHDbContext context) { _context = context; }
+        private readonly IRealtimeNotifier _notifier;
+
+        public TableService(QLNHDbContext context, IRealtimeNotifier notifier)
+        {
+            _context = context;
+            _notifier = notifier;
+        }
 
         public async Task<ServiceResult<List<Ban>>> GetAllBanAsync()
         {
@@ -27,11 +31,8 @@ namespace RestaurantManagementAPI.Services
 
             ban.TrangThai = trangThai;
             await _context.SaveChangesAsync();
-            if (TcpSocketServer.Instance != null)
-            {
-                var payload = new { MaBan = maBan, TrangThai = trangThai };
-                await TcpSocketServer.Instance.BroadcastAsync($"TABLE|{JsonSerializer.Serialize(payload)}");
-            }
+            
+            await _notifier.NotifyTableStatusChangedAsync(maBan, trangThai);
 
             return ServiceResult<Ban>.Ok(ban, "Cập nhật thành công");
         }
