@@ -317,29 +317,12 @@ namespace RestaurantManagementAPI.Services
 
         private async Task<string> GenerateNewMaNV()
         {
-            const int maxRetries = 3;
-            for (int i = 0; i < maxRetries; i++)
-            {
-                var lastNv = await _context.NHANVIEN
-                    .Where(nv => nv.MaNV.StartsWith("NV"))
-                    .OrderByDescending(nv => nv.MaNV.Length)
-                    .ThenByDescending(nv => nv.MaNV)
-                    .Select(nv => nv.MaNV)
-                    .FirstOrDefaultAsync();
-
-                int nextNumber = 1;
-                if (lastNv != null && lastNv.Length > 2 &&
-                    int.TryParse(lastNv.Substring(2), out int lastNum))
-                {
-                    nextNumber = lastNum + 1;
-                }
-
-                var newMaNV = $"NV{nextNumber:D3}";
-
-                if (!await _context.NHANVIEN.AnyAsync(nv => nv.MaNV == newMaNV))
-                    return newMaNV;
-            }
-            throw new InvalidOperationException("Không thể tạo mã nhân viên mới.");
+            var nextValList = await _context.Database
+                .SqlQueryRaw<int>("SELECT NEXT VALUE FOR MaNVSequence")
+                .ToListAsync();
+            int nextVal = nextValList.FirstOrDefault();
+            if (nextVal == 0) nextVal = 1;
+            return $"NV{nextVal:D3}";
         }
 
         private static bool IsValidEmail(string email)

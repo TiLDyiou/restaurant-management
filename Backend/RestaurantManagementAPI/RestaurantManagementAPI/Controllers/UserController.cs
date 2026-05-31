@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManagementAPI.DTOs;
 using RestaurantManagementAPI.Interfaces;
@@ -62,9 +62,9 @@ namespace RestaurantManagementAPI.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> HardDelete(string id)
+        public async Task<IActionResult> SoftDelete(string id)
         {
-            var result = await _userService.HardDeleteUserAsync(id);
+            var result = await _userService.SoftDeleteUserAsync(id);
             return result.Success ? Ok(result) : NotFound(result);
         }
     }

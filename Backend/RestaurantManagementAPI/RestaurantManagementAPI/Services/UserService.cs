@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs;
@@ -93,7 +93,20 @@ namespace RestaurantManagementAPI.Services
                     user.Quyen = dto.Quyen.Trim();
 
                 if (!string.IsNullOrWhiteSpace(dto.MatKhau)) 
+                {
+                    if (!isAdmin)
+                    {
+                        if (string.IsNullOrWhiteSpace(dto.OldPassword))
+                        {
+                            return ServiceResult<object>.Fail("Yêu cầu nhập mật khẩu cũ để đổi mật khẩu");
+                        }
+                        if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.MatKhau))
+                        {
+                            return ServiceResult<object>.Fail("Mật khẩu cũ không chính xác");
+                        }
+                    }
                     user.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
+                }
 
                 bool emailChanged = false;
                 if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != user.Email)
@@ -193,7 +206,7 @@ namespace RestaurantManagementAPI.Services
             });
         }
 
-        public async Task<ServiceResult> HardDeleteUserAsync(string maNV)
+        public async Task<ServiceResult> SoftDeleteUserAsync(string maNV)
         {
             var nv = await _context.NHANVIEN
                 .Include(e => e.TaiKhoan)
@@ -201,11 +214,24 @@ namespace RestaurantManagementAPI.Services
             if (nv == null) 
                 return ServiceResult.Fail("Không tìm thấy NV");
 
+            nv.TrangThai = "Đã nghỉ";
             if (nv.TaiKhoan != null) 
-                _context.TAIKHOAN.Remove(nv.TaiKhoan);
-            _context.NHANVIEN.Remove(nv);
+            {
+                nv.TaiKhoan.IsActive = false;
+                nv.TaiKhoan.Online = false;
+
+                // Revoke active refresh tokens
+                var activeTokens = await _context.REFRESHTOKEN
+                    .Where(t => t.MaNV == maNV && t.RevokedAt == null && t.ExpiresAt > DateTime.UtcNow)
+                    .ToListAsync();
+                foreach (var t in activeTokens)
+                {
+                    t.RevokedAt = DateTime.UtcNow;
+                }
+            }
+
             await _context.SaveChangesAsync();
-            return ServiceResult.Ok("Đã xóa vĩnh viễn");
+            return ServiceResult.Ok("Đã cho nghỉ việc và khóa tài khoản thành công");
         }
     }
 }

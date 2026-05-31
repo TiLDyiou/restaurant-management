@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManagementAPI.Common.Constants;
+using RestaurantManagementAPI.Common.StateMachines;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs;
@@ -25,11 +26,15 @@ namespace RestaurantManagementAPI.Services
             _notifier = notifier;
         }
 
-        public async Task<ServiceResult<List<HoaDonDto>>> GetOrdersAsync()
+        public async Task<ServiceResult<PaginatedResult<HoaDonDto>>> GetOrdersAsync(int pageNumber = 1, int pageSize = 10)
         {
-            var list = await _context.HOADON
+            var query = _context.HOADON
                 .Include(hd => hd.ChiTietHoaDons)!
-                .ThenInclude(ct => ct.MonAn)
+                .ThenInclude(ct => ct.MonAn);
+
+            var totalCount = await query.CountAsync();
+
+            var list = await query
                 .Select(hd => new HoaDonDto
                 {
                     MaHD = hd.MaHD,
@@ -49,8 +54,12 @@ namespace RestaurantManagementAPI.Services
                     }).ToList()
                 })
                 .OrderByDescending(h => h.NgayLap)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-            return ServiceResult<List<HoaDonDto>>.Ok(list);
+
+            var paginated = PaginatedResult<HoaDonDto>.Create(list, totalCount, pageNumber, pageSize);
+            return ServiceResult<PaginatedResult<HoaDonDto>>.Ok(paginated);
         }
 
         public async Task<ServiceResult<HoaDonDto>> GetOrderByIdAsync(string id)
@@ -178,6 +187,12 @@ namespace RestaurantManagementAPI.Services
             if (item == null) 
                 return ServiceResult.Fail("Không tìm thấy món");
 
+            // State machine validation
+            if (!OrderStateMachine.IsItemTransitionAllowed(item.TrangThai ?? OrderStateMachine.ItemWaiting, newStatus))
+            {
+                return ServiceResult.Fail($"Chuyển trạng thái món từ '{item.TrangThai}' sang '{newStatus}' không hợp lệ");
+            }
+
             item.TrangThai = newStatus;
             string statusNorm = newStatus?.ToLower().Trim() ?? "";
             if (statusNorm == SystemConstants.ItemReady.ToLower() || statusNorm == "done")
@@ -208,6 +223,12 @@ namespace RestaurantManagementAPI.Services
             var hd = await _context.HOADON.FindAsync(id);
             if (hd == null) 
                 return ServiceResult.Fail("Hóa đơn không tồn tại");
+
+            // State machine validation
+            if (!OrderStateMachine.IsOrderTransitionAllowed(hd.TrangThai ?? OrderStateMachine.OrderUnpaid, newStatus))
+            {
+                return ServiceResult.Fail($"Chuyển trạng thái hóa đơn từ '{hd.TrangThai}' sang '{newStatus}' không hợp lệ");
+            }
 
             hd.TrangThai = newStatus;
             await _context.SaveChangesAsync();
@@ -246,15 +267,12 @@ namespace RestaurantManagementAPI.Services
 
         private async Task<string> GenerateMaHD()
         {
-            var lastHD = await _context.HOADON
-                .OrderByDescending(h => h.MaHD)
-                .Select(h => h.MaHD)
-                .FirstOrDefaultAsync();
-            if (string.IsNullOrEmpty(lastHD)) 
-                return "HD00001";
-            if (lastHD.Length > 2 && int.TryParse(lastHD.Substring(2), out int num)) 
-                return $"HD{(num + 1):D5}";
-            return $"HD{DateTime.Now.Ticks}";
+            var nextValList = await _context.Database
+                .SqlQueryRaw<int>("SELECT NEXT VALUE FOR MaHDSequence")
+                .ToListAsync();
+            int nextVal = nextValList.FirstOrDefault();
+            if (nextVal == 0) nextVal = 1;
+            return $"HD{nextVal:D5}";
         }
     }
 }

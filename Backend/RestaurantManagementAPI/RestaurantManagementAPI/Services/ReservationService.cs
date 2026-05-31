@@ -5,6 +5,10 @@ using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs.BanDtos;
 using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RestaurantManagementAPI.Services
 {
@@ -21,8 +25,23 @@ namespace RestaurantManagementAPI.Services
 
         public async Task<ServiceResult<DatBan>> CreateReservationAsync(CreateDatBanDto dto)
         {
-            var ban = await _context.BAN.FindAsync(dto.MaBan);
-            if (ban == null) return ServiceResult<DatBan>.Fail("Bàn không tồn tại");
+            var ban = await _context.BAN.FirstOrDefaultAsync(b => b.MaBan == dto.MaBan && !b.IsDeleted);
+            if (ban == null) return ServiceResult<DatBan>.Fail("Bàn không tồn tại hoặc đã bị xóa");
+
+            // Conflict Check: Assume each reservation blocks the table for 2 hours
+            var reservationStart = dto.ThoiGianDat;
+            var reservationEnd = dto.ThoiGianDat.AddHours(2);
+
+            var hasConflict = await _context.DATBAN
+                .AnyAsync(r => r.MaBan == dto.MaBan 
+                               && r.TrangThai != "Đã huỷ"
+                               && r.ThoiGianDat < reservationEnd 
+                               && r.ThoiGianDat.AddHours(2) > reservationStart);
+
+            if (hasConflict)
+            {
+                return ServiceResult<DatBan>.Fail("Thời gian này đã có người đặt bàn ăn trước đó");
+            }
 
             using var trans = await _context.Database.BeginTransactionAsync();
             try
@@ -59,17 +78,81 @@ namespace RestaurantManagementAPI.Services
             catch (Exception ex)
             {
                 await trans.RollbackAsync();
-                return ServiceResult<DatBan>.Fail("Lỗi: " + ex.Message);
+                return ServiceResult<DatBan>.Fail("Lỗi hệ thống khi đặt bàn: " + ex.Message);
             }
+        }
+
+        public async Task<ServiceResult> CancelReservationAsync(string maDatBan)
+        {
+            var datBan = await _context.DATBAN.FindAsync(maDatBan);
+            if (datBan == null)
+            {
+                return ServiceResult.Fail("Lịch đặt bàn không tồn tại");
+            }
+
+            if (datBan.TrangThai == "Đã huỷ")
+            {
+                return ServiceResult.Ok("Lịch đặt đã được hủy trước đó");
+            }
+
+            using var trans = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                datBan.TrangThai = "Đã huỷ";
+
+                // If the table is currently Reserved, release it
+                var ban = await _context.BAN.FindAsync(datBan.MaBan);
+                if (ban != null && ban.TrangThai == SystemConstants.TableReserved)
+                {
+                    ban.TrangThai = SystemConstants.TableEmpty;
+                    await _notifier.NotifyTableStatusChangedAsync(ban.MaBan, SystemConstants.TableEmpty);
+                }
+
+                await _context.SaveChangesAsync();
+                await trans.CommitAsync();
+
+                return ServiceResult.Ok("Hủy đặt bàn thành công");
+            }
+            catch (Exception ex)
+            {
+                await trans.RollbackAsync();
+                return ServiceResult.Fail("Lỗi hệ thống khi hủy đặt bàn: " + ex.Message);
+            }
+        }
+
+        public async Task<ServiceResult<PaginatedResult<DatBanDto>>> GetAllReservationsAsync(int pageNumber = 1, int pageSize = 10)
+        {
+            var query = _context.DATBAN.AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var list = await query
+                .OrderByDescending(r => r.ThoiGianDat)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(r => new DatBanDto
+                {
+                    MaDatBan = r.MaDatBan,
+                    MaBan = r.MaBan,
+                    TenKhachHang = r.TenKhachHang,
+                    SoDienThoai = r.SoDienThoai,
+                    ThoiGianDat = r.ThoiGianDat,
+                    SoNguoi = r.SoNguoi,
+                    TrangThai = r.TrangThai
+                })
+                .ToListAsync();
+
+            var paginated = PaginatedResult<DatBanDto>.Create(list, totalCount, pageNumber, pageSize);
+            return ServiceResult<PaginatedResult<DatBanDto>>.Ok(paginated);
         }
 
         private async Task<string> GenerateDatBanId()
         {
-            var last = await _context.DATBAN.OrderByDescending(db => db.MaDatBan).FirstOrDefaultAsync();
-            if (last == null) return "DB00001";
-            string num = last.MaDatBan.Substring(2);
-            if (int.TryParse(num, out int n)) return $"DB{n + 1:D5}";
-            return "DB00001";
+            var nextValList = await _context.Database
+                .SqlQueryRaw<int>("SELECT NEXT VALUE FOR MaDatBanSequence")
+                .ToListAsync();
+            int nextVal = nextValList.FirstOrDefault();
+            if (nextVal == 0) nextVal = 1;
+            return $"DB{nextVal:D5}";
         }
     }
 }

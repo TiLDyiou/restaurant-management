@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManagementAPI.DTOs.MonAnDtos;
 using RestaurantManagementAPI.Interfaces;
@@ -18,9 +18,9 @@ namespace RestaurantManagementAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> GetOrders([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _orderService.GetOrdersAsync();
+            var result = await _orderService.GetOrdersAsync(pageNumber, pageSize);
             return Ok(result);
         }
 

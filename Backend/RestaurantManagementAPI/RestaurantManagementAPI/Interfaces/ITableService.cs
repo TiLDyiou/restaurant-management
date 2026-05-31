@@ -8,7 +8,7 @@ namespace RestaurantManagementAPI.Interfaces
 {
     public interface ITableService
     {
-        Task<ServiceResult<List<Ban>>> GetAllBanAsync();
+        Task<ServiceResult<PaginatedResult<Ban>>> GetAllBanAsync(int pageNumber = 1, int pageSize = 10);
         Task<ServiceResult<Ban>> GetBanByIdAsync(string maBan);
         Task<ServiceResult<Ban>> UpdateStatusAsync(string maBan, string trangThai, string? maNV = null);
         Task<ServiceResult<Ban>> CreateBanAsync(CreateBanDto dto, string? maNV = null);

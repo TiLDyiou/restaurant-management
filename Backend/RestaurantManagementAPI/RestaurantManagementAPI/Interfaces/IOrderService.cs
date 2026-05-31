@@ -1,4 +1,4 @@
-﻿using RestaurantManagementAPI.Common.Wrappers;
+using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.DTOs;
 using RestaurantManagementAPI.DTOs.MonAnDtos;
 
@@ -6,7 +6,7 @@ namespace RestaurantManagementAPI.Interfaces
 {
     public interface IOrderService
     {
-        Task<ServiceResult<List<HoaDonDto>>> GetOrdersAsync();
+        Task<ServiceResult<PaginatedResult<HoaDonDto>>> GetOrdersAsync(int pageNumber = 1, int pageSize = 10);
         Task<ServiceResult<HoaDonDto>> GetOrderByIdAsync(string id);
         Task<ServiceResult<HoaDonDto>> CreateOrderAsync(CreateHoaDonDto createDto);
         Task<ServiceResult> UpdateOrderItemStatusAsync(string maHD, string maMA, string newStatus);

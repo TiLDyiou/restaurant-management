@@ -20,9 +20,9 @@ namespace RestaurantManagementAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBan()
+        public async Task<IActionResult> GetBan([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _banService.GetAllBanAsync();
+            var result = await _banService.GetAllBanAsync(pageNumber, pageSize);
             return Ok(result);
         }
 

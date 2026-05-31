@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
+using RestaurantManagementAPI.Models.Entities;
 
 [Authorize]
 [Route("api/notifications")]
@@ -13,16 +14,21 @@ public class NotificationsController : ControllerBase
     public NotificationsController(QLNHDbContext context) { _context = context; }
 
     [HttpGet]
-    public async Task<IActionResult> GetNotifications([FromQuery] string? loai = null)
+    public async Task<IActionResult> GetNotifications([FromQuery] string? loai = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         var query = _context.THONGBAO.AsQueryable();
         if (!string.IsNullOrEmpty(loai)) 
             query = query.Where(x => x.Loai == loai);
+
+        var totalCount = await query.CountAsync();
         var list = await query
             .OrderByDescending(x => x.ThoiGian)
-            .Take(30)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
-        return Ok(ServiceResult<object>.Ok(list));
+
+        var paginated = PaginatedResult<ThongBao>.Create(list, totalCount, pageNumber, pageSize);
+        return Ok(ServiceResult<PaginatedResult<ThongBao>>.Ok(paginated));
     }
 
     [HttpDelete]

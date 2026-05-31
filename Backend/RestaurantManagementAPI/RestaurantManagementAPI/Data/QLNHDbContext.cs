@@ -25,6 +25,10 @@ namespace RestaurantManagementAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasSequence<int>("MaHDSequence").StartsAt(1).IncrementsBy(1);
+            modelBuilder.HasSequence<int>("MaNVSequence").StartsAt(1).IncrementsBy(1);
+            modelBuilder.HasSequence<int>("MaDatBanSequence").StartsAt(1).IncrementsBy(1);
+
             // NhanVien 
             modelBuilder.Entity<NhanVien>()
                 .HasKey(n => n.MaNV);

@@ -137,7 +137,7 @@ Client cần lưu cả `accessToken` (để gọi API) và `refreshToken` (để
 | 2. Logging & Error Handling | DONE | Serilog, global exception middleware, health checks |
 | 3. TCP → SignalR Migration | DONE | Hợp nhất realtime về SignalR + Redis backplane |
 | 4. Table CRUD + Business Logic | DONE | Full CRUD + gộp/tách bàn, chuyển đơn hàng + audit log `LICHSUBAN` |
-| 5. Infrastructure Improvements | Pending | State machine, pagination, sequence-based IDs |
+| 5. Infrastructure Improvements | DONE | State machine, pagination, database sequence-based IDs, conflict check reservations |
 | 6. Docker + Production Deploy | Pending | docker-compose + Nginx LB + Let's Encrypt |
 
 ## License

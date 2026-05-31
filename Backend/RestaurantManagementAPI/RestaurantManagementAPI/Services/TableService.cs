@@ -23,12 +23,19 @@ namespace RestaurantManagementAPI.Services
             _notifier = notifier;
         }
 
-        public async Task<ServiceResult<List<Ban>>> GetAllBanAsync()
+        public async Task<ServiceResult<PaginatedResult<Ban>>> GetAllBanAsync(int pageNumber = 1, int pageSize = 10)
         {
-            var list = await _context.BAN
-                .Where(b => !b.IsDeleted)
+            var query = _context.BAN
+                .Where(b => !b.IsDeleted);
+
+            var totalCount = await query.CountAsync();
+            var list = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-            return ServiceResult<List<Ban>>.Ok(list);
+
+            var paginated = PaginatedResult<Ban>.Create(list, totalCount, pageNumber, pageSize);
+            return ServiceResult<PaginatedResult<Ban>>.Ok(paginated);
         }
 
         public async Task<ServiceResult<Ban>> GetBanByIdAsync(string maBan)

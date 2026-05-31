@@ -217,9 +217,9 @@ Branch: `refactor/backend-refactor-all`
 
 ---
 
-## Phase 5 — Infrastructure Improvements — TODO
+## Phase 5 — Infrastructure Improvements — DONE
 
-Branch dự kiến: `refactor/phase-5-infrastructure`
+Branch: `refactor/backend-refactor-all`
 
 ### 5.1 Order State Machine
 
@@ -293,7 +293,7 @@ Branch dự kiến: `refactor/phase-6-docker`
 | 2. Logging & Error Handling | DONE   | `refactor/phase-2-observability` | — |
 | 3. TCP → SignalR           | DONE   | `refactor/phase-3-signalr`       | — |
 | 4. Table CRUD               | DONE   | `refactor/backend-refactor-all`   | — |
-| 5. Infrastructure           | TODO   | —                                 | — |
+| 5. Infrastructure           | DONE   | `refactor/backend-refactor-all`   | — |
 | 6. Docker + Deploy          | TODO   | —                                 | — |
 
 ## Quy ước branch & commit
