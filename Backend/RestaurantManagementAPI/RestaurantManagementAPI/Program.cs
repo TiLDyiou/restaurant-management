@@ -145,7 +145,30 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddSingleton<IRealtimeNotifier, SignalRNotifier>();
 builder.Services.AddHostedService<TcpSocketServer>();
-builder.Services.AddSignalR();
+// SignalR with optional Redis Backplane for scale-out
+var redisConn = configuration.GetConnectionString("Redis");
+var signalrBuilder = builder.Services.AddSignalR();
+if (!string.IsNullOrEmpty(redisConn))
+{
+    signalrBuilder.AddStackExchangeRedis(redisConn, options =>
+    {
+        options.Configuration.ChannelPrefix = "QLNH_SignalR";
+    });
+}
+
+// Distributed Caching (Redis in Production, Memory Cache in Dev/fallback)
+if (!string.IsNullOrEmpty(redisConn))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConn;
+        options.InstanceName = "QLNH_Cache:";
+    });
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+}
 
 // Business Services
 builder.Services.AddScoped<IAuthService, AuthService>();

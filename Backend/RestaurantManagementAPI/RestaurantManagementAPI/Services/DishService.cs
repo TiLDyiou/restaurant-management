@@ -1,30 +1,79 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs;
 using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace RestaurantManagementAPI.Services
 {
     public class DishService : IDishService
     {
         private readonly QLNHDbContext _context;
-        public DishService(QLNHDbContext context) { _context = context; }
+        private readonly IDistributedCache _cache;
+        private const string CacheKey = "all_dishes";
+
+        public DishService(QLNHDbContext context, IDistributedCache cache)
+        {
+            _context = context;
+            _cache = cache;
+        }
 
         public async Task<ServiceResult<List<MonAnDto>>> GetAllDishesAsync()
         {
+            try
+            {
+                // Try to retrieve list from Redis Cache
+                var cachedData = await _cache.GetStringAsync(CacheKey);
+                if (!string.IsNullOrEmpty(cachedData))
+                {
+                    var cachedList = JsonSerializer.Deserialize<List<MonAnDto>>(cachedData);
+                    if (cachedList != null)
+                    {
+                        return ServiceResult<List<MonAnDto>>.Ok(cachedList);
+                    }
+                }
+            }
+            catch
+            {
+                // Silence cache exceptions to maintain service resilience
+            }
+
+            // Fallback to database
             var list = await _context.MONAN.Where(m => m.TrangThai == true)
                 .Select(m => new MonAnDto 
-                { MaMA = m.MaMA, 
+                { 
+                    MaMA = m.MaMA, 
                     TenMA = m.TenMA, 
                     DonGia = m.DonGia, 
                     Loai = m.Loai, 
                     HinhAnh = m.HinhAnh 
                 })
                 .ToListAsync();
+
+            try
+            {
+                // Store in Redis cache for 5 minutes
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                };
+                var serializedData = JsonSerializer.Serialize(list);
+                await _cache.SetStringAsync(CacheKey, serializedData, cacheOptions);
+            }
+            catch
+            {
+                // Silence cache exceptions
+            }
+
             return ServiceResult<List<MonAnDto>>.Ok(list);
         }
 
@@ -68,6 +117,9 @@ namespace RestaurantManagementAPI.Services
             _context.MONAN.Add(monAn);
             await _context.SaveChangesAsync();
 
+            // Cache Invalidation
+            await InvalidateCacheAsync();
+
             var resultDto = new MonAnDto 
             { 
                 MaMA = monAn.MaMA, 
@@ -102,6 +154,10 @@ namespace RestaurantManagementAPI.Services
 
             _context.Entry(monAn).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+
+            // Cache Invalidation
+            await InvalidateCacheAsync();
+
             return ServiceResult.Ok("Cập nhật thành công");
         }
 
@@ -113,7 +169,23 @@ namespace RestaurantManagementAPI.Services
 
             monAn.TrangThai = false;
             await _context.SaveChangesAsync();
+
+            // Cache Invalidation
+            await InvalidateCacheAsync();
+
             return ServiceResult.Ok("Xóa món thành công");
+        }
+
+        private async Task InvalidateCacheAsync()
+        {
+            try
+            {
+                await _cache.RemoveAsync(CacheKey);
+            }
+            catch
+            {
+                // Silence cache exceptions to maintain service resilience
+            }
         }
 
         private string SanitizePrefix(string loai)

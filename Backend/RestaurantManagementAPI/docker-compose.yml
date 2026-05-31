@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. SQL SERVER DATABASE SERVICE
+  # ----------------------------------------------------------------------------
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: qlnh_sqlserver
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:-YourSecurePassword123!}
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MSSQL_SA_PASSWORD:-YourSecurePassword123!}", "-Q", "SELECT 1", "-C"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - qlnh_network
+
+  # ----------------------------------------------------------------------------
+  # 2. REDIS DISTRIBUTED CACHE & SIGNALR BACKPLANE SERVICE
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: qlnh_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - qlnh_network
+
+  # ----------------------------------------------------------------------------
+  # 3. BACKEND API SERVICE - INSTANCE 1
+  # ----------------------------------------------------------------------------
+  api1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qlnh_api1
+    restart: always
+    environment:
+      - ConnectionStrings__QLNHDatabase=Server=sqlserver,1433;Database=QLNHDatabase;User Id=sa;Password=${MSSQL_SA_PASSWORD:-YourSecurePassword123!};Encrypt=True;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=${ConnectionStrings__Redis:-redis:6379}
+      - Jwt__Key=${Jwt__Key}
+      - Jwt__Issuer=${Jwt__Issuer}
+      - Jwt__Audience=${Jwt__Audience}
+      - EmailSettings__SenderEmail=${EmailSettings__SenderEmail}
+      - EmailSettings__SenderName=${EmailSettings__SenderName}
+      - EmailSettings__AppPassword=${EmailSettings__AppPassword}
+      - EmailSettings__Host=${EmailSettings__Host}
+      - EmailSettings__Port=${EmailSettings__Port}
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - qlnh_logs:/app/Logs
+      - qlnh_uploads:/app/wwwroot/uploads
+    networks:
+      - qlnh_network
+
+  # ----------------------------------------------------------------------------
+  # 4. BACKEND API SERVICE - INSTANCE 2
+  # ----------------------------------------------------------------------------
+  api2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qlnh_api2
+    restart: always
+    environment:
+      - ConnectionStrings__QLNHDatabase=Server=sqlserver,1433;Database=QLNHDatabase;User Id=sa;Password=${MSSQL_SA_PASSWORD:-YourSecurePassword123!};Encrypt=True;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=${ConnectionStrings__Redis:-redis:6379}
+      - Jwt__Key=${Jwt__Key}
+      - Jwt__Issuer=${Jwt__Issuer}
+      - Jwt__Audience=${Jwt__Audience}
+      - EmailSettings__SenderEmail=${EmailSettings__SenderEmail}
+      - EmailSettings__SenderName=${EmailSettings__SenderName}
+      - EmailSettings__AppPassword=${EmailSettings__AppPassword}
+      - EmailSettings__Host=${EmailSettings__Host}
+      - EmailSettings__Port=${EmailSettings__Port}
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - qlnh_logs:/app/Logs
+      - qlnh_uploads:/app/wwwroot/uploads
+    networks:
+      - qlnh_network
+
+  # ----------------------------------------------------------------------------
+  # 5. NGINX REVERSE PROXY & LOAD BALANCER SERVICE
+  # ----------------------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: qlnh_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/www/certbot
+    depends_on:
+      - api1
+      - api2
+    networks:
+      - qlnh_network
+
+# ------------------------------------------------------------------------------
+# VOLUMES & NETWORKS DEFINITIONS
+# ------------------------------------------------------------------------------
+volumes:
+  mssql_data:
+    driver: local
+  redis_data:
+    driver: local
+  qlnh_logs:
+    driver: local
+  qlnh_uploads:
+    driver: local
+  certbot_etc:
+    driver: local
+  certbot_var:
+    driver: local
+
+networks:
+  qlnh_network:
+    driver: bridge

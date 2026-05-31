@@ -138,7 +138,62 @@ Client cần lưu cả `accessToken` (để gọi API) và `refreshToken` (để
 | 3. TCP → SignalR Migration | DONE | Hợp nhất realtime về SignalR + Redis backplane |
 | 4. Table CRUD + Business Logic | DONE | Full CRUD + gộp/tách bàn, chuyển đơn hàng + audit log `LICHSUBAN` |
 | 5. Infrastructure Improvements | DONE | State machine, pagination, database sequence-based IDs, conflict check reservations |
-| 6. Docker + Production Deploy | Pending | docker-compose + Nginx LB + Let's Encrypt |
+| 6. Docker + Production Deploy | DONE | docker-compose + Nginx LB + Let's Encrypt |
+
+## Hướng dẫn deploy với Docker & Production
+
+Hệ thống đã được cấu hình sẵn sàng chạy đa container (Multi-container orchestration) với độ tin cậy cao thông qua Docker Compose.
+
+### 1. Chuẩn bị môi trường
+1. Cài đặt **Docker** và **Docker Compose** trên máy chủ/VPS của bạn.
+2. Di chuyển đến thư mục backend của project:
+   ```bash
+   cd Backend/RestaurantManagementAPI
+   ```
+3. Tạo file `.env` từ file mẫu `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
+4. Mở file `.env` vừa tạo và cấu hình các giá trị thực tế của bạn:
+   - Đặt `MSSQL_SA_PASSWORD` cực kỳ bảo mật cho cơ sở dữ liệu.
+   - Điền key JWT bảo mật cao tại `Jwt__Key`.
+   - Điền thông số SMTP email thực tế của bạn tại `EmailSettings__SenderEmail` và `EmailSettings__AppPassword` để OTP hoạt động.
+
+### 2. Khởi chạy toàn bộ hệ thống
+Để khởi tạo và chạy các service (`sqlserver`, `redis`, 2 instances `api1` & `api2`, và load-balancer `nginx`):
+```bash
+docker-compose up -d --build
+```
+
+Lệnh trên sẽ:
+- Tải về và cấu hình các image cần thiết (SQL Server 2022, Redis 7 Alpine, Nginx Alpine).
+- Build ứng dụng .NET 9.0 thông qua Dockerfile tối ưu hóa multi-stage.
+- Khởi động SQL Server và Redis trước, chờ cho đến khi chúng ở trạng thái `healthy` (sẵn sàng kết nối) rồi mới khởi động `api1` và `api2`.
+- Khởi chạy Nginx để phân phối tải (Load Balancing) giữa 2 API node và mở cổng HTTP/HTTPS.
+
+### 3. Kiểm tra trạng thái hệ thống
+Để kiểm tra xem các container đang chạy như thế nào:
+```bash
+docker-compose ps
+```
+
+Để xem log hoạt động của các container:
+```bash
+docker-compose logs -f
+```
+
+Để truy cập healthcheck của API nhằm xác thực kết nối database:
+```bash
+curl http://localhost/health
+```
+
+### 4. Tắt hệ thống
+Khi muốn dừng hệ thống mà không làm mất dữ liệu database và cache:
+```bash
+docker-compose down
+```
+
+*Lưu ý: Dữ liệu của SQL Server, Redis, logs và uploads được lưu lâu dài thông qua Docker Volumes độc lập.*
 
 ## License
 

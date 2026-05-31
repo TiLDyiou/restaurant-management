@@ -250,38 +250,40 @@ Branch: `refactor/backend-refactor-all`
 
 ---
 
-## Phase 6 — Docker + Production Deploy — TODO
+## Phase 6 — Docker + Production Deploy — DONE
 
-Branch dự kiến: `refactor/phase-6-docker`
+Branch: `refactor/backend-refactor-all`
 
-### 6.1 Dockerfile
+### 6.1 Dockerfile — DONE
 
-- Multi-stage build (sdk → aspnet runtime)
+- Multi-stage build (.NET 9.0 SDK to ASP.NET Core 9.0 Runtime)
 - File: `Backend/RestaurantManagementAPI/Dockerfile`
+- Optimized caching of restore layer, minimal runtime footprint
 
-### 6.2 Docker Compose
+### 6.2 Docker Compose — DONE
 
-- Services: api (×2), sqlserver, redis, nginx
-- File: `docker-compose.yml`
-- File: `docker-compose.prod.yml` cho production overrides
+- Services orchestrated: `api1` (API node 1), `api2` (API node 2), `sqlserver` (DB), `redis` (Cache/Backplane), `nginx` (Load balancer)
+- File: `Backend/RestaurantManagementAPI/docker-compose.yml`
+- Robust healthchecks on `redis` and `sqlserver` with dependent startup sequence (`service_healthy`)
 
-### 6.3 Redis
+### 6.3 Redis — DONE
 
-- SignalR backplane (`Microsoft.AspNetCore.SignalR.StackExchangeRedis`)
-- Response caching cho dishes, tables (read-heavy)
+- SignalR Redis backplane (`Microsoft.AspNetCore.SignalR.StackExchangeRedis`)
+- Redis cache-aside caching pattern for reading dishes in `DishService.cs` (`all_dishes` key auto-invalidated on writes)
+- Caching dynamically drops back to Memory Cache if connection string is missing
 
-### 6.4 Nginx
+### 6.4 Nginx — DONE
 
-- SSL termination Let's Encrypt
-- Load balance 2 API instances
-- WebSocket upgrade cho SignalR
-- File: `nginx/nginx.conf`
+- Load-balancing across two API instances (`api1` and `api2`)
+- WebSocket upgrade protocols configured for SignalR hubs (`/restaurantHub`, `/restaurantChatHub`)
+- ACME challenge ready for Certbot validation & SSL termination
+- File: `Backend/RestaurantManagementAPI/nginx/nginx.conf`
 
-### 6.5 Environment
+### 6.5 Environment — DONE
 
-- `.env.example` (committed) với placeholder
-- `.env` (gitignored) với giá trị thật
-- Health check Docker
+- Created `.env.example` file (committed) defining parameters for environment validation
+- Complete parameters for JWT keys, SQL Server passwords, SMTP emails, and Redis connection strings
+- Strictly avoids committing production credentials to Git
 
 ---
 
@@ -294,7 +296,7 @@ Branch dự kiến: `refactor/phase-6-docker`
 | 3. TCP → SignalR           | DONE   | `refactor/phase-3-signalr`       | — |
 | 4. Table CRUD               | DONE   | `refactor/backend-refactor-all`   | — |
 | 5. Infrastructure           | DONE   | `refactor/backend-refactor-all`   | — |
-| 6. Docker + Deploy          | TODO   | —                                 | — |
+| 6. Docker + Deploy          | DONE   | `refactor/backend-refactor-all`   | — |
 
 ## Quy ước branch & commit
 
