@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RestaurantManagementGUI.Views.RevenueReportPage"
@@ -93,7 +93,7 @@
 
                     <VerticalStackLayout x:Name="EmptyRightPanelState" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="True">
                         <Label Text="👤" FontSize="48" HorizontalOptions="Center" Opacity="0.3"/>
-                        <Label Text="Không có thông tin" FontSize="14" TextColor="#999" HorizontalOptions="Center"/>
+                 
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>

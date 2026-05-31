@@ -1,13 +1,11 @@
-﻿using Microsoft.Maui.Devices;
+using Microsoft.Maui.Devices;
 
 namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
     {
-        public static string BaseUrl =>
-            DeviceInfo.Platform == DevicePlatform.Android
-                ? "https://10.0.2.2:7004/api/"
-                : "https://localhost:7004/api/";
+        public const string DomainUrl = "https://localhost:7004/";
+        public static string BaseUrl => $"{DomainUrl}api/";
         // --------------AUTH-----------------------------------
         public static string Register => $"{BaseUrl}auth/register";
         public static string Login => $"{BaseUrl}auth/login";
@@ -72,7 +70,7 @@ namespace RestaurantManagementGUI.Helpers
 
         // ----------------------- CHAT & REALTIME -----------------------
 
-        public static string ChatHubUrl => BaseUrl.Replace("/api/", "/restaurantChatHub");
+        public static string ChatHubUrl => $"{DomainUrl}restaurantChatHub";
 
         // Lấy danh sách Inbox (Chứa tin nhắn cuối + UnreadCount để làm in đậm)
         public static string GetInboxList(string maNV) => $"{BaseUrl}Chat/inbox-list/{maNV}";

@@ -13,19 +13,15 @@ namespace RestaurantManagementGUI.Converters
             if (string.IsNullOrEmpty(url))
                 return "placeholder_image.png";
 
+            // Nếu đã là URL đầy đủ
             if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             {
-                if (DeviceInfo.Platform == DevicePlatform.Android && url.Contains("localhost"))
-                {
-                    return url.Replace("localhost", "10.0.2.2");
-                }
                 return url;
             }
 
-            string baseDomain = ApiConfig.BaseUrl;
+            string baseDomain = ApiConfig.DomainUrl.TrimEnd('/');
 
-            baseDomain = baseDomain.TrimEnd('/');
-
+            // Chuẩn hóa đường dẫn
             if (url.StartsWith("/"))
                 url = url.Substring(1);
 

@@ -3,6 +3,7 @@
 
 # dotenv files
 .env
+.appsettings.json
 
 # User-specific files (Chặn các file cấu hình riêng tư của user máy cá nhân)
 *.rsuser

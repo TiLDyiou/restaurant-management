@@ -1,9 +1,10 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Storage;
+using RestaurantManagementGUI.Helpers;
+using RestaurantManagementGUI.Models;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using Microsoft.Maui.Storage;
-using RestaurantManagementGUI.Models;
 
 namespace RestaurantManagementGUI.Services
 {
@@ -23,11 +24,20 @@ namespace RestaurantManagementGUI.Services
         public event Action<string> OnDishDone;
         public event Action<string> OnChatReceived;
 
-#if ANDROID
-        private const string SERVER_IP = "10.0.2.2";
-#else
-        private const string SERVER_IP = "localhost"; 
-#endif
+        private static string GetServerHost()
+        {
+            try
+            {
+                var uri = new Uri(ApiConfig.DomainUrl);
+                return uri.Host;
+            }
+            catch
+            {
+                return "localhost";
+            }
+        }
+
+        private static string SERVER_IP => GetServerHost();
         private const int SERVER_PORT = 9000;
 
         public async Task ConnectAsync()

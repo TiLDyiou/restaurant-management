@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RestaurantManagementGUI.ImageViewerPage"
+             BackgroundColor="Black"
+             Title="Xem ảnh">
+
+    <Grid>
+        <ScrollView Orientation="Both" 
+                    HorizontalOptions="FillAndExpand" 
+                    VerticalOptions="FillAndExpand">
+
+            <Image x:Name="DetailImage"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill">
+
+                <Image.GestureRecognizers>
+                    <PinchGestureRecognizer PinchUpdated="OnPinchUpdated"/>
+                </Image.GestureRecognizers>
+            </Image>
+        </ScrollView>
+
+        <Button Text="✕"
+                TextColor="White"
+                FontSize="24"
+                BackgroundColor="Transparent"
+                HorizontalOptions="End"
+                VerticalOptions="Start"
+                Margin="0,10,10,0"
+                Clicked="OnCloseClicked"/>
+    </Grid>
+</ContentPage>
