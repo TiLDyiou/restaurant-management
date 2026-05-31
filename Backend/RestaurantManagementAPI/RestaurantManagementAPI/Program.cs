@@ -186,6 +186,8 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
+        var dbContext = scope.ServiceProvider.GetRequiredService<QLNHDbContext>();
+        await dbContext.Database.MigrateAsync();
         await DataSeeder.SeedAdminAsync(scope.ServiceProvider);
         await BanSeeder.SeedTableAsync(scope.ServiceProvider);
     }
