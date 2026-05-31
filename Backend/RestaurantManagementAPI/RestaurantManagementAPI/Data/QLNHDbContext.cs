@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RestaurantManagementAPI.Models.Entities;
 
 namespace RestaurantManagementAPI.Data
@@ -21,6 +21,7 @@ namespace RestaurantManagementAPI.Data
         public DbSet<ThongBao> THONGBAO { get; set; }
         public DbSet<Message> MESSAGES { get; set; }
         public DbSet<RefreshToken> REFRESHTOKEN { get; set; }
+        public DbSet<LichSuBan> LICHSUBAN { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -176,6 +177,20 @@ namespace RestaurantManagementAPI.Data
                       .WithMany()
                       .HasForeignKey(r => r.MaNV)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // LichSuBan
+            modelBuilder.Entity<LichSuBan>(entity =>
+            {
+                entity.HasKey(l => l.Id);
+                entity.HasOne(l => l.Ban)
+                      .WithMany()
+                      .HasForeignKey(l => l.MaBan)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(l => l.NhanVien)
+                      .WithMany()
+                      .HasForeignKey(l => l.MaNV)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

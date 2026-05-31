@@ -133,10 +133,10 @@ Client cần lưu cả `accessToken` (để gọi API) và `refreshToken` (để
 
 | Phase | Status | Mô tả |
 |-------|--------|-------|
-| 1. Security Hardening | Đang làm | Secrets, [Authorize], refresh token, rate limiting |
-| 2. Logging & Error Handling | Pending | Serilog, global exception middleware, health checks |
-| 3. TCP → SignalR Migration | Pending | Hợp nhất realtime về SignalR + Redis backplane |
-| 4. Table CRUD + Business Logic | Pending | Full CRUD + merge/split/transfer bàn |
+| 1. Security Hardening | DONE | Secrets, [Authorize], refresh token, rate limiting |
+| 2. Logging & Error Handling | DONE | Serilog, global exception middleware, health checks |
+| 3. TCP → SignalR Migration | DONE | Hợp nhất realtime về SignalR + Redis backplane |
+| 4. Table CRUD + Business Logic | DONE | Full CRUD + gộp/tách bàn, chuyển đơn hàng + audit log `LICHSUBAN` |
 | 5. Infrastructure Improvements | Pending | State machine, pagination, sequence-based IDs |
 | 6. Docker + Production Deploy | Pending | docker-compose + Nginx LB + Let's Encrypt |
 
