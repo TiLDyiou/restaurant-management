@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RestaurantManagementAPI.Common.Constants;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
@@ -14,10 +15,12 @@ namespace RestaurantManagementAPI.Services
     public class OrderService : IOrderService
     {
         private readonly QLNHDbContext _context;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(QLNHDbContext context)
+        public OrderService(QLNHDbContext context, ILogger<OrderService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<ServiceResult<List<HoaDonDto>>> GetOrdersAsync()
@@ -158,7 +161,7 @@ namespace RestaurantManagementAPI.Services
                 }
                 catch (Exception ex) 
                 { 
-                    Console.WriteLine($"Lỗi Socket: {ex.Message}"); 
+                    _logger.LogError(ex, "Lỗi Socket khi phát thông tin bàn/hóa đơn"); 
                 }
 
                 var resultDto = (await GetOrderByIdAsync(maHD)).Data; // dùng query lại để lấy đầy đủ thông tin vì Entity HoaDon mới chỉ có dữ liệu cơ bản

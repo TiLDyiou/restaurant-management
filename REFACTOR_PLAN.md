@@ -116,9 +116,9 @@ dotnet ef database update
 
 ---
 
-## Phase 2 — Logging + Error Handling + Health Checks — TODO
+## Phase 2 — Logging + Error Handling + Health Checks — DONE
 
-Branch dự kiến: `refactor/phase-2-observability`
+Branch: `refactor/phase-2-observability`
 
 ### 2.1 Serilog
 - Packages: `Serilog.AspNetCore 8.0.3`, `Serilog.Sinks.Console`, `Serilog.Sinks.File`
@@ -255,7 +255,7 @@ Branch dự kiến: `refactor/phase-6-docker`
 | Phase | Status | Branch | PR |
 |-------|--------|--------|-----|
 | 1. Security Hardening | DONE | `refactor/phase-1-security` | — |
-| 2. Logging & Error Handling | TODO | — | — |
+| 2. Logging & Error Handling | DONE | `refactor/phase-2-observability` | — |
 | 3. TCP → SignalR | TODO | — | — |
 | 4. Table CRUD | TODO | — | — |
 | 5. Infrastructure | TODO | — | — |

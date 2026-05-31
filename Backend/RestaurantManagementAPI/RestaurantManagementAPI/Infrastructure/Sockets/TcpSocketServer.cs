@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using RestaurantManagementAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -16,11 +17,13 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
         private readonly int _port = 9000;
         private ConcurrentDictionary<string, TcpClient> _clients = new();
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<TcpSocketServer> _logger;
 
-        public TcpSocketServer(IServiceProvider serviceProvider)
+        public TcpSocketServer(IServiceProvider serviceProvider, ILogger<TcpSocketServer> logger)
         {
             Instance = this;
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,7 +40,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
 
                 _listener = new TcpListener(IPAddress.Any, _port);
                 _listener.Start();
-                Console.WriteLine($"[SOCKET]: Server started on port {_port}");
+                _logger.LogInformation("Server started on port {Port}", _port);
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -47,7 +50,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
             }
             catch (Exception ex) 
             { 
-                Console.WriteLine($"[SOCKET ERROR]: {ex.Message}"); 
+                _logger.LogError(ex, "Socket server execution error"); 
             }
         }
 
@@ -65,7 +68,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     if (message == null) 
                         break;
 
-                    Console.WriteLine($"[RECV]: {message}");
+                    _logger.LogInformation("Received message: {Message}", message);
 
                     if (message.StartsWith("LOGIN|")) // Định dạng : LOGIN|MaNV
                     {
@@ -74,7 +77,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                         {
                             maNV = parts[1].Trim();
                             _clients.AddOrUpdate(maNV, client, (k, v) => client);
-                            Console.WriteLine($"-> User {maNV} Connected");
+                            _logger.LogInformation("User {MaNV} Connected", maNV);
                             await UpdateUserStatusInDb(maNV, true); // Cập nhật trạng thái online trong DB
                             await BroadcastAsync($"STATUS|{maNV}|TRUE"); // Thông báo cho tất cả client biết user đã online
                         }
@@ -91,14 +94,14 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[SOCKET ERROR]: {ex.Message}");
+                _logger.LogError(ex, "Error handling client");
             }
             finally
             {
                 if (!string.IsNullOrEmpty(maNV))
                 {
                     _clients.TryRemove(maNV, out _);
-                    Console.WriteLine($"-> User {maNV} Disconnected");
+                    _logger.LogInformation("User {MaNV} Disconnected", maNV);
                     await UpdateUserStatusInDb(maNV, false);
                     await BroadcastAsync($"STATUS|{maNV}|FALSE");
                 }
@@ -121,7 +124,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
             }
             catch (Exception ex)
             { 
-                Console.WriteLine($"[DB Error]: {ex.Message}"); 
+                _logger.LogError(ex, "DB Error updating status for user {MaNV}", maNV); 
             }
         }
 
@@ -139,7 +142,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[SOCKET ERROR]: {ex.Message}");
+                        _logger.LogError(ex, "Error broadcasting message to client");
                     }
                 }
             }

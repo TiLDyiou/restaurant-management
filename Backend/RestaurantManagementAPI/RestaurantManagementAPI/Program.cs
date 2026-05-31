@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,17 +8,28 @@ using RestaurantManagementAPI.Infrastructure.Email;
 using RestaurantManagementAPI.Infrastructure.Security;
 using RestaurantManagementAPI.Infrastructure.Sockets;
 using RestaurantManagementAPI.Interfaces;
+using RestaurantManagementAPI.Middleware;
 using RestaurantManagementAPI.Seeders;
 using RestaurantManagementAPI.Services;
+using Serilog;
 using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+// Set up Serilog
+builder.Host.UseSerilog((context, loggerConfiguration) => loggerConfiguration
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day));
+
 // DbContext
 builder.Services.AddDbContext<QLNHDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("QLNHDatabase")));
+
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddSqlServer(configuration.GetConnectionString("QLNHDatabase") ?? throw new InvalidOperationException("Connection string 'QLNHDatabase' not found."));
 
 // Controllers & Swagger
 builder.Services.AddControllers();
@@ -157,7 +168,7 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine("Seeding Error: " + ex.Message);
+    app.Logger.LogError(ex, "Seeding Error");
 }
 
 if (app.Environment.IsDevelopment())
@@ -166,6 +177,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseStaticFiles();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseRouting();
 app.UseCors("Production");
 app.UseRateLimiter();
@@ -174,4 +186,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<RestaurantChatHub>("/restaurantChatHub");
+app.MapHealthChecks("/health");
 app.Run();
