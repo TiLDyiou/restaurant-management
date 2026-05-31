@@ -61,7 +61,7 @@ services:
       - EmailSettings__AppPassword=${EmailSettings__AppPassword}
       - EmailSettings__Host=${EmailSettings__Host}
       - EmailSettings__Port=${EmailSettings__Port}
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
       - ASPNETCORE_URLS=http://+:8080
     depends_on:
       sqlserver:
@@ -94,7 +94,7 @@ services:
       - EmailSettings__AppPassword=${EmailSettings__AppPassword}
       - EmailSettings__Host=${EmailSettings__Host}
       - EmailSettings__Port=${EmailSettings__Port}
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
       - ASPNETCORE_URLS=http://+:8080
     depends_on:
       sqlserver:
