@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace RestaurantManagementAPI.DTOs
 {
@@ -18,7 +18,7 @@ namespace RestaurantManagementAPI.DTOs
         public string SDT { get; set; } = string.Empty;
 
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }
     }
 
     public class LoginDto
