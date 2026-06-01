@@ -1,4 +1,4 @@
-﻿using RestaurantManagementGUI.Models;
+using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Helpers;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
@@ -158,8 +158,55 @@ public partial class QuanLyMonAnPage : ContentPage
         try
         {
             var result = await FilePicker.Default.PickAsync(new PickOptions { FileTypes = FilePickerFileType.Images });
-            if (result != null) NewHinhAnh.Text = result.FullPath;
+            if (result != null) 
+            {
+                NewHinhAnh.Text = "Đang tải ảnh lên...";
+                var url = await UploadImageAsync(result.FullPath);
+                if (!string.IsNullOrEmpty(url))
+                {
+                    NewHinhAnh.Text = url;
+                }
+                else
+                {
+                    NewHinhAnh.Text = "";
+                    await DisplayAlert("Lỗi", "Tải ảnh lên thất bại.", "OK");
+                }
+            }
         }
         catch { }
+    }
+
+    private async Task<string?> UploadImageAsync(string localPath)
+    {
+        try
+        {
+            var token = await SecureStorage.Default.GetAsync("auth_token");
+            if (!string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            using var stream = File.OpenRead(localPath);
+            using var content = new MultipartFormDataContent();
+            var streamContent = new StreamContent(stream);
+            
+            string extension = Path.GetExtension(localPath).ToLower();
+            string contentType = extension switch { ".png" => "image/png", ".gif" => "image/gif", _ => "image/jpeg" };
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            content.Add(streamContent, "file", Path.GetFileName(localPath));
+
+            var response = await _httpClient.PostAsync(ApiConfig.UploadDishImage, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>(_jsonOptions);
+                if (result != null && result.Success && !string.IsNullOrEmpty(result.Data))
+                {
+                    return ApiConfig.DomainUrl + result.Data;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Upload image error: {ex.Message}");
+        }
+        return null;
     }
 }

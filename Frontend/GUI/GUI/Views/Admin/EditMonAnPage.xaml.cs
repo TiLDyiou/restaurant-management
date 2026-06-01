@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
@@ -40,14 +40,58 @@ namespace RestaurantManagementGUI
 
                 if (result != null)
                 {
-                    EntryHinhAnh.Text = result.FullPath;
-                    UpdateImagePreview();
+                    EntryHinhAnh.Text = "Đang tải ảnh lên...";
+                    var url = await UploadImageAsync(result.FullPath);
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        EntryHinhAnh.Text = url;
+                        UpdateImagePreview();
+                    }
+                    else
+                    {
+                        EntryHinhAnh.Text = "";
+                        await DisplayAlert("Lỗi", "Tải ảnh lên thất bại.", "OK");
+                    }
                 }
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Lỗi", "Không thể chọn ảnh: " + ex.Message, "OK");
             }
+        }
+
+        private async Task<string?> UploadImageAsync(string localPath)
+        {
+            try
+            {
+                var token = await SecureStorage.Default.GetAsync("auth_token");
+                if (!string.IsNullOrEmpty(token))
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                using var stream = File.OpenRead(localPath);
+                using var content = new MultipartFormDataContent();
+                var streamContent = new StreamContent(stream);
+                
+                string extension = Path.GetExtension(localPath).ToLower();
+                string contentType = extension switch { ".png" => "image/png", ".gif" => "image/gif", _ => "image/jpeg" };
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+                content.Add(streamContent, "file", Path.GetFileName(localPath));
+
+                var response = await _httpClient.PostAsync(ApiConfig.UploadDishImage, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>(_jsonOptions);
+                    if (result != null && result.Success && !string.IsNullOrEmpty(result.Data))
+                    {
+                        return ApiConfig.DomainUrl + result.Data;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Upload image error: {ex.Message}");
+            }
+            return null;
         }
 
         private void EntryHinhAnh_Unfocused(object sender, FocusEventArgs e) => UpdateImagePreview();

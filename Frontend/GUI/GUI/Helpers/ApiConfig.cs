@@ -40,6 +40,7 @@ namespace RestaurantManagementGUI.Helpers
         // ------------------------------- DISHES -------------------------------------
         public static string Dishes => $"{BaseUrl}dishes";
         public static string DishById(string id) => $"{BaseUrl}dishes/{id}";
+        public static string UploadDishImage => $"{BaseUrl}dishes/upload-image";
 
         // ------------------------------- TABLES (TableController) --------------------
         public static string Tables => $"{BaseUrl}tables";
