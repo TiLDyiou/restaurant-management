@@ -39,8 +39,8 @@ jobs:
               echo "Creating default .env file..."
               cp .env.example .env
               
-              # Cập nhật các mật khẩu mặc định sang chuỗi bảo mật ngẫu nhiên
-              DB_PASS=$(openssl rand -hex 12)
+              # Cập nhật các mật khẩu mặc định sang chuỗi bảo mật ngẫu nhiên (đảm bảo độ phức tạp của SQL Server)
+              DB_PASS="SqlPass_${RANDOM}_$(openssl rand -base64 12 | tr -d '/+=')"
               JWT_SECRET=$(openssl rand -base64 32)
               
               sed -i "s/YourSecurePassword123!/$DB_PASS/g" .env
