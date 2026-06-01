@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using RestaurantManagementAPI.Interfaces;
-using System.Net;
-using System.Net.Mail;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace RestaurantManagementAPI.Infrastructure.Email
@@ -11,58 +13,51 @@ namespace RestaurantManagementAPI.Infrastructure.Email
         private readonly IConfiguration _config;
         private readonly string _senderEmail;
         private readonly string _senderName;
-        private readonly string _appPassword;
-        private readonly string _host;
-        private readonly int _port;
+        private readonly string _apiKey; 
+        private readonly HttpClient _httpClient;
 
         public EmailService(IConfiguration config)
         {
-            // Lấy cấu hình từ appsettings.json
             _config = config; 
             var emailSettings = _config.GetSection("EmailSettings");
+            
             _senderEmail = emailSettings["SenderEmail"]!;
-            _senderName = emailSettings["SenderName"] ?? "NoName";
-            _appPassword = emailSettings["AppPassword"]!;
-            _host = emailSettings["Host"] ?? "smtp.gmail.com";
-            _port = int.TryParse(emailSettings["Port"], out int port) ? port : 587;
+            _senderName = emailSettings["SenderName"] ?? "Nhà hàng";
+            
+            // Tận dụng biến AppPassword trong appsettings.json để lưu API Key của Brevo 
+            // (Bạn đỡ phải sửa lại cấu trúc file config)
+            _apiKey = emailSettings["AppPassword"]!; 
+
+            _httpClient = new HttpClient();
+            _httpClient.Timeout = TimeSpan.FromSeconds(10);
+            
+            // Header bắt buộc của Brevo API
+            _httpClient.DefaultRequestHeaders.Add("api-key", _apiKey);
+            _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
         }
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            using var mail = new MailMessage
+            // Cấu trúc JSON payload theo chuẩn API của Brevo
+            var payload = new
             {
-                From = new MailAddress(_senderEmail, _senderName),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true 
-            };
-            mail.To.Add(new MailAddress(toEmail));
-
-            using var smtp = new SmtpClient(_host, _port) 
-            {
-                Credentials = new NetworkCredential(_senderEmail, _appPassword),
-                EnableSsl = true, // Sử dụng SSL để mã hóa kết nối giúp bảo mật
-                Timeout = 3000 // Cấu hình timeout cho các thao tác đồng bộ
+                sender = new { name = _senderName, email = _senderEmail },
+                to = new[] { new { email = toEmail } },
+                subject = subject,
+                htmlContent = body
             };
 
-            var sendTask = smtp.SendMailAsync(mail);
-            var delayTask = Task.Delay(3000); // Strict 3 seconds timeout
+            var jsonPayload = JsonSerializer.Serialize(payload);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            var completedTask = await Task.WhenAny(sendTask, delayTask);
-            if (completedTask == delayTask)
+            // Gửi qua HTTPS (Port 443 - không bao giờ bị khóa trên VPS)
+            var response = await _httpClient.PostAsync("https://api.brevo.com/v3/smtp/email", content);
+
+            if (!response.IsSuccessStatusCode)
             {
-                try
-                {
-                    smtp.Dispose();
-                }
-                catch
-                {
-                    // Ignore disposal errors
-                }
-                throw new System.TimeoutException("Gửi email vượt quá thời gian chờ (Timeout 3s). Có thể cổng SMTP đang bị VPS chặn.");
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Lỗi gửi email qua Brevo API: {response.StatusCode} - {errorMsg}");
             }
-
-            await sendTask; // Throws the original exception if sendTask failed
         }
     }
 }
