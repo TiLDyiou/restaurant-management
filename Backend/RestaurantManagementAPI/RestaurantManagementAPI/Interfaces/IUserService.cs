@@ -12,5 +12,6 @@ namespace RestaurantManagementAPI.Interfaces
         Task<ServiceResult> ResendEmailOtpAsync(string email);
         Task<ServiceResult<object>> ToggleUserStatusAsync(string maNV);
         Task<ServiceResult> SoftDeleteUserAsync(string maNV);
+        Task<ServiceResult> HardDeleteUserAsync(string maNV);
     }
 }

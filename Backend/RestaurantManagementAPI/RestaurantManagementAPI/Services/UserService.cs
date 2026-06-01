@@ -236,5 +236,35 @@ namespace RestaurantManagementAPI.Services
             await _context.SaveChangesAsync();
             return ServiceResult.Ok("Đã cho nghỉ việc và khóa tài khoản thành công");
         }
+
+        public async Task<ServiceResult> HardDeleteUserAsync(string maNV)
+        {
+            var nv = await _context.NHANVIEN
+                .Include(e => e.TaiKhoan)
+                .FirstOrDefaultAsync(e => e.MaNV == maNV);
+            if (nv == null) 
+                return ServiceResult.Fail("Không tìm thấy NV");
+
+            // Kiểm tra các ràng buộc dữ liệu quan trọng (chặn xóa cứng nếu đã có dữ liệu giao dịch)
+            bool hasOrders = await _context.HOADON.AnyAsync(h => h.MaNV == maNV);
+            bool hasImports = await _context.PHIEUNHAPKHO.AnyAsync(p => p.MaNV == maNV);
+            if (hasOrders || hasImports)
+            {
+                return ServiceResult.Fail("Không thể xóa cứng vì nhân viên này đã có lịch sử tạo hóa đơn hoặc nhập kho. Vui lòng dùng tính năng 'Cho nghỉ việc' để vô hiệu hóa tài khoản.");
+            }
+
+            // Xóa các tin nhắn nhận/gửi để tránh lỗi Restrict constraint
+            var receivedMessages = await _context.MESSAGES.Where(m => m.MaNV_Receiver == maNV).ToListAsync();
+            if (receivedMessages.Any())
+            {
+                _context.MESSAGES.RemoveRange(receivedMessages);
+            }
+
+            // Tài khoản và Token sẽ tự động bị xóa nhờ Cascade Delete, nhưng ta có thể xóa thủ công NhanVien
+            _context.NHANVIEN.Remove(nv);
+            
+            await _context.SaveChangesAsync();
+            return ServiceResult.Ok("Đã xóa vĩnh viễn nhân viên thành công.");
+        }
     }
 }
