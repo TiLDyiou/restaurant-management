@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:RestaurantManagementGUI.ViewModels"
@@ -8,6 +8,12 @@
              x:DataType="vm:BillGenerationViewModel"
              Title="Thu Ngân"
              BackgroundColor="#F2F2F7">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Grid x:Name="MainLayout" Padding="10" ColumnSpacing="10" RowSpacing="10">
 
@@ -190,14 +196,26 @@
                             StrokeThickness="1">
 
                         <Grid>
-                            <ActivityIndicator IsRunning="True" Color="#8B6B47" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            <ActivityIndicator IsRunning="{Binding IsQrLoading}"
+                                               IsVisible="{Binding IsQrLoading}"
+                                               Color="#8B6B47"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
 
                             <Image Source="{Binding QrCodeUrl}" 
                                    Aspect="AspectFit"
                                    HorizontalOptions="Fill"
-                                   VerticalOptions="Fill"/>
+                                   VerticalOptions="Fill"
+                                   IsVisible="{Binding IsQrLoading, Converter={StaticResource InvertedBoolConverter}}"/>
                         </Grid>
                     </Border>
+                    
+                    <VerticalStackLayout IsVisible="{Binding IsTransferPayment}" Spacing="2" HorizontalOptions="Center">
+                        <Label Text="{Binding BankName}" FontSize="12" TextColor="#888" HorizontalOptions="Center" FontAttributes="Bold"/>
+                        <Label Text="{Binding AccountNumber}" FontSize="14" TextColor="#333" HorizontalOptions="Center" FontAttributes="Bold"/>
+                        <Label Text="{Binding AccountName}" FontSize="12" TextColor="#888" HorizontalOptions="Center"/>
+                        <Label Text="{Binding SelectedBill.FormattedTotal}" FontSize="16" TextColor="#4CAF50" HorizontalOptions="Center" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
                     <Button Text="XÁC NHẬN THANH TOÁN" Command="{Binding PayAndPrintCommand}" BackgroundColor="#8B6B47" TextColor="White" FontAttributes="Bold" HeightRequest="50" CornerRadius="10" Margin="0,20,0,0"/>
                 </VerticalStackLayout>
             </ScrollView>

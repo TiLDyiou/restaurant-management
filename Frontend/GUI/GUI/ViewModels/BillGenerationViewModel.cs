@@ -25,6 +25,21 @@ namespace RestaurantManagementGUI.ViewModels
         [ObservableProperty]
         private string qrCodeUrl;
 
+        [ObservableProperty]
+        private string bankName;
+
+        [ObservableProperty]
+        private string accountName;
+
+        [ObservableProperty]
+        private string accountNumber;
+
+        [ObservableProperty]
+        private string paymentDescription;
+
+        [ObservableProperty]
+        private bool isQrLoading;
+
         partial void OnSelectedBillChanged(HoaDonDto value)
         {
             ResetPaymentForm();
@@ -36,8 +51,12 @@ namespace RestaurantManagementGUI.ViewModels
             if (bill == null)
             {
                 QrCodeUrl = "";
+                IsQrLoading = false;
                 return;
             }
+
+            IsQrLoading = true;
+            QrCodeUrl = "";
 
             try
             {
@@ -47,15 +66,30 @@ namespace RestaurantManagementGUI.ViewModels
                     var result = await response.Content.ReadFromJsonAsync<PayOSResponse>(_jsonOptions);
                     if (result != null && result.Success)
                     {
-                        var accountName = Uri.EscapeDataString(result.AccountName ?? "");
-                        var description = Uri.EscapeDataString(result.Description ?? "");
-                        QrCodeUrl = $"https://img.vietqr.io/image/{result.Bin}-{result.AccountNumber}-compact.png?amount={result.Amount}&addInfo={description}&accountName={accountName}";
+                        var accName = result.AccountName ?? "";
+                        var desc = result.Description ?? "";
+                        
+                        AccountName = accName;
+                        AccountNumber = result.AccountNumber ?? "";
+                        BankName = result.Bin ?? ""; 
+                        PaymentDescription = desc;
+
+                        var urlSafeAccName = Uri.EscapeDataString(accName);
+                        var urlSafeDesc = Uri.EscapeDataString(desc);
+                        QrCodeUrl = $"https://img.vietqr.io/image/{result.Bin}-{result.AccountNumber}-compact.png?amount={result.Amount}&addInfo={urlSafeDesc}&accountName={urlSafeAccName}";
+                        return;
                     }
                 }
+
+                QrCodeUrl = "";
             }
             catch (Exception)
             {
                 QrCodeUrl = "";
+            }
+            finally
+            {
+                IsQrLoading = false;
             }
         }
 
