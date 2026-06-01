@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using System.Collections.ObjectModel;
@@ -36,7 +36,7 @@ namespace RestaurantManagementGUI.ViewModels
 
                 if (response != null && response.Success && response.Data != null)
                 {
-                    var dishes = response.Data;
+                    var dishes = response.Data.Where(x => x.TrangThai).ToList();
                     var groups = dishes
                         .GroupBy(d =>
                         {

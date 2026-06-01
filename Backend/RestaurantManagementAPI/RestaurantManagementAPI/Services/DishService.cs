@@ -48,14 +48,15 @@ namespace RestaurantManagementAPI.Services
             }
 
             // Fallback to database
-            var list = await _context.MONAN.Where(m => m.TrangThai == true)
+            var list = await _context.MONAN
                 .Select(m => new MonAnDto 
                 { 
                     MaMA = m.MaMA, 
                     TenMA = m.TenMA, 
                     DonGia = m.DonGia, 
                     Loai = m.Loai, 
-                    HinhAnh = m.HinhAnh 
+                    HinhAnh = m.HinhAnh,
+                    TrangThai = m.TrangThai
                 })
                 .ToListAsync();
 
@@ -88,7 +89,8 @@ namespace RestaurantManagementAPI.Services
                 TenMA = m.TenMA, 
                 DonGia = m.DonGia, 
                 Loai = m.Loai, 
-                HinhAnh = m.HinhAnh 
+                HinhAnh = m.HinhAnh,
+                TrangThai = m.TrangThai
             });
         }
 
@@ -126,7 +128,8 @@ namespace RestaurantManagementAPI.Services
                 TenMA = monAn.TenMA, 
                 DonGia = monAn.DonGia, 
                 Loai = monAn.Loai, 
-                HinhAnh = monAn.HinhAnh 
+                HinhAnh = monAn.HinhAnh,
+                TrangThai = monAn.TrangThai
             };
             return ServiceResult<MonAnDto>.Ok(resultDto, "Thêm món thành công");
         }

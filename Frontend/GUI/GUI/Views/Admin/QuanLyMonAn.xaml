@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RestaurantManagementGUI.QuanLyMonAnPage" 
@@ -66,10 +66,19 @@
                                         BackgroundColor="#3B5998" TextColor="White"
                                         CornerRadius="5" HeightRequest="35" FontSize="12" Margin="0,0,5,0"/>
 
-                                <Button Grid.Column="3" Text="Xóa"
-                                        Clicked="DeleteDish_Clicked" BindingContext="{Binding .}" 
-                                        BackgroundColor="#D32F2F" TextColor="White"
-                                        CornerRadius="5" HeightRequest="35" FontSize="12"/>
+                                <Button Grid.Column="3" Clicked="ToggleDishStatus_Clicked" BindingContext="{Binding .}" 
+                                        CornerRadius="5" HeightRequest="35" FontSize="12">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding TrangThai}" Value="True">
+                                            <Setter Property="Text" Value="Ngừng bán" />
+                                            <Setter Property="BackgroundColor" Value="#D32F2F" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Button" Binding="{Binding TrangThai}" Value="False">
+                                            <Setter Property="Text" Value="Bán lại" />
+                                            <Setter Property="BackgroundColor" Value="#4CAF50" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
                             </Grid>
                         </Border>
                     </DataTemplate>

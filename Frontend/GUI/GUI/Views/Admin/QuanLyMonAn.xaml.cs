@@ -71,12 +71,30 @@ public partial class QuanLyMonAnPage : ContentPage
         AddButton.IsEnabled = false;
         AddButton.Text = "Đang thêm...";
 
+        string finalImageUrl = string.IsNullOrWhiteSpace(NewHinhAnh.Text) ? "" : NewHinhAnh.Text.Trim();
+        if (finalImageUrl.StartsWith("data:image/"))
+        {
+            AddButton.Text = "Đang xử lý ảnh...";
+            var uploadedUrl = await UploadBase64ImageAsync(finalImageUrl);
+            if (!string.IsNullOrEmpty(uploadedUrl))
+            {
+                finalImageUrl = uploadedUrl;
+            }
+            else
+            {
+                await DisplayAlert("Lỗi", "Không thể lưu ảnh đã dán. Vui lòng thử lại hoặc tải ảnh về máy để chọn.", "OK");
+                AddButton.IsEnabled = true;
+                AddButton.Text = "THÊM MÓN MỚI";
+                return;
+            }
+        }
+
         var newDish = new CreateMonAnDto
         {
             TenMA = NewTenMA.Text.Trim(),
             DonGia = donGia,
             Loai = NewLoai.Text.Trim(),
-            HinhAnh = string.IsNullOrWhiteSpace(NewHinhAnh.Text) ? "" : NewHinhAnh.Text.Trim()
+            HinhAnh = finalImageUrl
         };
 
         try
@@ -111,11 +129,12 @@ public partial class QuanLyMonAnPage : ContentPage
         }
     }
 
-    private async void DeleteDish_Clicked(object sender, EventArgs e)
+    private async void ToggleDishStatus_Clicked(object sender, EventArgs e)
     {
         if (sender is Button btn && btn.BindingContext is FoodModel food)
         {
-            bool confirm = await DisplayAlert("Xác nhận", $"Xóa món '{food.Name}'?", "Xóa", "Hủy");
+            string action = food.TrangThai ? "Ngừng bán" : "Bán lại";
+            bool confirm = await DisplayAlert("Xác nhận", $"{action} món '{food.Name}'?", "Đồng ý", "Hủy");
             if (!confirm) return;
 
             try
@@ -125,17 +144,18 @@ public partial class QuanLyMonAnPage : ContentPage
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 var url = ApiConfig.DishById(food.Id);
-                var response = await _httpClient.DeleteAsync(url);
+                var updateDto = new { TrangThai = !food.TrangThai };
+                var response = await _httpClient.PutAsJsonAsync(url, updateDto);
                 var result = await response.Content.ReadFromJsonAsync<ApiResponse<object>>(_jsonOptions);
 
                 if (response.IsSuccessStatusCode && result != null && result.Success)
                 {
-                    await DisplayAlert("Thành công", "Đã xóa món ăn.", "OK");
+                    await DisplayAlert("Thành công", $"Đã {action.ToLower()} món ăn.", "OK");
                     await LoadDishesAsync();
                 }
                 else
                 {
-                    await DisplayAlert("Lỗi", result?.Message ?? "Không thể xóa.", "OK");
+                    await DisplayAlert("Lỗi", result?.Message ?? $"Không thể {action.ToLower()}.", "OK");
                 }
             }
             catch (Exception ex)
@@ -206,6 +226,49 @@ public partial class QuanLyMonAnPage : ContentPage
         catch (Exception ex)
         {
             Console.WriteLine($"Upload image error: {ex.Message}");
+        }
+        return null;
+    }
+
+    private async Task<string?> UploadBase64ImageAsync(string dataUri)
+    {
+        try
+        {
+            var commaIndex = dataUri.IndexOf(',');
+            if (commaIndex < 0) return null;
+            
+            var header = dataUri.Substring(0, commaIndex);
+            var base64 = dataUri.Substring(commaIndex + 1);
+            
+            string extension = ".jpg";
+            string contentType = "image/jpeg";
+            if (header.Contains("image/png")) { extension = ".png"; contentType = "image/png"; }
+            else if (header.Contains("image/gif")) { extension = ".gif"; contentType = "image/gif"; }
+            
+            byte[] imageBytes = Convert.FromBase64String(base64);
+            using var stream = new MemoryStream(imageBytes);
+            using var content = new MultipartFormDataContent();
+            var streamContent = new StreamContent(stream);
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            content.Add(streamContent, "file", $"pasted_image_{Guid.NewGuid()}{extension}");
+
+            var token = await SecureStorage.Default.GetAsync("auth_token");
+            if (!string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.PostAsync(ApiConfig.UploadDishImage, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>(_jsonOptions);
+                if (result != null && result.Success && !string.IsNullOrEmpty(result.Data))
+                {
+                    return ApiConfig.DomainUrl + result.Data;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Upload base64 image error: {ex.Message}");
         }
         return null;
     }

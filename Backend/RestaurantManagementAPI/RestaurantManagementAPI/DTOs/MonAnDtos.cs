@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace RestaurantManagementAPI.DTOs
 {
@@ -9,6 +9,7 @@ namespace RestaurantManagementAPI.DTOs
         public decimal DonGia { get; set; }
         public string? Loai { get; set; }
         public string? HinhAnh { get; set; }
+        public bool TrangThai { get; set; }
     }
     public class CreateMonAnDto
     {

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
@@ -71,7 +71,7 @@ namespace RestaurantManagementGUI.ViewModels
 
                 if (response != null && response.Success && response.Data != null)
                 {
-                    _originalList = response.Data;
+                    _originalList = response.Data.Where(x => x.TrangThai).ToList();
                     Categories.Clear();
                     Categories.Add("Tất cả");
 
