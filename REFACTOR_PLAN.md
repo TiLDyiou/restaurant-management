@@ -287,16 +287,59 @@ Branch: `refactor/backend-refactor-all`
 
 ---
 
+## Phase 7 — VietQR & Webhook Automatic Payment — 📅 PENDING
+
+Branch: `refactor/phase-7-auto-payment`
+
+### 7.1 PayOS/SePay/Casso Integration Plan
+- Tích hợp cổng thanh toán trung gian như **PayOS** (hoặc Casso/SePay) qua API/Webhook để nhận diện giao dịch ngân hàng thực tế.
+- Khách quét mã VietQR tĩnh/động chứa nội dung chuyển khoản định danh hóa đơn (ví dụ: `QLNH HD0001`).
+
+### 7.2 Webhook API Endpoint
+- Thêm `PaymentsController` với endpoint `POST /api/payments/webhook`:
+  - Xác thực chữ ký số (Checksum/Signature) từ Webhook Provider sử dụng Secret Key bảo mật.
+  - Phân tích nội dung chuyển khoản để tìm mã hóa đơn (`MaHD`).
+  - Kiểm tra số tiền nhận được so với tổng tiền hóa đơn thực tế.
+
+### 7.3 Nghiệp vụ Backend & Realtime
+- Đánh dấu trạng thái hóa đơn thành `Đã thanh toán` và lưu vết vào bảng `LichSuThanhToan` mới (Mã giao dịch, Số tiền, Ngân hàng, Thời gian).
+- Sử dụng `IRealtimeNotifier` để broadcast sự kiện `OrderPaymentCompleted` qua SignalR (`RestaurantHub`) đến toàn bộ các thiết bị nhân viên.
+- Giải phóng bàn ăn liên quan nếu đơn hàng là thanh toán cuối cùng của bàn đó.
+
+---
+
+## Phase 8 — CI/CD Pipeline Automation — 📅 PENDING
+
+Branch: `refactor/phase-8-cicd`
+
+### 8.1 Continuous Integration (CI)
+- Tạo GitHub Action Workflow `.github/workflows/ci.yml` chạy tự động khi PR hoặc push:
+  - Khởi tạo môi trường .NET 9 SDK.
+  - Chạy `dotnet restore` và `dotnet build` để kiểm tra lỗi cú pháp.
+  - Chạy toàn bộ Unit/Integration Tests.
+
+### 8.2 Continuous Deployment (CD)
+- Tạo GitHub Action Workflow `.github/workflows/deploy.yml` tự động deploy khi merge vào `main`:
+  - Build Docker image từ `Dockerfile` của backend API.
+  - Push Docker image lên GitHub Container Registry (GHCR) hoặc Docker Hub an toàn.
+  - SSH vào VPS `qlnhnhom2.me` bằng SSH Private Key (Secrets).
+  - Tải Docker image mới và triển khai rolling update (cập nhật xoay vòng `api1` rồi `api2` phía sau Nginx để duy trì **Zero-Downtime**).
+  - Chạy tự động `dotnet ef database update` để migration dữ liệu database nếu có thay đổi.
+
+---
+
 ## Bảng tiến độ
 
-| Phase                       | Status | Branch                             | PR |
-| --------------------------- | ------ | ---------------------------------- | -- |
-| 1. Security Hardening       | DONE   | `refactor/phase-1-security`      | — |
-| 2. Logging & Error Handling | DONE   | `refactor/phase-2-observability` | — |
-| 3. TCP → SignalR           | DONE   | `refactor/phase-3-signalr`       | — |
-| 4. Table CRUD               | DONE   | `refactor/backend-refactor-all`   | — |
-| 5. Infrastructure           | DONE   | `refactor/backend-refactor-all`   | — |
-| 6. Docker + Deploy          | DONE   | `refactor/backend-refactor-all`   | — |
+| Phase                       | Status  | Branch                             | PR |
+| --------------------------- | ------- | ---------------------------------- | -- |
+| 1. Security Hardening       | DONE    | `refactor/phase-1-security`        | —  |
+| 2. Logging & Error Handling | DONE    | `refactor/phase-2-observability`   | —  |
+| 3. TCP → SignalR            | DONE    | `refactor/phase-3-signalr`         | —  |
+| 4. Table CRUD               | DONE    | `refactor/backend-refactor-all`    | —  |
+| 5. Infrastructure           | DONE    | `refactor/backend-refactor-all`    | —  |
+| 6. Docker + Deploy          | DONE    | `refactor/backend-refactor-all`    | —  |
+| 7. VietQR Auto Payment      | PENDING | `refactor/phase-7-auto-payment`    | —  |
+| 8. CI/CD Automation         | PENDING | `refactor/phase-8-cicd`            | —  |
 
 ## Quy ước branch & commit
 

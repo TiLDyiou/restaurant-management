@@ -8,5 +8,6 @@ namespace RestaurantManagementAPI.Interfaces
         Task NotifyOrderCreatedAsync(string maHD);
         Task NotifyKitchenItemReadyAsync(string msg);
         Task NotifyUserStatusChangedAsync(string maNV, bool isOnline);
+        Task NotifyPaymentSuccessAsync(string maHD, decimal amount);
     }
 }

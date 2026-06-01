@@ -17,6 +17,7 @@ namespace RestaurantManagementGUI.Services
         public event Action<string>? OnNewOrderReceived;
         public event Action<string>? OnTableStatusChanged;
         public event Action<string>? OnDishDone;
+        public event Action<string, decimal>? OnPaymentSuccess;
         public event Action<string>? OnChatReceived; // Kept for backward compatibility
 
         private TCPSocketClient()
@@ -85,6 +86,13 @@ namespace RestaurantManagementGUI.Services
                 string message = $"STATUS|{maNV}|{statusStr}";
                 Debug.WriteLine($"[SignalR RECV UserStatusChanged]: {message}");
                 MessagingCenter.Send(this, "UpdateStatus", message);
+            });
+
+            // 5. Payment success event
+            _hubConnection.On<string, decimal>("PaymentSuccess", (maHD, amount) =>
+            {
+                Debug.WriteLine($"[SignalR RECV PaymentSuccess]: {maHD} - {amount}");
+                OnPaymentSuccess?.Invoke(maHD, amount);
             });
         }
 

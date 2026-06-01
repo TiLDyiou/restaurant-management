@@ -64,5 +64,15 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                 await TcpSocketServer.Instance.BroadcastAsync($"STATUS|{maNV}|{statusStr}");
             }
         }
+        public async Task NotifyPaymentSuccessAsync(string maHD, decimal amount)
+        {
+            await _hubContext.Clients.All.SendAsync("PaymentSuccess", maHD, amount);
+            
+            if (TcpSocketServer.Instance != null)
+            {
+                var payload = new { MaHD = maHD, Amount = amount };
+                await TcpSocketServer.Instance.BroadcastAsync($"PAYMENT_SUCCESS|{JsonSerializer.Serialize(payload)}");
+            }
+        }
     }
 }

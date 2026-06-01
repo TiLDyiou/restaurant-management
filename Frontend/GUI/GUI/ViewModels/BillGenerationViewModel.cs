@@ -68,6 +68,29 @@ namespace RestaurantManagementGUI.ViewModels
 
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             _ = LoadPendingBills();
+
+            TCPSocketClient.Instance.OnPaymentSuccess -= HandlePaymentSuccess;
+            TCPSocketClient.Instance.OnPaymentSuccess += HandlePaymentSuccess;
+        }
+
+        private void HandlePaymentSuccess(string maHD, decimal amount)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                var bill = PendingBills.FirstOrDefault(b => b.MaHD == maHD);
+                if (bill != null)
+                {
+                    PendingBills.Remove(bill);
+                    if (SelectedBill?.MaHD == maHD)
+                    {
+                        SelectedBill = PendingBills.FirstOrDefault();
+                        ResetPaymentForm();
+                    }
+                    
+                    PaymentEventService.NotifyPaymentCompleted(maHD, amount, bill.TableName, "Chuyển khoản (Tự động)");
+                    await Application.Current.MainPage.DisplayAlert("💰 Ting ting!", $"Khách hàng vừa thanh toán thành công {amount:N0}đ cho đơn {maHD} qua mã QR.", "Tuyệt vời");
+                }
+            });
         }
 
         public async Task LoadPendingBills()
