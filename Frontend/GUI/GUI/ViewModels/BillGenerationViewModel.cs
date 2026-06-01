@@ -76,7 +76,7 @@ namespace RestaurantManagementGUI.ViewModels
 
                         var urlSafeAccName = Uri.EscapeDataString(accName);
                         var urlSafeDesc = Uri.EscapeDataString(desc);
-                        QrCodeUrl = $"https://img.vietqr.io/image/{result.Bin}-{result.AccountNumber}-compact.png?amount={result.Amount}&addInfo={urlSafeDesc}&accountName={urlSafeAccName}";
+                        QrCodeUrl = $"https://img.vietqr.io/image/{result.Bin}-{result.AccountNumber}-compact2.png?amount={result.Amount}&addInfo={urlSafeDesc}&accountName={urlSafeAccName}";
                         return;
                     }
                 }
