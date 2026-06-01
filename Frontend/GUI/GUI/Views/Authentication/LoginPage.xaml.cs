@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
 using RestaurantManagementGUI.Models;
@@ -61,10 +61,11 @@ namespace RestaurantManagementGUI
                 {
                     var data = apiResponse.Data;
 
-                    if (!string.IsNullOrWhiteSpace(data.Token))
+                    if (!string.IsNullOrWhiteSpace(data.AccessToken))
                     {
                         
-                        await SecureStorage.Default.SetAsync("auth_token", data.Token);
+                        await SecureStorage.Default.SetAsync("auth_token", data.AccessToken);
+                        await SecureStorage.Default.SetAsync("refresh_token", data.RefreshToken ?? "");
                         await SecureStorage.Default.SetAsync("user_username", data.Username ?? data.MaNV);
                         await SecureStorage.Default.SetAsync("user_manv", data.MaNV);
                         await SecureStorage.Default.SetAsync("user_role", data.Role ?? "");
@@ -79,7 +80,8 @@ namespace RestaurantManagementGUI
                         UserState.CurrentMaNV = data.MaNV;
                         UserState.CurrentTenNV = data.Username;
                         UserState.CurrentRole = data.Role;
-                        UserState.AccessToken = data.Token;
+                        UserState.AccessToken = data.AccessToken;
+                        UserState.RefreshToken = data.RefreshToken;
 
                         // Gọi sau khi đã lưu xong current_ma_nv
                         if (!string.IsNullOrEmpty(data.MaNV))

@@ -1,6 +1,7 @@
-﻿public static class UserState
+public static class UserState
 {
     public static string AccessToken { get; set; } = "";
+    public static string RefreshToken { get; set; } = "";
 
     public static string CurrentMaNV { get; set; } = "";
     public static string CurrentTenNV { get; set; } = "";
@@ -11,6 +12,7 @@
     public static void Clear()
     {
         AccessToken = "";
+        RefreshToken = "";
         CurrentMaNV = "";
         CurrentTenNV = "";
         CurrentRole = "";

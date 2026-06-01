@@ -1,4 +1,4 @@
-﻿using RestaurantManagementGUI.Models;
+using RestaurantManagementGUI.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using RestaurantManagementGUI.Constants;
@@ -21,6 +21,11 @@ namespace RestaurantManagementGUI
         public event EventHandler<Ban> PaymentRequested;
         public event EventHandler RefreshRequested;
         public event EventHandler<string> FilterChanged;
+        public event EventHandler<Ban> MergeRequested;
+        public event EventHandler<Ban> SplitRequested;
+        public event EventHandler<Ban> TransferRequested;
+        public event EventHandler<Ban> HistoryRequested;
+        public event EventHandler<Ban> DeleteRequested;
 
         public FlyoutMenuView()
         {
@@ -73,21 +78,47 @@ namespace RestaurantManagementGUI
             SelectedTableName.Text = table.TenBan;
 
             string status = table.TrangThai;
+            bool isMerged = table.IsMerged;
+
             if (status == SystemConstants.TableEmpty)
             {
-                SelectedTableStatus.Text = "Trống";
+                SelectedTableStatus.Text = isMerged ? "Trống (Bàn gộp)" : "Trống";
                 SelectedTableStatus.TextColor = Colors.Green;
+
+                ChangeStatusBtn.IsVisible = true;
+                ViewAddOrderBtn.IsVisible = false;
+                PaymentBtn.IsVisible = false;
+                MergeBtn.IsVisible = !isMerged;
+                SplitBtn.IsVisible = isMerged;
+                TransferBtn.IsVisible = false;
             }
             else if (status == SystemConstants.TableOccupied)
             {
-                SelectedTableStatus.Text = "Có khách";
+                SelectedTableStatus.Text = isMerged ? "Có khách (Bàn gộp)" : "Có khách";
                 SelectedTableStatus.TextColor = Colors.Red;
+
+                ChangeStatusBtn.IsVisible = true;
+                ViewAddOrderBtn.IsVisible = true;
+                PaymentBtn.IsVisible = true;
+                MergeBtn.IsVisible = false;
+                SplitBtn.IsVisible = isMerged;
+                TransferBtn.IsVisible = true;
             }
             else
             {
-                SelectedTableStatus.Text = "Đã đặt";
+                SelectedTableStatus.Text = isMerged ? "Đã đặt (Bàn gộp)" : "Đã đặt";
                 SelectedTableStatus.TextColor = Color.FromArgb("#FFBD59");
+
+                ChangeStatusBtn.IsVisible = true;
+                ViewAddOrderBtn.IsVisible = false;
+                PaymentBtn.IsVisible = false;
+                MergeBtn.IsVisible = false;
+                SplitBtn.IsVisible = isMerged;
+                TransferBtn.IsVisible = false;
             }
+
+            HistoryBtn.IsVisible = true;
+            DeleteBtn.IsVisible = UserState.IsAdmin;
         }
 
         public void UpdateStatistics(ObservableCollection<Ban> tables)
@@ -103,6 +134,11 @@ namespace RestaurantManagementGUI
         private void OnChangeStatusTapped(object sender, EventArgs e) => ChangeStatusRequested?.Invoke(this, SelectedTable);
         private void OnViewAddOrderTapped(object sender, EventArgs e) => ViewAddOrderRequested?.Invoke(this, SelectedTable);
         private void OnPaymentTapped(object sender, EventArgs e) => PaymentRequested?.Invoke(this, SelectedTable);
+        private void OnMergeTapped(object sender, EventArgs e) => MergeRequested?.Invoke(this, SelectedTable);
+        private void OnSplitTapped(object sender, EventArgs e) => SplitRequested?.Invoke(this, SelectedTable);
+        private void OnTransferTapped(object sender, EventArgs e) => TransferRequested?.Invoke(this, SelectedTable);
+        private void OnHistoryTapped(object sender, EventArgs e) => HistoryRequested?.Invoke(this, SelectedTable);
+        private void OnDeleteTapped(object sender, EventArgs e) => DeleteRequested?.Invoke(this, SelectedTable);
         private void OnStatusFilterChanged(object sender, EventArgs e) => FilterChanged?.Invoke(this, StatusFilterPicker.SelectedItem?.ToString());
     }
 }

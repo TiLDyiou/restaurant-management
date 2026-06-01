@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
@@ -118,7 +118,7 @@
 
 
                         <!-- Button: Đổi trạng thái -->
-                        <Border Style="{StaticResource ActionButtonStyle}">
+                        <Border x:Name="ChangeStatusBtn" Style="{StaticResource ActionButtonStyle}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnChangeStatusTapped" />
                             </Border.GestureRecognizers>
@@ -129,7 +129,7 @@
                         </Border>
 
                         <!-- Button: Xem/Thêm món -->
-                        <Border Style="{StaticResource ActionButtonStyle}">
+                        <Border x:Name="ViewAddOrderBtn" Style="{StaticResource ActionButtonStyle}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnViewAddOrderTapped" />
                             </Border.GestureRecognizers>
@@ -140,13 +140,68 @@
                         </Border>
 
                         <!-- Button: Thanh toán -->
-                        <Border Style="{StaticResource ActionButtonStyle}">
+                        <Border x:Name="PaymentBtn" Style="{StaticResource ActionButtonStyle}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnPaymentTapped" />
                             </Border.GestureRecognizers>
                             <HorizontalStackLayout Spacing="14">
                                 <Label Text="&#xe8a1;" Style="{StaticResource IconStyle}" />
                                 <Label Text="Thanh toán" Style="{StaticResource ButtonTextStyle}" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Button: Gộp bàn -->
+                        <Border x:Name="MergeBtn" Style="{StaticResource ActionButtonStyle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMergeTapped" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="14">
+                                <Label Text="&#xe8f4;" Style="{StaticResource IconStyle}" />
+                                <Label Text="Gộp bàn" Style="{StaticResource ButtonTextStyle}" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Button: Tách bàn -->
+                        <Border x:Name="SplitBtn" Style="{StaticResource ActionButtonStyle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSplitTapped" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="14">
+                                <Label Text="&#xe8f5;" Style="{StaticResource IconStyle}" />
+                                <Label Text="Tách bàn gộp" Style="{StaticResource ButtonTextStyle}" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Button: Chuyển bàn -->
+                        <Border x:Name="TransferBtn" Style="{StaticResource ActionButtonStyle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTransferTapped" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="14">
+                                <Label Text="&#xe8a0;" Style="{StaticResource IconStyle}" />
+                                <Label Text="Chuyển bàn" Style="{StaticResource ButtonTextStyle}" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Button: Lịch sử bàn -->
+                        <Border x:Name="HistoryBtn" Style="{StaticResource ActionButtonStyle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnHistoryTapped" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="14">
+                                <Label Text="&#xe889;" Style="{StaticResource IconStyle}" />
+                                <Label Text="Lịch sử bàn" Style="{StaticResource ButtonTextStyle}" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Button: Xóa bàn (Admin Only) -->
+                        <Border x:Name="DeleteBtn" Style="{StaticResource ActionButtonStyle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDeleteTapped" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="14">
+                                <Label Text="&#xe872;" Style="{StaticResource IconStyle}" />
+                                <Label Text="Xóa bàn" Style="{StaticResource ButtonTextStyle}" />
                             </HorizontalStackLayout>
                         </Border>
                     </VerticalStackLayout>

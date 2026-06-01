@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:RestaurantManagementGUI.Models"
@@ -54,6 +54,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0" BackgroundColor="{StaticResource ColorYellowGold}" StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="12" HeightRequest="52" WidthRequest="52" HorizontalOptions="Start">
@@ -63,7 +64,26 @@
                         <Label Text="&#xe5d2;" FontFamily="MaterialIcons" FontSize="28" TextColor="{StaticResource ColorDarkBrown}" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
 
-                    <Grid Grid.Column="2" WidthRequest="50" HeightRequest="50" HorizontalOptions="End">
+                    <Label Grid.Column="1" Text="SƠ ĐỒ BÀN ĂN" TextColor="{StaticResource ColorDarkBrown}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Button Thêm bàn (Admin Only) -->
+                    <Border Grid.Column="2" 
+                            BackgroundColor="{StaticResource ColorYellowGold}" 
+                            StrokeShape="RoundRectangle 16" 
+                            StrokeThickness="0" 
+                            Padding="12" 
+                            HeightRequest="52" 
+                            WidthRequest="52" 
+                            HorizontalOptions="End" 
+                            Margin="0,0,10,0"
+                            IsVisible="{Binding IsAdmin}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding AddTableCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="&#xe145;" FontFamily="MaterialIcons" FontSize="26" TextColor="{StaticResource ColorDarkBrown}" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Grid Grid.Column="3" WidthRequest="50" HeightRequest="50" HorizontalOptions="End">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ToggleNotificationsCommand}"/>
                         </Grid.GestureRecognizers>
@@ -124,11 +144,16 @@
         </Grid>
 
         <local:FlyoutMenuView x:Name="FlyoutMenu" 
-                              ChangeStatusRequested="OnFlyoutChangeStatusRequested" 
-                              ViewAddOrderRequested="OnFlyoutViewAddOrderRequested" 
-                              PaymentRequested="OnFlyoutPaymentRequested" 
-                              RefreshRequested="OnFlyoutRefreshRequested" 
-                              FilterChanged="OnFlyoutFilterChanged" />
+                               ChangeStatusRequested="OnFlyoutChangeStatusRequested" 
+                               ViewAddOrderRequested="OnFlyoutViewAddOrderRequested" 
+                               PaymentRequested="OnFlyoutPaymentRequested" 
+                               RefreshRequested="OnFlyoutRefreshRequested" 
+                               FilterChanged="OnFlyoutFilterChanged"
+                               MergeRequested="OnFlyoutMergeRequested"
+                               SplitRequested="OnFlyoutSplitRequested"
+                               TransferRequested="OnFlyoutTransferRequested"
+                               HistoryRequested="OnFlyoutHistoryRequested"
+                               DeleteRequested="OnFlyoutDeleteRequested" />
 
         <ContentView IsVisible="{Binding ShowNotificationPopup}" BackgroundColor="Transparent" ZIndex="99" InputTransparent="False">
             <ContentView.GestureRecognizers>

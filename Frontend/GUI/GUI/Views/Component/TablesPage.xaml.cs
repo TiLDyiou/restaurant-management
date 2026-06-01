@@ -1,23 +1,21 @@
-﻿using RestaurantManagementGUI.ViewModels;
+using System;
+using System.Net.Http;
+using Microsoft.Maui.Controls;
+using RestaurantManagementGUI.ViewModels;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
-using System.Net.Http.Json;
-using RestaurantManagementGUI.Helpers;
 
 namespace RestaurantManagementGUI
 {
     public partial class TablesPage : ContentPage
     {
         private readonly TablesViewModel _viewModel;
-        private readonly HttpClient _httpClient;
 
-        public TablesPage(TablesViewModel viewModel, HttpClient httpClient)
+        public TablesPage(TablesViewModel viewModel)
         {
             InitializeComponent();
 
             _viewModel = viewModel;
-            _httpClient = httpClient;
-
             BindingContext = _viewModel;
             _viewModel.DataUpdated += (s, e) => FlyoutMenu.UpdateStatistics(_viewModel.FilteredTables);
         }
@@ -35,6 +33,7 @@ namespace RestaurantManagementGUI
             base.OnDisappearing();
             _viewModel.UnsubscribeSocket();
         }
+
         private async void OnHamburgerTapped(object sender, EventArgs e)
         {
             FlyoutMenu.SelectedTable = null;
@@ -53,25 +52,7 @@ namespace RestaurantManagementGUI
         private async void OnFlyoutChangeStatusRequested(object sender, Ban table)
         {
             await FlyoutMenu.CloseAsync();
-            var status = await DisplayActionSheet($"Trạng thái {table.TenBan}", "Hủy", null, "Trống", "Có khách", "Bàn đã đặt");
-            if (string.IsNullOrEmpty(status) || status == "Hủy") return;
-
-            try
-            {
-                var response = await _httpClient.PutAsJsonAsync(ApiConfig.UpdateTableStatus(table.MaBan), status);
-                if (response.IsSuccessStatusCode)
-                {
-                    table.TrangThai = status;
-                }
-                else
-                {
-                    await DisplayAlert("Lỗi", "Cập nhật thất bại", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Lỗi", ex.Message, "OK");
-            }
+            await _viewModel.UpdateTableStatusCommand.ExecuteAsync(table);
         }
 
         private async void OnFlyoutViewAddOrderRequested(object sender, Ban table)
@@ -97,6 +78,35 @@ namespace RestaurantManagementGUI
         private void OnFlyoutFilterChanged(object sender, string filterType)
         {
             _viewModel.FilterTables(filterType);
+        }
+
+        private async void OnFlyoutMergeRequested(object sender, Ban table)
+        {
+            await FlyoutMenu.CloseAsync();
+            await _viewModel.MergeTablesCommand.ExecuteAsync(table);
+        }
+
+        private async void OnFlyoutSplitRequested(object sender, Ban table)
+        {
+            await FlyoutMenu.CloseAsync();
+            await _viewModel.SplitTablesCommand.ExecuteAsync(table);
+        }
+
+        private async void OnFlyoutTransferRequested(object sender, Ban table)
+        {
+            await FlyoutMenu.CloseAsync();
+            await _viewModel.TransferOrderCommand.ExecuteAsync(table);
+        }
+
+        private void OnFlyoutHistoryRequested(object sender, Ban table)
+        {
+            _viewModel.ShowTableHistoryCommand.Execute(table);
+        }
+
+        private async void OnFlyoutDeleteRequested(object sender, Ban table)
+        {
+            await FlyoutMenu.CloseAsync();
+            await _viewModel.DeleteTableCommand.ExecuteAsync(table);
         }
     }
 }

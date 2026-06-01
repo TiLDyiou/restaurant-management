@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using RestaurantManagementGUI.Helpers; // Để dùng HttpsClientHandlerService
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
@@ -40,12 +40,19 @@ public static class MauiProgram
                 fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
             });
 
+        builder.Services.AddTransient<AuthHeaderHandler>();
+
         builder.Services.AddSingleton(sp =>
         {
             // Lấy Handler đã bypass SSL từ Bước 1
-            var handler = HttpsClientHandlerService.GetPlatformMessageHandler();
+            var platformHandler = HttpsClientHandlerService.GetPlatformMessageHandler();
+            
+            // Lấy AuthHeaderHandler để tự động chèn JWT + Refresh Token
+            var authHandler = sp.GetRequiredService<AuthHeaderHandler>();
+            authHandler.InnerHandler = platformHandler;
+
             // Tự động gán BaseURL
-            return new HttpClient(handler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
+            return new HttpClient(authHandler) { BaseAddress = new Uri(ApiConfig.BaseUrl) };
         });
 
         // 3. ĐĂNG KÝ SERVICES

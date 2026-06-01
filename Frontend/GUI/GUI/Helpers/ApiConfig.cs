@@ -4,7 +4,7 @@ namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
     {
-        public const string DomainUrl = "https://localhost:7004/";
+        public const string DomainUrl = "http://188.166.240.218/";
         public static string BaseUrl => $"{DomainUrl}api/";
         // --------------AUTH-----------------------------------
         public static string Register => $"{BaseUrl}auth/register";
@@ -44,6 +44,10 @@ namespace RestaurantManagementGUI.Helpers
         // ------------------------------- TABLES (TableController) --------------------
         public static string Tables => $"{BaseUrl}tables";
         public static string UpdateTableStatus(string id) => $"{BaseUrl}tables/{id}/status";
+        public static string MergeTables => $"{BaseUrl}tables/merge";
+        public static string SplitTables(string id) => $"{BaseUrl}tables/{id}/split";
+        public static string TransferOrder => $"{BaseUrl}tables/transfer";
+        public static string TableHistory(string id) => $"{BaseUrl}tables/{id}/history";
 
         // ----------------------------- ORDERS -----------------------------------------
         public static string Orders => $"{BaseUrl}orders";
