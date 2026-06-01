@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using System.Net.Http.Json;
@@ -37,6 +37,8 @@ namespace RestaurantManagementGUI.Services
                 {
                     options.AccessTokenProvider = () => Task.FromResult(UserState.AccessToken);
                     options.HttpMessageHandlerFactory = _ => handler;
+                    options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets;
+                    options.SkipNegotiation = true;
                 })
                 .WithAutomaticReconnect()
                 .Build();

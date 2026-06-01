@@ -36,6 +36,8 @@ namespace RestaurantManagementGUI.Services
                 {
                     options.AccessTokenProvider = () => Task.FromResult(UserState.AccessToken);
                     options.HttpMessageHandlerFactory = _ => handler;
+                    options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets;
+                    options.SkipNegotiation = true;
                 })
                 .WithAutomaticReconnect()
                 .Build();
