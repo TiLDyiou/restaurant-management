@@ -47,7 +47,9 @@ namespace RestaurantManagementGUI.ViewModels
                     var result = await response.Content.ReadFromJsonAsync<PayOSResponse>(_jsonOptions);
                     if (result != null && result.Success)
                     {
-                        QrCodeUrl = $"https://img.vietqr.io/image/{result.Bin}-{result.AccountNumber}-compact.png?amount={result.Amount}&addInfo={Uri.EscapeDataString(result.Description)}&accountName={Uri.EscapeDataString(result.AccountName)}";
+                        var accountName = Uri.EscapeDataString(result.AccountName ?? "");
+                        var description = Uri.EscapeDataString(result.Description ?? "");
+                        QrCodeUrl = $"https://img.vietqr.io/image/{result.Bin}-{result.AccountNumber}-compact.png?amount={result.Amount}&addInfo={description}&accountName={accountName}";
                     }
                 }
             }
