@@ -114,12 +114,27 @@ namespace RestaurantManagementGUI
                 return;
             }
 
+            string finalImageUrl = string.IsNullOrWhiteSpace(EntryHinhAnh.Text) ? "" : EntryHinhAnh.Text.Trim();
+            if (finalImageUrl.StartsWith("data:image/"))
+            {
+                var uploadedUrl = await UploadBase64ImageAsync(finalImageUrl);
+                if (!string.IsNullOrEmpty(uploadedUrl))
+                {
+                    finalImageUrl = uploadedUrl;
+                }
+                else
+                {
+                    await DisplayAlert("Lỗi", "Không thể xử lý ảnh copy từ Google. Vui lòng thử lại hoặc tải ảnh về máy.", "OK");
+                    return;
+                }
+            }
+
             var updateDto = new UpdateDishReq
             {
                 TenMA = tenMoi,
                 DonGia = giaMoi,
                 Loai = EntryLoai.Text?.Trim(),
-                HinhAnh = EntryHinhAnh.Text?.Trim(),
+                HinhAnh = finalImageUrl,
                 TrangThai = SwitchTrangThai.IsToggled
             };
 
@@ -157,6 +172,49 @@ namespace RestaurantManagementGUI
         private async void Cancel_Clicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private async Task<string?> UploadBase64ImageAsync(string dataUri)
+        {
+            try
+            {
+                var commaIndex = dataUri.IndexOf(',');
+                if (commaIndex < 0) return null;
+                
+                var header = dataUri.Substring(0, commaIndex);
+                var base64 = dataUri.Substring(commaIndex + 1);
+                
+                string extension = ".jpg";
+                string contentType = "image/jpeg";
+                if (header.Contains("image/png")) { extension = ".png"; contentType = "image/png"; }
+                else if (header.Contains("image/gif")) { extension = ".gif"; contentType = "image/gif"; }
+                
+                byte[] imageBytes = Convert.FromBase64String(base64);
+                using var stream = new MemoryStream(imageBytes);
+                using var content = new MultipartFormDataContent();
+                var streamContent = new StreamContent(stream);
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+                content.Add(streamContent, "file", $"pasted_image_{Guid.NewGuid()}{extension}");
+
+                var token = await SecureStorage.Default.GetAsync("auth_token");
+                if (!string.IsNullOrEmpty(token))
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync(ApiConfig.UploadDishImage, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>(_jsonOptions);
+                    if (result != null && result.Success && !string.IsNullOrEmpty(result.Data))
+                    {
+                        return ApiConfig.DomainUrl + result.Data;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Upload base64 image error: {ex.Message}");
+            }
+            return null;
         }
     }
 }
