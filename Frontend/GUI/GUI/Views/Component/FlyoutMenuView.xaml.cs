@@ -88,8 +88,6 @@ namespace RestaurantManagementGUI
                 ChangeStatusBtn.IsVisible = true;
                 ViewAddOrderBtn.IsVisible = false;
                 PaymentBtn.IsVisible = false;
-                MergeBtn.IsVisible = !isMerged;
-                SplitBtn.IsVisible = isMerged;
                 TransferBtn.IsVisible = false;
             }
             else if (status == SystemConstants.TableOccupied)
@@ -100,8 +98,6 @@ namespace RestaurantManagementGUI
                 ChangeStatusBtn.IsVisible = true;
                 ViewAddOrderBtn.IsVisible = true;
                 PaymentBtn.IsVisible = true;
-                MergeBtn.IsVisible = false;
-                SplitBtn.IsVisible = isMerged;
                 TransferBtn.IsVisible = true;
             }
             else
@@ -112,8 +108,6 @@ namespace RestaurantManagementGUI
                 ChangeStatusBtn.IsVisible = true;
                 ViewAddOrderBtn.IsVisible = false;
                 PaymentBtn.IsVisible = false;
-                MergeBtn.IsVisible = false;
-                SplitBtn.IsVisible = isMerged;
                 TransferBtn.IsVisible = false;
             }
 
