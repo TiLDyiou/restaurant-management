@@ -197,11 +197,9 @@ catch (Exception ex)
     app.Logger.LogError(ex, "Seeding Error");
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Luôn bật Swagger (kể cả Production) để phục vụ chấm điểm và chạy thử dự án sinh viên
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseRouting();
