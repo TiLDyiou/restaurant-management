@@ -41,7 +41,7 @@ namespace RestaurantManagementGUI.ViewModels
 
             try
             {
-                var response = await _httpClient.PostAsync($"{ApiConfig.BaseUrl}/api/PayOS/create-payment-link/{bill.MaHD}", null);
+                var response = await _httpClient.PostAsync($"{ApiConfig.BaseUrl}PayOS/create-payment-link/{bill.MaHD}", null);
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<PayOSResponse>(_jsonOptions);
