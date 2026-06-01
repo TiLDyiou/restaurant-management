@@ -80,6 +80,58 @@ namespace RestaurantManagementAPI.Controllers
 
             return Ok(new { success = true, message = "Webhook processed successfully" });
         }
+
+        [HttpPost("casso")]
+        public async Task<IActionResult> CassoWebhook([FromBody] CassoWebhookPayload payload)
+        {
+            if (payload == null || payload.error != 0 || payload.data == null)
+                return BadRequest(new { success = false, message = "Invalid Casso Payload" });
+
+            foreach (var transaction in payload.data)
+            {
+                // Only care about money-in transactions (amount > 0)
+                if (transaction.amount <= 0) continue;
+
+                var match = Regex.Match(transaction.description ?? "", @"HD\d{5}", RegexOptions.IgnoreCase);
+                if (!match.Success) continue;
+
+                string maHD = match.Value.ToUpper();
+                var orderResult = await _orderService.GetOrderByIdAsync(maHD);
+                
+                if (!orderResult.Success || orderResult.Data == null) continue;
+
+                var hd = orderResult.Data;
+                if (hd.TrangThai == "Đã thanh toán") continue;
+                if (transaction.amount < hd.TongTien) continue;
+
+                var checkoutDto = new CheckoutRequestDto { PaymentMethod = "Chuyển khoản (Casso)" };
+                var checkoutResult = await _orderService.CheckoutAsync(maHD, checkoutDto);
+
+                if (checkoutResult.Success)
+                {
+                    _logger.LogInformation("Auto checkout successful via Casso for {MaHD}", maHD);
+                    await _notifier.NotifyPaymentSuccessAsync(maHD, transaction.amount);
+                }
+            }
+
+            return Ok(new { success = true, message = "Casso Webhook processed" });
+        }
+    }
+
+    public class CassoWebhookPayload
+    {
+        public int error { get; set; }
+        public List<CassoTransaction> data { get; set; } = new List<CassoTransaction>();
+    }
+
+    public class CassoTransaction
+    {
+        public int id { get; set; }
+        public string tid { get; set; }
+        public string description { get; set; }
+        public decimal amount { get; set; }
+        public decimal cusum_balance { get; set; }
+        public string when { get; set; }
     }
 
     public class SePayWebhookDto
