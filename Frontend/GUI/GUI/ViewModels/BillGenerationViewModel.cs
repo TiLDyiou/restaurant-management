@@ -15,28 +15,53 @@ namespace RestaurantManagementGUI.ViewModels
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        private const string MY_BANK_ID = "VCB";
-        private const string MY_ACCOUNT_NO = "9969390384";
-        private const string QR_TEMPLATE = "compact2";
-
         [ObservableProperty]
         private ObservableCollection<HoaDonDto> pendingBills = new();
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(QrCodeUrl), nameof(ChangeAmount), nameof(ShowChange))]
+        [NotifyPropertyChangedFor(nameof(ChangeAmount), nameof(ShowChange))]
         private HoaDonDto selectedBill;
 
-        partial void OnSelectedBillChanged(HoaDonDto value) => ResetPaymentForm();
+        [ObservableProperty]
+        private string qrCodeUrl;
 
-        public string QrCodeUrl
+        partial void OnSelectedBillChanged(HoaDonDto value)
         {
-            get
+            ResetPaymentForm();
+            _ = LoadPayOSQrCode(value);
+        }
+
+        private async Task LoadPayOSQrCode(HoaDonDto bill)
+        {
+            if (bill == null)
             {
-                if (SelectedBill == null) return "";
-                long amount = (long)(SelectedBill.TongTien ?? 0);
-                string addInfo = $"Thanh toan HD {SelectedBill.MaHD}";
-                return $"https://img.vietqr.io/image/{MY_BANK_ID}-{MY_ACCOUNT_NO}-{QR_TEMPLATE}.png?amount={amount}&addInfo={Uri.EscapeDataString(addInfo)}";
+                QrCodeUrl = "";
+                return;
             }
+
+            try
+            {
+                var response = await _httpClient.PostAsync($"{ApiConfig.BaseUrl}/api/PayOS/create-payment-link/{bill.MaHD}", null);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<PayOSResponse>(_jsonOptions);
+                    if (result != null && result.Success)
+                    {
+                        QrCodeUrl = result.QrCode;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                QrCodeUrl = "";
+            }
+        }
+
+        public class PayOSResponse
+        {
+            public bool Success { get; set; }
+            public string CheckoutUrl { get; set; }
+            public string QrCode { get; set; }
         }
 
         [ObservableProperty]

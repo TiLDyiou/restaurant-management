@@ -12,6 +12,7 @@ using RestaurantManagementAPI.Middleware;
 using RestaurantManagementAPI.Seeders;
 using RestaurantManagementAPI.Services;
 using Serilog;
+using PayOS;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -137,6 +138,15 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(1)
             }));
 });
+
+// PayOS setup
+PayOSClient payOS = new PayOSClient(new PayOSOptions
+{
+    ClientId = configuration["PayOS:ClientId"] ?? "YOUR_CLIENT_ID",
+    ApiKey = configuration["PayOS:ApiKey"] ?? "YOUR_API_KEY",
+    ChecksumKey = configuration["PayOS:ChecksumKey"] ?? "YOUR_CHECKSUM_KEY"
+});
+builder.Services.AddSingleton(payOS);
 
 // Dependency Injection (Đăng ký Services)
 
