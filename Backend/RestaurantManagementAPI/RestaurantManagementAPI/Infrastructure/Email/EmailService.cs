@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using RestaurantManagementAPI.Interfaces;
 using System.Net;
 using System.Net.Mail;
@@ -41,9 +41,28 @@ namespace RestaurantManagementAPI.Infrastructure.Email
             using var smtp = new SmtpClient(_host, _port) 
             {
                 Credentials = new NetworkCredential(_senderEmail, _appPassword),
-                EnableSsl = true // Sử dụng SSL để mã hóa kết nối giúp bảo mật
+                EnableSsl = true, // Sử dụng SSL để mã hóa kết nối giúp bảo mật
+                Timeout = 3000 // Cấu hình timeout cho các thao tác đồng bộ
             };
-            await smtp.SendMailAsync(mail); // Gửi email bất đồng bộ để server không bị block do quá trình gửi email có thể mất thời gian
+
+            var sendTask = smtp.SendMailAsync(mail);
+            var delayTask = Task.Delay(3000); // Strict 3 seconds timeout
+
+            var completedTask = await Task.WhenAny(sendTask, delayTask);
+            if (completedTask == delayTask)
+            {
+                try
+                {
+                    smtp.Dispose();
+                }
+                catch
+                {
+                    // Ignore disposal errors
+                }
+                throw new System.TimeoutException("Gửi email vượt quá thời gian chờ (Timeout 3s). Có thể cổng SMTP đang bị VPS chặn.");
+            }
+
+            await sendTask; // Throws the original exception if sendTask failed
         }
     }
 }

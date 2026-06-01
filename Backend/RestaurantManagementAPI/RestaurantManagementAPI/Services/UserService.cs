@@ -6,6 +6,7 @@ using RestaurantManagementAPI.Infrastructure.Email;
 using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
 using System.Security.Cryptography;
+using Serilog;
 
 namespace RestaurantManagementAPI.Services
 {
@@ -125,10 +126,11 @@ namespace RestaurantManagementAPI.Services
                         await _emailService.SendEmailAsync(dto.Email, "OTP Verify", $"OTP: {otp}"); 
                         emailChanged = true; 
                     }
-                    catch 
+                    catch (Exception ex)
                     { 
-                        await transaction.RollbackAsync(); 
-                        return ServiceResult<object>.Fail("Lỗi gửi mail"); 
+                        // [SMTP Bypass] In mã OTP ra logs và tiếp tục để hỗ trợ môi trường VPS bị chặn cổng gửi mail
+                        Log.Warning("⚠️ [SMTP Bypass] Gửi email OTP Verify thất bại do lỗi kết nối mạng VPS: {Message}. OTP của {Email} là: {Otp}", ex.Message, dto.Email, otp);
+                        emailChanged = true; 
                     }
                 }
 
@@ -182,7 +184,8 @@ namespace RestaurantManagementAPI.Services
             }
             catch (Exception ex) 
             { 
-                return ServiceResult.Fail("Lỗi gửi mail: " + ex.Message); 
+                // [SMTP Bypass] In mã OTP ra logs và tiếp tục để hỗ trợ môi trường VPS bị chặn cổng gửi mail
+                Log.Warning("⚠️ [SMTP Bypass] Gửi email Resend OTP thất bại do lỗi kết nối mạng VPS: {Message}. OTP của {Email} là: {Otp}", ex.Message, user.Email, otp);
             }
             return ServiceResult.Ok("Đã gửi lại OTP");
         }

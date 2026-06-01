@@ -7,6 +7,7 @@ using RestaurantManagementAPI.Interfaces;
 using RestaurantManagementAPI.Models.Entities;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace RestaurantManagementAPI.Services
 {
