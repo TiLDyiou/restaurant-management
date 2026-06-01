@@ -61,6 +61,7 @@ namespace RestaurantManagementGUI.ViewModels
                 {
                     var pendingOrders = response.Data.Items
                         .Where(x => x.TrangThai != "Đã thanh toán" && x.TrangThai != "Đã hủy" && x.TrangThai != "Đã hoàn thành")
+                        .Where(o => o.ChiTietHoaDons != null && o.ChiTietHoaDons.Any(c => c.TrangThai != "Đã xong" && c.TrangThai != "Hết món"))
                         .OrderByDescending(x => x.NgayLap)
                         .ToList();
 

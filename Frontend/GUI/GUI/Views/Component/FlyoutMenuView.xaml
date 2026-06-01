@@ -150,27 +150,7 @@
                             </HorizontalStackLayout>
                         </Border>
 
-                        <!-- Button: Gộp bàn -->
-                        <Border x:Name="MergeBtn" Style="{StaticResource ActionButtonStyle}">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnMergeTapped" />
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout Spacing="14">
-                                <Label Text="&#xe8f4;" Style="{StaticResource IconStyle}" />
-                                <Label Text="Gộp bàn" Style="{StaticResource ButtonTextStyle}" />
-                            </HorizontalStackLayout>
-                        </Border>
 
-                        <!-- Button: Tách bàn -->
-                        <Border x:Name="SplitBtn" Style="{StaticResource ActionButtonStyle}">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnSplitTapped" />
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout Spacing="14">
-                                <Label Text="&#xe8f5;" Style="{StaticResource IconStyle}" />
-                                <Label Text="Tách bàn gộp" Style="{StaticResource ButtonTextStyle}" />
-                            </HorizontalStackLayout>
-                        </Border>
 
                         <!-- Button: Chuyển bàn -->
                         <Border x:Name="TransferBtn" Style="{StaticResource ActionButtonStyle}">

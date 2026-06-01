@@ -103,6 +103,15 @@ namespace RestaurantManagementGUI.ViewModels
         {
             if (SelectedBill == null) return;
 
+            if (IsCashPayment)
+            {
+                if (!decimal.TryParse(CustomerPayAmount, out decimal payAmount) || payAmount < (SelectedBill.TongTien ?? 0))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Số tiền khách đưa không hợp lệ hoặc không đủ để thanh toán.", "OK");
+                    return;
+                }
+            }
+
             string method = IsCashPayment ? "Tiền mặt" : "Chuyển khoản";
             var requestDto = new { PaymentMethod = method };
 

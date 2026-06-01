@@ -153,7 +153,12 @@ namespace RestaurantManagementGUI.ViewModels
             else if (filterType == "Bàn đã đặt")
                 result = _allTables.Where(t => t.TrangThai == SystemConstants.TableReserved);
 
-            FilteredTables = new ObservableCollection<Ban>(result);
+            var sortedResult = result.OrderBy(t => {
+                var match = System.Text.RegularExpressions.Regex.Match(t.TenBan ?? "", @"\d+");
+                return match.Success ? int.Parse(match.Value) : int.MaxValue;
+            }).ThenBy(t => t.TenBan);
+
+            FilteredTables = new ObservableCollection<Ban>(sortedResult);
             DataUpdated?.Invoke(this, EventArgs.Empty);
         }
 
