@@ -17,6 +17,7 @@ namespace RestaurantManagementAPI.Services
         private readonly IEmailService _emailService;
         private readonly IJwtTokenGenerator _jwtGenerator;
         private readonly IConfiguration _config;
+        private readonly IRealtimeNotifier _notifier;
 
         private static readonly string DummyHash =
             BCrypt.Net.BCrypt.HashPassword("dummy-timing-defense-value");
@@ -25,12 +26,14 @@ namespace RestaurantManagementAPI.Services
             QLNHDbContext context,
             IEmailService emailService,
             IJwtTokenGenerator jwtGenerator,
-            IConfiguration config)
+            IConfiguration config,
+            IRealtimeNotifier notifier)
         {
             _context = context;
             _emailService = emailService;
             _jwtGenerator = jwtGenerator;
             _config = config;
+            _notifier = notifier;
         }
 
         public async Task<ServiceResult<string>> RegisterAsync(RegisterDto dto)
@@ -130,6 +133,7 @@ namespace RestaurantManagementAPI.Services
             var refreshToken = CreateRefreshTokenAsync(user.MaNV, ip);
 
             await _context.SaveChangesAsync();
+            await _notifier.NotifyUserStatusChangedAsync(user.MaNV, true);
 
             return ServiceResult<object>.Ok(new
             {
@@ -201,6 +205,7 @@ namespace RestaurantManagementAPI.Services
                 t.RevokedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+            await _notifier.NotifyUserStatusChangedAsync(user.MaNV, false);
             return ServiceResult.Ok("Đăng xuất thành công.");
         }
 
