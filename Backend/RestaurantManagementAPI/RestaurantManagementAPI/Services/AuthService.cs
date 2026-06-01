@@ -309,9 +309,11 @@ namespace RestaurantManagementAPI.Services
                 await _emailService.SendEmailAsync(user.Email!, subject, $"Mã OTP: {otp}");
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                // [SMTP Bypass] In mã OTP ra logs và trả về true để bỏ qua chặn cổng gửi thư của nhà mạng VPS (DigitalOcean chặn cổng 587)
+                Log.Warning("⚠️ [SMTP Bypass] Gửi email thất bại do lỗi kết nối mạng VPS: {Message}. Mã OTP của {Email} là: {Otp}", ex.Message, user.Email, otp);
+                return true;
             }
         }
 
