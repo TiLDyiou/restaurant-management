@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
@@ -55,11 +55,11 @@ namespace RestaurantManagementGUI.ViewModels
             IsBusy = true;
             try
             {
-                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<HoaDonDto>>>(ApiConfig.Orders, _jsonOptions);
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<PaginatedResult<HoaDonDto>>>(ApiConfig.Orders, _jsonOptions);
 
-                if (response != null && response.Success && response.Data != null)
+                if (response != null && response.Success && response.Data != null && response.Data.Items != null)
                 {
-                    var pendingOrders = response.Data
+                    var pendingOrders = response.Data.Items
                         .Where(x => x.TrangThai != "Đã thanh toán" && x.TrangThai != "Đã hủy" && x.TrangThai != "Đã hoàn thành")
                         .OrderByDescending(x => x.NgayLap)
                         .ToList();
@@ -151,14 +151,11 @@ namespace RestaurantManagementGUI.ViewModels
             IsBusy = true;
             try
             {
-                var url = ApiConfig.UpdateOrderStatus(order.MaHD);
-                var res = await _httpClient.PutAsJsonAsync(url, new { NewStatus = "Đã hoàn thành" });
-
-                if (res.IsSuccessStatusCode)
-                {
-                    ActiveOrders.Remove(order);
-                    await Application.Current.MainPage.DisplayAlert("Bếp", $"Đã hoàn thành đơn {order.MaHD}", "OK");
-                }
+                // No need to update the database for the whole order status,
+                // because order status must remain "Chưa thanh toán" for the staff.
+                // The order is naturally excluded from the Chef's view when all items are done.
+                ActiveOrders.Remove(order);
+                await Application.Current.MainPage.DisplayAlert("Bếp", $"Đã dọn xong đơn {order.MaHD}", "OK");
             }
             catch (Exception ex)
             {
@@ -190,17 +187,20 @@ namespace RestaurantManagementGUI.ViewModels
             {
                 string url = $"{ApiConfig.Notifications}?loai=BEP";
 
-                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<ThongBaoDto>>>(url, _jsonOptions);
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<PaginatedResult<ThongBaoDto>>>(url, _jsonOptions);
 
                 if (response != null && response.Success && response.Data != null)
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         NotificationList.Clear();
-                        foreach (var item in response.Data)
+                        if (response.Data.Items != null)
                         {
-                            string time = item.ThoiGian.ToString("HH:mm");
-                            NotificationList.Add($"{item.NoiDung} ({time})");
+                            foreach (var item in response.Data.Items)
+                            {
+                                string time = item.ThoiGian.ToString("HH:mm");
+                                NotificationList.Add($"{item.NoiDung} ({time})");
+                            }
                         }
                         NewOrderCount = NotificationList.Count;
                     });

@@ -65,17 +65,20 @@ namespace RestaurantManagementGUI.ViewModels
             {
                 string url = $"{ApiConfig.Notifications}?loai=PHUCVU";
 
-                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<ThongBaoDto>>>(url, _jsonOptions);
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<PaginatedResult<ThongBaoDto>>>(url, _jsonOptions);
 
                 if (response != null && response.Success && response.Data != null)
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         NotificationList.Clear();
-                        foreach (var item in response.Data)
+                        if (response.Data.Items != null)
                         {
-                            string time = item.ThoiGian.ToString("HH:mm");
-                            NotificationList.Add($"{item.NoiDung} ({time})");
+                            foreach (var item in response.Data.Items)
+                            {
+                                string time = item.ThoiGian.ToString("HH:mm");
+                                NotificationList.Add($"{item.NoiDung} ({time})");
+                            }
                         }
                         NewNotificationCount = NotificationList.Count;
                     });

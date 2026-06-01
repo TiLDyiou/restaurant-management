@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
@@ -74,10 +74,10 @@ namespace RestaurantManagementGUI.ViewModels
         {
             try
             {
-                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<HoaDonDto>>>(ApiConfig.Orders, _jsonOptions);
-                if (response != null && response.Success && response.Data != null)
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<PaginatedResult<HoaDonDto>>>(ApiConfig.Orders, _jsonOptions);
+                if (response != null && response.Success && response.Data != null && response.Data.Items != null)
                 {
-                    var pending = response.Data
+                    var pending = response.Data.Items
                         .Where(b => b.TrangThai != "Đã thanh toán" && b.TrangThai != "Đã hủy")
                         .OrderByDescending(b => b.NgayLap).ToList();
 
