@@ -25,6 +25,9 @@ namespace RestaurantManagementAPI.Controllers
         [HttpPost("create-payment-link/{maHD}")]
         public async Task<IActionResult> CreatePaymentLink(string maHD)
         {
+            long orderCode = 0;
+            CreatePaymentLinkRequest request = null;
+
             try
             {
                 var orderResult = await _orderService.GetOrderByIdAsync(maHD);
@@ -39,7 +42,7 @@ namespace RestaurantManagementAPI.Controllers
                 
                 // PayOS orderCode requires a numeric ID. We can strip "HD" and convert to integer.
                 // Assuming MaHD is format "HD00012"
-                long orderCode = long.Parse(maHD.Replace("HD", ""));
+                orderCode = long.Parse(maHD.Replace("HD", ""));
 
                 var items = new List<PaymentLinkItem>
                 {
@@ -47,7 +50,7 @@ namespace RestaurantManagementAPI.Controllers
                 };
 
                 // Note: The cancel and return URL can be dummy URLs for a desktop/mobile app
-                var request = new CreatePaymentLinkRequest
+                request = new CreatePaymentLinkRequest
                 {
                     OrderCode = orderCode,
                     Amount = amount,
