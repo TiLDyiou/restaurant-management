@@ -21,7 +21,7 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "Backend/RestaurantManagementAPI/**"
+          source: "Backend/**"
           target: "/var/www/restaurant-management"
           strip_components: 0
 
@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /var/www/restaurant-management/Backend/RestaurantManagementAPI
+            cd /var/www/restaurant-management/Backend
             
             # Khởi tạo file .env từ .env.example nếu chưa tồn tại trên VPS
             if [ ! -f .env ]; then
@@ -47,6 +47,13 @@ jobs:
               sed -i "s/YourSuperSecretAndSecureKeyThatIsAtLeast32BytesLong!/$JWT_SECRET/g" .env
               
               echo "Môi trường .env mới đã được khởi tạo. Hãy SSH vào VPS để chỉnh sửa các thông số Email/Gmail App Password nếu cần thiết."
+            fi
+
+            # Dừng các container cũ ở thư mục cũ (nếu có) để tránh xung đột port
+            if [ -d /var/www/restaurant-management/Backend/RestaurantManagementAPI ]; then
+              echo "Stopping old containers..."
+              cd /var/www/restaurant-management/Backend/RestaurantManagementAPI && docker compose down || true
+              cd /var/www/restaurant-management/Backend
             fi
 
             # Khởi chạy Docker Compose
