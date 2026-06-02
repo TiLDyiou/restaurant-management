@@ -73,6 +73,34 @@ namespace RestaurantManagementAPI.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("tồn tại") || ex.Message.Contains("exist") || ex.Message.Contains("đã tạo"))
+                {
+                    try
+                    {
+                        // Hủy link cũ
+                        await _payOS.PaymentRequests.CancelAsync((int)orderCode, "Tạo lại mã QR mới");
+                        
+                        // Tạo lại link mới
+                        var createPaymentRetry = await _payOS.PaymentRequests.CreateAsync(request);
+                        
+                        return Ok(new
+                        {
+                            success = true,
+                            checkoutUrl = createPaymentRetry.CheckoutUrl,
+                            qrCode = createPaymentRetry.QrCode,
+                            bin = createPaymentRetry.Bin,
+                            accountNumber = createPaymentRetry.AccountNumber,
+                            accountName = createPaymentRetry.AccountName,
+                            amount = createPaymentRetry.Amount,
+                            description = createPaymentRetry.Description
+                        });
+                    }
+                    catch (Exception retryEx)
+                    {
+                        return StatusCode(500, new { success = false, message = "Lỗi khi tạo lại mã QR: " + retryEx.Message });
+                    }
+                }
+
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
