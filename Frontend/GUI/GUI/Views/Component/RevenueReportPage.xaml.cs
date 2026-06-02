@@ -5,7 +5,6 @@ using RestaurantManagementGUI.Services;
 using System.Net.Http.Json;
 using System.Text.Json;
 using ClosedXML.Excel;
-using System.IO;
 
 namespace RestaurantManagementGUI.Views
 {
@@ -382,7 +381,7 @@ namespace RestaurantManagementGUI.Views
                 sheet.Columns().AdjustToContents();
 
                 string docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string filePath = Path.Combine(docsPath, $"BaoCaoDoanhThu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+                string filePath = System.IO.Path.Combine(docsPath, $"BaoCaoDoanhThu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
                 
                 workbook.SaveAs(filePath);
                 await DisplayAlert("Thành công", $"File Excel đã được lưu tại:\n{filePath}", "OK");
