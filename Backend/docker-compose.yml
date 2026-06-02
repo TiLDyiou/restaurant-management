@@ -136,18 +136,18 @@ services:
 # ------------------------------------------------------------------------------
 volumes:
   mssql_data:
-    driver: local
+    name: restaurantmanagementapi_mssql_data
   redis_data:
-    driver: local
+    name: restaurantmanagementapi_redis_data
   qlnh_logs:
-    driver: local
+    name: restaurantmanagementapi_qlnh_logs
   qlnh_uploads:
-    driver: local
+    name: restaurantmanagementapi_qlnh_uploads
   certbot_etc:
-    driver: local
+    name: restaurantmanagementapi_certbot_etc
   certbot_var:
-    driver: local
+    name: restaurantmanagementapi_certbot_var
 
 networks:
   qlnh_network:
-    driver: bridge
+    name: restaurantmanagementapi_qlnh_network
