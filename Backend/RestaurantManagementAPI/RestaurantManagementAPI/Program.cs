@@ -33,7 +33,25 @@ builder.Services.AddHealthChecks()
     .AddSqlServer(configuration.GetConnectionString("QLNHDatabase") ?? throw new InvalidOperationException("Connection string 'QLNHDatabase' not found."));
 
 // Controllers & Swagger
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value != null && e.Value.Errors.Count > 0)
+                .Select(e => $"{e.Key}: {string.Join(", ", e.Value!.Errors.Select(x => x.ErrorMessage))}")
+                .ToList();
+
+            var message = string.Join("\n", errors);
+
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(new
+            {
+                success = false,
+                message = string.IsNullOrEmpty(message) ? "Dữ liệu không hợp lệ." : message
+            });
+        };
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

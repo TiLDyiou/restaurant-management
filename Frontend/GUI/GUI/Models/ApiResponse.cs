@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
@@ -9,7 +9,7 @@ namespace RestaurantManagementGUI.Models
         public bool Success { get; set; }
 
         [JsonPropertyName("message")]
-        public string Message { get; set; } = string.Empty;
+        public string? Message { get; set; }
 
         [JsonPropertyName("data")]
         public T? Data { get; set; }
@@ -22,6 +22,6 @@ namespace RestaurantManagementGUI.Models
         public bool Success { get; set; }
 
         [JsonPropertyName("message")]
-        public string Message { get; set; } = string.Empty;
+        public string? Message { get; set; }
     }
 }
