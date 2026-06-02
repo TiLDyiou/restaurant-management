@@ -19,7 +19,7 @@ docker run -it --rm \
   -v "restaurantmanagementapi_certbot_etc:/etc/letsencrypt" \
   -v "restaurantmanagementapi_certbot_var:/var/www/certbot" \
   certbot/certbot certonly --webroot -w /var/www/certbot \
-  -d qlnhnhom2.me -d www.qlnhnhom2.me --email email_cua_ban@gmail.com --agree-tos --no-eff-email
+  -d qlnhnhom2.me -d www.qlnhnhom2.me --email nguyentrangiabao7100@gmail.com --agree-tos --no-eff-email
 ```
 *(Nếu nó báo `Successfully received certificate` là đã thành công!)*
 
