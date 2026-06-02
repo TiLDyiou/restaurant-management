@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RestaurantManagementAPI.Common.Wrappers;
 using RestaurantManagementAPI.Data;
 using RestaurantManagementAPI.DTOs.ReportDtos;
 using RestaurantManagementAPI.Interfaces;
+using RestaurantManagementAPI.Models.Entities;
 
 namespace RestaurantManagementAPI.Services
 {
@@ -30,6 +31,8 @@ namespace RestaurantManagementAPI.Services
                                 o.NgayLap.Value <= end &&
                                 o.TrangThai == "Đã thanh toán")
                     .Include(o => o.NhanVien)
+                    .Include(o => o.ChiTietHoaDons!)
+                        .ThenInclude(c => c.MonAn)
                     .ToListAsync();
 
                 // Tính toán tổng quan
@@ -103,16 +106,29 @@ namespace RestaurantManagementAPI.Services
                     ).OrderBy(d => d.Date).ToList();
                 }
 
-                // Tính Top Nhân viên & Giao dịch gần đây
-                var topEmployees = ordersInRange
-                    .GroupBy(o => o.NhanVien != null ? o.NhanVien.HoTen : "Không xác định")
-                    .Select(g => new EmployeePerformanceDto
+                // Tính Top Dishes & Bottom Dishes & Giao dịch gần đây
+                var allOrderDetails = ordersInRange
+                    .Where(o => o.ChiTietHoaDons != null)
+                    .SelectMany(o => o.ChiTietHoaDons!)
+                    .Where(c => c.MonAn != null)
+                    .ToList();
+
+                var dishPerformance = allOrderDetails
+                    .GroupBy(c => c.MonAn!.TenMA)
+                    .Select(g => new DishPerformanceDto
                     {
-                        EmployeeName = g.Key,
-                        OrdersServed = g.Count(),
-                        TotalRevenue = g.Sum(o => o.TongTien)
+                        DishName = g.Key,
+                        QuantitySold = g.Sum(c => c.SoLuong)
                     })
-                    .OrderByDescending(e => e.TotalRevenue)
+                    .ToList();
+
+                var topDishes = dishPerformance
+                    .OrderByDescending(d => d.QuantitySold)
+                    .Take(5)
+                    .ToList();
+
+                var bottomDishes = dishPerformance
+                    .OrderBy(d => d.QuantitySold)
                     .Take(5)
                     .ToList();
 
@@ -135,7 +151,8 @@ namespace RestaurantManagementAPI.Services
                     AverageOrderValue = avgOrderValue,
                     RevenueTrend = Math.Round(trend, 2),
                     DailyRevenues = chartData,
-                    TopEmployees = topEmployees,
+                    TopDishes = topDishes,
+                    BottomDishes = bottomDishes,
                     RecentTransactions = recentTransactions
                 };
                 return ServiceResult<RevenueReportResponse>.Ok(response);

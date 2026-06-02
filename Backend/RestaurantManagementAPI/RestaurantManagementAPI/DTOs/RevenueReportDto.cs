@@ -1,4 +1,4 @@
-﻿namespace RestaurantManagementAPI.DTOs.ReportDtos
+namespace RestaurantManagementAPI.DTOs.ReportDtos
 {
     public class RevenueReportResponse
     {
@@ -7,7 +7,8 @@
         public decimal AverageOrderValue { get; set; }
         public decimal RevenueTrend { get; set; }
         public List<DailyRevenueDto> DailyRevenues { get; set; } = new();
-        public List<EmployeePerformanceDto> TopEmployees { get; set; } = new();
+        public List<DishPerformanceDto> TopDishes { get; set; } = new();
+        public List<DishPerformanceDto> BottomDishes { get; set; } = new();
         public List<TransactionDetailDto> RecentTransactions { get; set; } = new();
     }
 
@@ -18,11 +19,10 @@
         public int OrderCount { get; set; }
     }
 
-    public class EmployeePerformanceDto
+    public class DishPerformanceDto
     {
-        public string EmployeeName { get; set; } = string.Empty;
-        public int OrdersServed { get; set; }
-        public decimal TotalRevenue { get; set; }
+        public string DishName { get; set; } = string.Empty;
+        public int QuantitySold { get; set; }
     }
 
     public class TransactionDetailDto
