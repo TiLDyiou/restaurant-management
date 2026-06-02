@@ -25,9 +25,6 @@ namespace RestaurantManagementAPI.Controllers
         [HttpPost("create-payment-link/{maHD}")]
         public async Task<IActionResult> CreatePaymentLink(string maHD)
         {
-            long orderCode = 0;
-            CreatePaymentLinkRequest request = null;
-
             try
             {
                 var orderResult = await _orderService.GetOrderByIdAsync(maHD);
@@ -40,17 +37,18 @@ namespace RestaurantManagementAPI.Controllers
 
                 int amount = (int)hd.TongTien;
                 
-                // PayOS orderCode requires a numeric ID. We can strip "HD" and convert to integer.
-                // Assuming MaHD is format "HD00012"
-                orderCode = long.Parse(maHD.Replace("HD", ""));
+                // PayOS orderCode requires a numeric ID up to 53 bits.
+                // We encode MaHD and Unix Timestamp to guarantee uniqueness.
+                // Format: maHDNumber * 10,000,000,000 + UnixTimestamp % 10,000,000,000
+                long maHDNumber = long.Parse(maHD.Replace("HD", ""));
+                long orderCode = maHDNumber * 10000000000L + (DateTimeOffset.UtcNow.ToUnixTimeSeconds() % 10000000000L);
 
                 var items = new List<PaymentLinkItem>
                 {
                     new PaymentLinkItem { Name = "Hóa đơn " + maHD, Quantity = 1, Price = amount }
                 };
 
-                // Note: The cancel and return URL can be dummy URLs for a desktop/mobile app
-                request = new CreatePaymentLinkRequest
+                var request = new CreatePaymentLinkRequest
                 {
                     OrderCode = orderCode,
                     Amount = amount,
@@ -76,34 +74,6 @@ namespace RestaurantManagementAPI.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("tồn tại") || ex.Message.Contains("exist") || ex.Message.Contains("đã tạo"))
-                {
-                    try
-                    {
-                        // Hủy link cũ
-                        await _payOS.PaymentRequests.CancelAsync((int)orderCode, "Tạo lại mã QR mới");
-                        
-                        // Tạo lại link mới
-                        var createPaymentRetry = await _payOS.PaymentRequests.CreateAsync(request);
-                        
-                        return Ok(new
-                        {
-                            success = true,
-                            checkoutUrl = createPaymentRetry.CheckoutUrl,
-                            qrCode = createPaymentRetry.QrCode,
-                            bin = createPaymentRetry.Bin,
-                            accountNumber = createPaymentRetry.AccountNumber,
-                            accountName = createPaymentRetry.AccountName,
-                            amount = createPaymentRetry.Amount,
-                            description = createPaymentRetry.Description
-                        });
-                    }
-                    catch (Exception retryEx)
-                    {
-                        return StatusCode(500, new { success = false, message = "Lỗi khi tạo lại mã QR: " + retryEx.Message });
-                    }
-                }
-
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
@@ -118,7 +88,9 @@ namespace RestaurantManagementAPI.Controllers
                 if (data.Code == "00" || webhookBody.Code == "00")
                 {
                     // Payment successful
-                    string maHD = "HD" + data.OrderCode.ToString("D5");
+                    // Extract the original MaHD number
+                    long maHDNumber = data.OrderCode / 10000000000L;
+                    string maHD = "HD" + maHDNumber.ToString("D5");
                     
                     var orderResult = await _orderService.GetOrderByIdAsync(maHD);
                     if (orderResult.Success && orderResult.Data != null)
