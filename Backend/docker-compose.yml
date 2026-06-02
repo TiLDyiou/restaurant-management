@@ -1,3 +1,5 @@
+name: restaurantmanagementapi
+
 services:
   # ----------------------------------------------------------------------------
   # 1. SQL SERVER DATABASE SERVICE
