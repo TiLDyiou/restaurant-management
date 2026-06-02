@@ -19,6 +19,8 @@ namespace RestaurantManagementAPI.DTOs
 
         [EmailAddress]
         public string? Email { get; set; }
+
+        public string? Quyen { get; set; }
     }
 
     public class LoginDto

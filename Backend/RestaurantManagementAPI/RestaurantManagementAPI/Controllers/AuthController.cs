@@ -70,6 +70,7 @@ namespace RestaurantManagementAPI.Controllers
                 : BadRequest(new { message = result.Message });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {

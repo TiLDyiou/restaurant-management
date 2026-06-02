@@ -75,7 +75,7 @@ namespace RestaurantManagementAPI.Services
                     TenDangNhap = dto.TenDangNhap,
                     MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau),
                     MaNV = newMaNV,
-                    Quyen = "NhanVien", // Đăng ký công khai luôn là NhanVien. Admin tạo từ trang quản lý user.
+                    Quyen = string.IsNullOrEmpty(dto.Quyen) ? "NhanVien" : dto.Quyen,
                     IsActive = false,
                     Email = dto.Email,
                     IsVerified = false
