@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:conv="clr-namespace:RestaurantManagementGUI.Converters"
@@ -137,23 +137,29 @@
                                     <Label Text="{Binding SenderName}" FontSize="11" TextColor="#65676B" Margin="5,0"
                                            IsVisible="{Binding IsSentMessage, Converter={StaticResource InverseBooleanConverter}}"/>
 
-                                    <Frame BackgroundColor="{Binding IsSentMessage, Converter={StaticResource BubbleColorConverter}}" 
-                                           Padding="12,10" CornerRadius="18" HasShadow="False" BorderColor="Transparent">
-                                        <Grid>
+                                    <Grid>
+                                        <!-- Message Bubble for Text -->
+                                        <Frame BackgroundColor="{Binding IsSentMessage, Converter={StaticResource BubbleColorConverter}}" 
+                                               Padding="12,10" CornerRadius="18" HasShadow="False" BorderColor="Transparent"
+                                               IsVisible="{Binding IsImage, Converter={StaticResource InverseBooleanConverter}}">
                                             <Label Text="{Binding Content}" FontSize="15" 
-                                                   TextColor="{Binding IsSentMessage, Converter={StaticResource IsMineToTextColorConverter}}"
-                                                   IsVisible="{Binding IsImage, Converter={StaticResource InverseBooleanConverter}}"/>
+                                                   TextColor="{Binding IsSentMessage, Converter={StaticResource IsMineToTextColorConverter}}"/>
+                                        </Frame>
+
+                                        <!-- Message Bubble for Image -->
+                                        <Frame BackgroundColor="Transparent" 
+                                               Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#E4E6EB"
+                                               IsVisible="{Binding IsImage}">
                                             <Image Source="{Binding Content, Converter={StaticResource ImageUrlConverter}}" 
                                                     Aspect="AspectFill" 
                                                     WidthRequest="200"
-                                                    HeightRequest="200"
-                                                    IsVisible="{Binding IsImage}">
+                                                    HeightRequest="200">
                                                 <Image.GestureRecognizers>
                                                     <TapGestureRecognizer Tapped="OnImageTapped"/>
                                                 </Image.GestureRecognizers>
                                             </Image>
-                                        </Grid>
-                                    </Frame>
+                                        </Frame>
+                                    </Grid>
 
                                     <HorizontalStackLayout Spacing="5" HorizontalOptions="End">
                                         <Label Text="{Binding TimeDisplay}" FontSize="10" TextColor="#B0B3B8"/>
@@ -189,6 +195,32 @@
 
             <ActivityIndicator Grid.Row="2" IsRunning="{Binding IsUploadingImage}" IsVisible="{Binding IsUploadingImage}" 
                                Color="#0084FF" VerticalOptions="Center" HorizontalOptions="Center"/>
+        </Grid>
+
+        <!-- Full Screen Image Overlay -->
+        <Grid x:Name="FullScreenImageOverlay" 
+              Grid.ColumnSpan="2" 
+              BackgroundColor="#E6000000" 
+              IsVisible="False"
+              InputTransparent="False">
+            
+            <Image x:Name="FullScreenImageView" 
+                   Aspect="AspectFit" 
+                   VerticalOptions="Center" 
+                   HorizontalOptions="Center" 
+                   Margin="20"/>
+
+            <Button Text="✕ Đóng" 
+                    TextColor="White" 
+                    BackgroundColor="#33FFFFFF" 
+                    CornerRadius="20"
+                    VerticalOptions="Start" 
+                    HorizontalOptions="End" 
+                    Margin="20"
+                    Clicked="OnCloseImageTapped"/>
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCloseImageTapped"/>
+            </Grid.GestureRecognizers>
         </Grid>
     </Grid>
 </ContentPage>

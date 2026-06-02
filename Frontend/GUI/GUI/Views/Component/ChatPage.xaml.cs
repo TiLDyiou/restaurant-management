@@ -1,4 +1,4 @@
-﻿using RestaurantManagementGUI.ViewModels;
+using RestaurantManagementGUI.ViewModels;
 using System.Collections.Specialized;
 
 namespace RestaurantManagementGUI
@@ -45,20 +45,26 @@ namespace RestaurantManagementGUI
             }
         }
 
-        private async void OnImageTapped(object sender, EventArgs e)
+        private void OnImageTapped(object sender, EventArgs e)
         {
             try
             {
-                if (sender is Image image && image.Source is UriImageSource uriSource)
+                if (sender is Image image && image.Source != null)
                 {
-                    string url = uriSource.Uri.ToString();
-                    await DisplayAlert("Xem ảnh", "Đường dẫn: " + url, "Đóng");
+                    FullScreenImageView.Source = image.Source;
+                    FullScreenImageOverlay.IsVisible = true;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Image tap error: {ex.Message}");
             }
+        }
+
+        private void OnCloseImageTapped(object sender, EventArgs e)
+        {
+            FullScreenImageOverlay.IsVisible = false;
+            FullScreenImageView.Source = null;
         }
 
         protected override void OnDisappearing()
