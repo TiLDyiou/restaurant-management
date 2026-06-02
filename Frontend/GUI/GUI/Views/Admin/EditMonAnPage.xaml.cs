@@ -95,7 +95,6 @@ namespace RestaurantManagementGUI
         }
 
         private void EntryHinhAnh_Unfocused(object sender, FocusEventArgs e) => UpdateImagePreview();
-        private void EntryHinhAnh_Completed(object sender, EventArgs e) => UpdateImagePreview();
 
         private void UpdateImagePreview()
         {
