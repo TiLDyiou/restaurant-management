@@ -64,7 +64,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ChefOrdersViewModel>();
         builder.Services.AddTransient<TablesViewModel>();
         builder.Services.AddTransient<FoodMenuViewModel>();
-        builder.Services.AddTransient<BillGenerationViewModel>();
+        builder.Services.AddSingleton<BillGenerationViewModel>();
         builder.Services.AddTransient<ChatViewModel>();
         builder.Services.AddTransient<MenuViewerViewModel>();
 
