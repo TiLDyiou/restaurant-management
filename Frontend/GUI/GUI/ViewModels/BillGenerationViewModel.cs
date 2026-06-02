@@ -137,6 +137,14 @@ namespace RestaurantManagementGUI.ViewModels
 
             TCPSocketClient.Instance.OnPaymentSuccess -= HandlePaymentSuccess;
             TCPSocketClient.Instance.OnPaymentSuccess += HandlePaymentSuccess;
+            
+            TCPSocketClient.Instance.OnNewOrderReceived -= HandleNewOrder;
+            TCPSocketClient.Instance.OnNewOrderReceived += HandleNewOrder;
+        }
+
+        private void HandleNewOrder(string maHD)
+        {
+            _ = LoadPendingBills();
         }
 
         private void HandlePaymentSuccess(string maHD, decimal amount)
@@ -159,6 +167,8 @@ namespace RestaurantManagementGUI.ViewModels
             });
         }
 
+        public string? TargetTableId { get; set; }
+
         public async Task LoadPendingBills()
         {
             try
@@ -174,7 +184,16 @@ namespace RestaurantManagementGUI.ViewModels
                     {
                         PendingBills.Clear();
                         foreach (var bill in pending) PendingBills.Add(bill);
-                        if (SelectedBill == null && PendingBills.Any()) SelectedBill = PendingBills[0];
+                        
+                        if (!string.IsNullOrEmpty(TargetTableId))
+                        {
+                            SelectedBill = PendingBills.FirstOrDefault(b => b.MaBan == TargetTableId) ?? PendingBills.FirstOrDefault();
+                            TargetTableId = null;
+                        }
+                        else if (SelectedBill == null && PendingBills.Any()) 
+                        {
+                            SelectedBill = PendingBills[0];
+                        }
                     });
                 }
             }

@@ -1,4 +1,4 @@
-﻿using RestaurantManagementGUI.ViewModels;
+using RestaurantManagementGUI.ViewModels;
 
 namespace RestaurantManagementGUI
 {
@@ -8,6 +8,15 @@ namespace RestaurantManagementGUI
         {
             InitializeComponent();
             BindingContext = viewModel;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is BillGenerationViewModel vm)
+            {
+                await vm.LoadPendingBills();
+            }
         }
     }
 }

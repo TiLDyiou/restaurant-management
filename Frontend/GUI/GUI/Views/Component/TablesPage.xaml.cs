@@ -65,6 +65,11 @@ namespace RestaurantManagementGUI
 
         private async void OnFlyoutPaymentRequested(object sender, Ban table)
         {
+            var vm = Handler.MauiContext.Services.GetService<BillGenerationViewModel>();
+            if (vm != null)
+            {
+                vm.TargetTableId = table.MaBan;
+            }
             var billPage = Handler.MauiContext.Services.GetService<BillGenerationPage>();
             await Navigation.PushAsync(billPage);
         }
