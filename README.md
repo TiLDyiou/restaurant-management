@@ -193,6 +193,23 @@ Khi muốn dừng hệ thống mà không làm mất dữ liệu database và ca
 docker-compose down
 ```
 
+### 5. Thiết lập Tên miền & HTTPS (Production)
+Dự án được cấu hình sẵn môi trường Let's Encrypt qua Certbot để tự động lấy chứng chỉ bảo mật HTTPS.
+- Tên miền sử dụng: `qlnhnhom2.me`
+- URL API: `https://qlnhnhom2.me/`
+
+**Cách kích hoạt:**
+1. Trỏ tên miền `qlnhnhom2.me` về IP của máy chủ VPS (A Record).
+2. Tải chứng chỉ SSL bằng Docker:
+   ```bash
+   docker run -it --rm -v "restaurantmanagementapi_certbot_etc:/etc/letsencrypt" -v "restaurantmanagementapi_certbot_var:/var/www/certbot" certbot/certbot certonly --webroot -w /var/www/certbot -d qlnhnhom2.me -d www.qlnhnhom2.me --agree-tos
+   ```
+3. Mở khóa (uncomment) khối **PRODUCTION HTTPS BLOCK** trong file `nginx/nginx.conf`.
+4. Khởi động lại Nginx:
+   ```bash
+   docker compose restart nginx
+   ```
+
 *Lưu ý: Dữ liệu của SQL Server, Redis, logs và uploads được lưu lâu dài thông qua Docker Volumes độc lập.*
 
 ## License

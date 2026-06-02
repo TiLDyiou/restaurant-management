@@ -4,7 +4,7 @@ namespace RestaurantManagementGUI.Helpers
 {
     public static class ApiConfig
     {
-        public const string DomainUrl = "http://188.166.240.218/";
+        public const string DomainUrl = "https://qlnhnhom2.me/";
         public static string BaseUrl => $"{DomainUrl}api/";
         // --------------AUTH-----------------------------------
         public static string Register => $"{BaseUrl}auth/register";
