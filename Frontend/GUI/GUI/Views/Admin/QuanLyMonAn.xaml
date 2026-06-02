@@ -13,38 +13,42 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="*">
-        <CollectionView Grid.Row="0" x:Name="DishesCollectionView" SelectionMode="None">
-            <CollectionView.Header>
-                <Border StrokeShape="RoundRectangle 10" BackgroundColor="White" Padding="15" Margin="10">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Thêm món ăn mới" FontAttributes="Bold" FontSize="18" TextColor="#263238"/>
+    <Grid RowDefinitions="Auto, *">
+        <!-- Add Dish UI -->
+        <ScrollView Grid.Row="0" MaximumHeightRequest="400">
+            <Border StrokeShape="RoundRectangle 10" BackgroundColor="White" Padding="15" Margin="10">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Thêm món ăn mới" FontAttributes="Bold" FontSize="18" TextColor="#263238"/>
 
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto, Auto" 
-                              ColumnSpacing="10" RowSpacing="5">
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto, Auto" 
+                          ColumnSpacing="10" RowSpacing="5">
 
-                            <Entry x:Name="NewTenMA" Grid.Row="0" Grid.Column="0" Placeholder="Tên món ăn" />
-                            <Entry x:Name="NewDonGia" Grid.Row="0" Grid.Column="1" Placeholder="Giá tiền" Keyboard="Numeric"/>
-                            <Entry x:Name="NewLoai" Grid.Row="1" Grid.Column="0" Placeholder="Loại món" />
+                        <Entry x:Name="NewTenMA" Grid.Row="0" Grid.Column="0" Placeholder="Tên món ăn" />
+                        <Entry x:Name="NewDonGia" Grid.Row="0" Grid.Column="1" Placeholder="Giá tiền" Keyboard="Numeric"/>
+                        <Entry x:Name="NewLoai" Grid.Row="1" Grid.Column="0" Placeholder="Loại món" />
 
-                            <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*, Auto" ColumnSpacing="5">
-                                <Entry Grid.Column="0" x:Name="NewHinhAnh" Placeholder="Link ảnh hoặc chọn file" />
-                                <Button Grid.Column="1" Text="..." Clicked="PickImage_Clicked" 
-                                        HeightRequest="45" WidthRequest="50" Padding="0"/>
-                            </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                            <Editor Grid.Column="0" x:Name="NewHinhAnh" Placeholder="Link ảnh hoặc chọn file" 
+                                    HeightRequest="45" AutoSize="Disabled" VerticalOptions="Center"/>
+                            <Button Grid.Column="1" Text="..." Clicked="PickImage_Clicked" 
+                                    HeightRequest="45" WidthRequest="50" Padding="0" VerticalOptions="Center"/>
                         </Grid>
+                    </Grid>
 
-                        <Button x:Name="AddButton"
-                                Text="THÊM MÓN MỚI" 
-                                Clicked="AddDish_Clicked" 
-                                BackgroundColor="#FFBD59"
-                                TextColor="#263238"
-                                FontAttributes="Bold"
-                                CornerRadius="8"
-                                HeightRequest="45"/>
-                    </VerticalStackLayout>
-                </Border>
-            </CollectionView.Header>
+                    <Button x:Name="AddButton"
+                            Text="THÊM MÓN MỚI" 
+                            Clicked="AddDish_Clicked" 
+                            BackgroundColor="#FFBD59"
+                            TextColor="#263238"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="45"/>
+                </VerticalStackLayout>
+            </Border>
+        </ScrollView>
+
+        <!-- Dishes List -->
+        <CollectionView Grid.Row="1" x:Name="DishesCollectionView" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:FoodModel">
                     <Border StrokeShape="RoundRectangle 10" Padding="10" Margin="10,5" BackgroundColor="White" Stroke="#E0E0E0">
