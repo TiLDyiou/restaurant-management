@@ -8,12 +8,12 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy project files and restore dependencies
-COPY ["RestaurantManagementAPI/RestaurantManagementAPI.csproj", "RestaurantManagementAPI/"]
-RUN dotnet restore "RestaurantManagementAPI/RestaurantManagementAPI.csproj"
+COPY ["src/RestaurantManagementAPI/RestaurantManagementAPI.csproj", "src/RestaurantManagementAPI/"]
+RUN dotnet restore "src/RestaurantManagementAPI/RestaurantManagementAPI.csproj"
 
 # Copy all sources and build
 COPY . .
-WORKDIR "/src/RestaurantManagementAPI"
+WORKDIR "/src/src/RestaurantManagementAPI"
 RUN dotnet build "RestaurantManagementAPI.csproj" -c Release -o /app/build
 
 # Publish release assets

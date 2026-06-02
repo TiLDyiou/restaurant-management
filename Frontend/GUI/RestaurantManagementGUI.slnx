@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="GUI/RestaurantManagementGUI.csproj">
+  <Project Path="src/RestaurantManagementGUI/RestaurantManagementGUI.csproj">
     <Deploy Solution="Debug|*" />
   </Project>
 </Solution>
