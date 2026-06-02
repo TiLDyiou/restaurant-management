@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Helpers;
@@ -146,12 +146,10 @@ namespace RestaurantManagementGUI.ViewModels
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                // TÌM TIN NHẮN "ĐANG GỬI..."
-                // Sửa lỗi: So sánh thời gian cho phép lệch nhau 1-2 giây để tránh lỗi sai số giây/mili-giây
+                // TÌM TIN NHẮN CHƯA XÁC NHẬN VÀ TRÙNG NỘI DUNG
                 var existingMsg = CurrentMessages.FirstOrDefault(m =>
                     m.Content == msg.Content &&
                     m.MaNV_Sender == msg.MaNV_Sender &&
-                    Math.Abs((m.Timestamp - msg.Timestamp).TotalSeconds) < 5 && // Cho phép lệch 5 giây
                     !m.IsSentConfirmed); // Chỉ tìm những cái chưa xác nhận
 
                 if (existingMsg != null)
@@ -304,7 +302,11 @@ namespace RestaurantManagementGUI.ViewModels
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         _isHistoryLoading = true;
-                        foreach (var m in history) CurrentMessages.Add(m);
+                        foreach (var m in history) 
+                        {
+                            m.IsSentConfirmed = true;
+                            CurrentMessages.Add(m);
+                        }
                         _isHistoryLoading = false;
                     });
 
