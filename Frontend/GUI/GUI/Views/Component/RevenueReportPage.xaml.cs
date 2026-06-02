@@ -1,9 +1,11 @@
-﻿using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Controls.Shapes;
 using RestaurantManagementGUI.Helpers;
 using RestaurantManagementGUI.Models;
 using RestaurantManagementGUI.Services;
 using System.Net.Http.Json;
 using System.Text.Json;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace RestaurantManagementGUI.Views
 {
@@ -15,6 +17,7 @@ namespace RestaurantManagementGUI.Views
         private string _currentPeriod = "day";
         private bool _isAdmin = false;
         private string _currentMaNV = "";
+        private RevenueReportDto _currentData;
 
         public RevenueReportPage(HttpClient httpClient)
         {
@@ -55,7 +58,7 @@ namespace RestaurantManagementGUI.Views
             _currentMaNV = UserState.CurrentMaNV ?? "";
             _isAdmin = (UserState.CurrentRole?.ToLower() == "admin");
 
-            if (_isAdmin) { PageTitleLabel.Text = "Doanh Số"; RightPanelTitle.Text = "🏆 Hiệu Suất Nhân Viên"; }
+            if (_isAdmin) { PageTitleLabel.Text = "Doanh Số"; RightPanelTitle.Text = "🏆 Hiệu Suất Món Ăn"; }
             else { PageTitleLabel.Text = "Doanh Số Của Tôi"; RightPanelTitle.Text = "📋 Chi Tiết Giao Dịch"; }
         }
 
@@ -72,9 +75,15 @@ namespace RestaurantManagementGUI.Views
                 var response = await _httpClient.GetFromJsonAsync<ApiResponse<RevenueReportDto>>(url, _jsonOptions);
 
                 if (response != null && response.Success && response.Data != null)
+                {
+                    _currentData = response.Data;
                     UpdateUI(response.Data);
+                }
                 else
+                {
+                    _currentData = null;
                     ResetUI();
+                }
             }
             catch (Exception ex)
             {
@@ -93,7 +102,7 @@ namespace RestaurantManagementGUI.Views
 
             DrawRevenueChart(data.DailyRevenues);
 
-            if (_isAdmin) DrawEmployeeChart(data.TopEmployees);
+            if (_isAdmin) DrawDishesChart(data.TopDishes, data.BottomDishes);
             else DrawTransactionList(data.RecentTransactions);
         }
 
@@ -169,29 +178,54 @@ namespace RestaurantManagementGUI.Views
             }
         }
 
-        private void DrawEmployeeChart(List<EmployeePerformanceDto> list)
+        private void DrawDishesChart(List<DishPerformanceDto> top, List<DishPerformanceDto> bottom)
         {
             RightPanelContent.Children.Clear();
-            if (list == null) return;
-
-            decimal max = list.Any() ? list.Max(x => x.TotalRevenue) : 1;
-            if (max == 0) max = 1;
-
-            foreach (var item in list)
+            
+            if (top != null && top.Any())
             {
-                var grid = new Grid { ColumnDefinitions = { new ColumnDefinition { Width = 100 }, new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = 90 } }, Margin = new Thickness(0, 0, 0, 10) };
+                RightPanelContent.Children.Add(new Label { Text = "Bán chạy nhất", FontAttributes = FontAttributes.Bold, TextColor = Colors.Green, Margin = new Thickness(0, 5) });
+                decimal max = top.Max(x => x.Revenue);
+                if (max == 0) max = 1;
 
-                grid.Children.Add(new Label { Text = item.EmployeeName, VerticalOptions = LayoutOptions.Center, FontSize = 13, FontAttributes = FontAttributes.Bold });
+                foreach (var item in top)
+                {
+                    var grid = new Grid { ColumnDefinitions = { new ColumnDefinition { Width = 110 }, new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = 90 } }, Margin = new Thickness(0, 0, 0, 10) };
+                    grid.Children.Add(new Label { Text = item.DishName, VerticalOptions = LayoutOptions.Center, FontSize = 12, FontAttributes = FontAttributes.Bold });
+                    
+                    var bar = new BoxView { Color = Color.FromArgb("#4CAF50"), HeightRequest = 15, CornerRadius = 5, HorizontalOptions = LayoutOptions.Start, WidthRequest = Math.Max(10, 150 * ((double)item.Revenue / (double)max)) };
+                    Grid.SetColumn(bar, 1);
+                    grid.Children.Add(bar);
 
-                var bar = new BoxView { Color = Color.FromArgb("#4CAF50"), HeightRequest = 20, CornerRadius = 5, HorizontalOptions = LayoutOptions.Start, WidthRequest = Math.Max(10, 200 * ((double)item.TotalRevenue / (double)max)) };
-                Grid.SetColumn(bar, 1);
-                grid.Children.Add(bar);
+                    var lbl = new Label { Text = $"{item.Revenue:N0}", HorizontalOptions = LayoutOptions.End, FontSize = 11, TextColor = Colors.Green };
+                    Grid.SetColumn(lbl, 2);
+                    grid.Children.Add(lbl);
 
-                var lbl = new Label { Text = $"{item.TotalRevenue:N0}", HorizontalOptions = LayoutOptions.End, FontSize = 12, TextColor = Colors.Green };
-                Grid.SetColumn(lbl, 2);
-                grid.Children.Add(lbl);
+                    RightPanelContent.Children.Add(grid);
+                }
+            }
 
-                RightPanelContent.Children.Add(grid);
+            if (bottom != null && bottom.Any())
+            {
+                RightPanelContent.Children.Add(new Label { Text = "Bán chậm nhất", FontAttributes = FontAttributes.Bold, TextColor = Colors.Red, Margin = new Thickness(0, 15, 0, 5) });
+                decimal max = bottom.Max(x => x.Revenue);
+                if (max == 0) max = 1;
+
+                foreach (var item in bottom)
+                {
+                    var grid = new Grid { ColumnDefinitions = { new ColumnDefinition { Width = 110 }, new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = 90 } }, Margin = new Thickness(0, 0, 0, 10) };
+                    grid.Children.Add(new Label { Text = item.DishName, VerticalOptions = LayoutOptions.Center, FontSize = 12, FontAttributes = FontAttributes.Bold });
+                    
+                    var bar = new BoxView { Color = Color.FromArgb("#F44336"), HeightRequest = 15, CornerRadius = 5, HorizontalOptions = LayoutOptions.Start, WidthRequest = Math.Max(10, 150 * ((double)item.Revenue / (double)max)) };
+                    Grid.SetColumn(bar, 1);
+                    grid.Children.Add(bar);
+
+                    var lbl = new Label { Text = $"{item.Revenue:N0}", HorizontalOptions = LayoutOptions.End, FontSize = 11, TextColor = Colors.Red };
+                    Grid.SetColumn(lbl, 2);
+                    grid.Children.Add(lbl);
+
+                    RightPanelContent.Children.Add(grid);
+                }
             }
         }
 
@@ -249,12 +283,114 @@ namespace RestaurantManagementGUI.Views
         private async void OnMonthClicked(object sender, EventArgs e) => await UpdatePeriod("month", new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1), DateTime.Now);
         private async void OnYearClicked(object sender, EventArgs e)
         {
-            // Lấy ngày đầu năm nay
             var start = new DateTime(DateTime.Now.Year, 1, 1);
-            // Lấy ngày cuối năm nay
             var end = new DateTime(DateTime.Now.Year, 12, 31);
-
             await UpdatePeriod("year", start, end);
+        }
+
+        private async void OnExportExcelClicked(object sender, EventArgs e)
+        {
+            if (_currentData == null)
+            {
+                await DisplayAlert("Lỗi", "Không có dữ liệu để xuất", "OK");
+                return;
+            }
+
+            try
+            {
+                using var workbook = new XLWorkbook();
+                var sheet = workbook.Worksheets.Add("BaoCaoDoanhThu");
+
+                sheet.Cell(1, 1).Value = "BÁO CÁO DOANH THU";
+                sheet.Cell(1, 1).Style.Font.Bold = true;
+                sheet.Cell(1, 1).Style.Font.FontSize = 16;
+                sheet.Range(1, 1, 1, 4).Merge();
+
+                sheet.Cell(3, 1).Value = "Thời gian:";
+                sheet.Cell(3, 2).Value = $"{_startDate:dd/MM/yyyy} - {_endDate:dd/MM/yyyy}";
+
+                sheet.Cell(4, 1).Value = "Tổng doanh thu:";
+                sheet.Cell(4, 2).Value = _currentData.TotalRevenue;
+                sheet.Cell(4, 2).Style.NumberFormat.Format = "#,##0";
+
+                sheet.Cell(5, 1).Value = "Tổng số đơn hàng:";
+                sheet.Cell(5, 2).Value = _currentData.TotalOrders;
+
+                sheet.Cell(7, 1).Value = "Món ăn bán chạy / bán chậm";
+                sheet.Cell(7, 1).Style.Font.Bold = true;
+                
+                sheet.Cell(8, 1).Value = "Tên món";
+                sheet.Cell(8, 2).Value = "Số lượng";
+                sheet.Cell(8, 3).Value = "Doanh thu";
+                sheet.Range(8, 1, 8, 3).Style.Font.Bold = true;
+                
+                int row = 9;
+                if (_currentData.TopDishes != null)
+                {
+                    sheet.Cell(row, 1).Value = "[Bán chạy]";
+                    sheet.Cell(row, 1).Style.Font.Italic = true;
+                    row++;
+                    foreach (var d in _currentData.TopDishes)
+                    {
+                        sheet.Cell(row, 1).Value = d.DishName;
+                        sheet.Cell(row, 2).Value = d.QuantitySold;
+                        sheet.Cell(row, 3).Value = d.Revenue;
+                        sheet.Cell(row, 3).Style.NumberFormat.Format = "#,##0";
+                        row++;
+                    }
+                }
+                
+                if (_currentData.BottomDishes != null)
+                {
+                    sheet.Cell(row, 1).Value = "[Bán chậm]";
+                    sheet.Cell(row, 1).Style.Font.Italic = true;
+                    row++;
+                    foreach (var d in _currentData.BottomDishes)
+                    {
+                        sheet.Cell(row, 1).Value = d.DishName;
+                        sheet.Cell(row, 2).Value = d.QuantitySold;
+                        sheet.Cell(row, 3).Value = d.Revenue;
+                        sheet.Cell(row, 3).Style.NumberFormat.Format = "#,##0";
+                        row++;
+                    }
+                }
+
+                row++;
+                sheet.Cell(row, 1).Value = "CHI TIẾT GIAO DỊCH";
+                sheet.Cell(row, 1).Style.Font.Bold = true;
+                row++;
+                
+                sheet.Cell(row, 1).Value = "Mã Hóa Đơn";
+                sheet.Cell(row, 2).Value = "Thời gian";
+                sheet.Cell(row, 3).Value = "Tổng tiền";
+                sheet.Cell(row, 4).Value = "Trạng thái";
+                sheet.Range(row, 1, row, 4).Style.Font.Bold = true;
+                row++;
+                if (_currentData.RecentTransactions != null)
+                {
+                    foreach (var t in _currentData.RecentTransactions)
+                    {
+                        sheet.Cell(row, 1).Value = t.MaHD;
+                        sheet.Cell(row, 2).Value = t.ThoiGian.ToString("dd/MM/yyyy HH:mm");
+                        sheet.Cell(row, 3).Value = t.TongTien;
+                        sheet.Cell(row, 3).Style.NumberFormat.Format = "#,##0";
+                        sheet.Cell(row, 4).Value = t.TrangThai;
+                        row++;
+                    }
+                }
+
+                sheet.Columns().AdjustToContents();
+
+                string docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string filePath = Path.Combine(docsPath, $"BaoCaoDoanhThu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+                
+                workbook.SaveAs(filePath);
+                await DisplayAlert("Thành công", $"File Excel đã được lưu tại:\n{filePath}", "OK");
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Lỗi", "Lỗi xuất file Excel: " + ex.Message, "OK");
+            }
         }
 
         private async Task UpdatePeriod(string period, DateTime start, DateTime end)

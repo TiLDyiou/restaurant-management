@@ -291,50 +291,6 @@ namespace RestaurantManagementGUI.ViewModels
             }
         }
 
-        [RelayCommand]
-        public async Task TransferOrderAsync(Ban table)
-        {
-            if (table == null) return;
-            try
-            {
-                var vacantTables = _allTables
-                    .Where(t => t.TrangThai == SystemConstants.TableEmpty && !t.IsMerged)
-                    .ToList();
-
-                if (vacantTables.Count == 0)
-                {
-                    await Application.Current.MainPage.DisplayAlert("Thông báo", "Không có bàn trống nào khả dụng để chuyển đến.", "OK");
-                    return;
-                }
-
-                var options = vacantTables.Select(t => t.TenBan).ToArray();
-                var choice = await Application.Current.MainPage.DisplayActionSheet($"Chuyển đơn từ {table.TenBan} đến bàn:", "Hủy", null, options);
-
-                if (string.IsNullOrEmpty(choice) || choice == "Hủy") return;
-
-                var targetTable = vacantTables.FirstOrDefault(t => t.TenBan == choice);
-                if (targetTable != null)
-                {
-                    bool confirm = await Application.Current.MainPage.DisplayAlert("Xác nhận chuyển bàn", $"Bạn có muốn chuyển toàn bộ đơn hàng từ {table.TenBan} sang {targetTable.TenBan} không?", "Chuyển ngay", "Hủy");
-                    if (!confirm) return;
-
-                    bool success = await _tableService.TransferOrderAsync(table.MaBan, targetTable.MaBan);
-                    if (success)
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Thành công", $"Đã chuyển đơn hàng sang {targetTable.TenBan} thành công.", "OK");
-                        await LoadTablesAsync();
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Lỗi", "Chuyển bàn thất bại.", "OK");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                await Application.Current.MainPage.DisplayAlert("Lỗi hệ thống", ex.Message, "OK");
-            }
-        }
 
         [RelayCommand]
         public async Task ShowTableHistoryAsync(Ban table)

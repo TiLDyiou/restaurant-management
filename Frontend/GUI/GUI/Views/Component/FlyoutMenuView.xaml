@@ -152,17 +152,6 @@
 
 
 
-                        <!-- Button: Chuyển bàn -->
-                        <Border x:Name="TransferBtn" Style="{StaticResource ActionButtonStyle}">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnTransferTapped" />
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout Spacing="14">
-                                <Label Text="&#xe8a0;" Style="{StaticResource IconStyle}" />
-                                <Label Text="Chuyển bàn" Style="{StaticResource ButtonTextStyle}" />
-                            </HorizontalStackLayout>
-                        </Border>
-
                         <!-- Button: Lịch sử bàn -->
                         <Border x:Name="HistoryBtn" Style="{StaticResource ActionButtonStyle}">
                             <Border.GestureRecognizers>

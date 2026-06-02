@@ -118,7 +118,8 @@ namespace RestaurantManagementAPI.Services
                     .Select(g => new DishPerformanceDto
                     {
                         DishName = g.Key,
-                        QuantitySold = g.Sum(c => c.SoLuong)
+                        QuantitySold = g.Sum(c => c.SoLuong),
+                        Revenue = g.Sum(c => c.DonGia * c.SoLuong)
                     })
                     .ToList();
 

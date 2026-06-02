@@ -92,11 +92,7 @@ namespace RestaurantManagementGUI
             await _viewModel.SplitTablesCommand.ExecuteAsync(table);
         }
 
-        private async void OnFlyoutTransferRequested(object sender, Ban table)
-        {
-            await FlyoutMenu.CloseAsync();
-            await _viewModel.TransferOrderCommand.ExecuteAsync(table);
-        }
+
 
         private void OnFlyoutHistoryRequested(object sender, Ban table)
         {

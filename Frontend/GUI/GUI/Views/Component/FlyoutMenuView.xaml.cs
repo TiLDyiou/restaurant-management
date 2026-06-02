@@ -23,7 +23,6 @@ namespace RestaurantManagementGUI
         public event EventHandler<string> FilterChanged;
         public event EventHandler<Ban> MergeRequested;
         public event EventHandler<Ban> SplitRequested;
-        public event EventHandler<Ban> TransferRequested;
         public event EventHandler<Ban> HistoryRequested;
         public event EventHandler<Ban> DeleteRequested;
 
@@ -88,7 +87,6 @@ namespace RestaurantManagementGUI
                 ChangeStatusBtn.IsVisible = true;
                 ViewAddOrderBtn.IsVisible = false;
                 PaymentBtn.IsVisible = false;
-                TransferBtn.IsVisible = false;
             }
             else if (status == SystemConstants.TableOccupied)
             {
@@ -98,7 +96,6 @@ namespace RestaurantManagementGUI
                 ChangeStatusBtn.IsVisible = true;
                 ViewAddOrderBtn.IsVisible = true;
                 PaymentBtn.IsVisible = true;
-                TransferBtn.IsVisible = true;
             }
             else
             {
@@ -108,7 +105,6 @@ namespace RestaurantManagementGUI
                 ChangeStatusBtn.IsVisible = true;
                 ViewAddOrderBtn.IsVisible = false;
                 PaymentBtn.IsVisible = false;
-                TransferBtn.IsVisible = false;
             }
 
             HistoryBtn.IsVisible = true;
@@ -130,7 +126,6 @@ namespace RestaurantManagementGUI
         private void OnPaymentTapped(object sender, EventArgs e) => PaymentRequested?.Invoke(this, SelectedTable);
         private void OnMergeTapped(object sender, EventArgs e) => MergeRequested?.Invoke(this, SelectedTable);
         private void OnSplitTapped(object sender, EventArgs e) => SplitRequested?.Invoke(this, SelectedTable);
-        private void OnTransferTapped(object sender, EventArgs e) => TransferRequested?.Invoke(this, SelectedTable);
         private void OnHistoryTapped(object sender, EventArgs e) => HistoryRequested?.Invoke(this, SelectedTable);
         private void OnDeleteTapped(object sender, EventArgs e) => DeleteRequested?.Invoke(this, SelectedTable);
         private void OnStatusFilterChanged(object sender, EventArgs e) => FilterChanged?.Invoke(this, StatusFilterPicker.SelectedItem?.ToString());

@@ -39,6 +39,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="6.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />

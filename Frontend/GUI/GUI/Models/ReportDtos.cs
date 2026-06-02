@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace RestaurantManagementGUI.Models
 {
@@ -19,8 +19,11 @@ namespace RestaurantManagementGUI.Models
         [JsonPropertyName("dailyRevenues")]
         public List<DailyRevenueDto> DailyRevenues { get; set; }
 
-        [JsonPropertyName("topEmployees")]
-        public List<EmployeePerformanceDto> TopEmployees { get; set; }
+        [JsonPropertyName("topDishes")]
+        public List<DishPerformanceDto> TopDishes { get; set; }
+
+        [JsonPropertyName("bottomDishes")]
+        public List<DishPerformanceDto> BottomDishes { get; set; }
 
         [JsonPropertyName("recentTransactions")]
         public List<TransactionDetailDto> RecentTransactions { get; set; }
@@ -35,13 +38,16 @@ namespace RestaurantManagementGUI.Models
         public decimal Revenue { get; set; }
     }
 
-    public class EmployeePerformanceDto
+    public class DishPerformanceDto
     {
-        [JsonPropertyName("employeeName")]
-        public string EmployeeName { get; set; }
+        [JsonPropertyName("dishName")]
+        public string DishName { get; set; }
 
-        [JsonPropertyName("totalRevenue")]
-        public decimal TotalRevenue { get; set; }
+        [JsonPropertyName("quantitySold")]
+        public int QuantitySold { get; set; }
+
+        [JsonPropertyName("revenue")]
+        public decimal Revenue { get; set; }
     }
 
     public class TransactionDetailDto

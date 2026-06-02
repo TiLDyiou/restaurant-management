@@ -151,7 +151,7 @@
                                FilterChanged="OnFlyoutFilterChanged"
                                MergeRequested="OnFlyoutMergeRequested"
                                SplitRequested="OnFlyoutSplitRequested"
-                               TransferRequested="OnFlyoutTransferRequested"
+
                                HistoryRequested="OnFlyoutHistoryRequested"
                                DeleteRequested="OnFlyoutDeleteRequested" />
 

@@ -23,6 +23,7 @@ namespace RestaurantManagementAPI.DTOs.ReportDtos
     {
         public string DishName { get; set; } = string.Empty;
         public int QuantitySold { get; set; }
+        public decimal Revenue { get; set; }
     }
 
     public class TransactionDetailDto
