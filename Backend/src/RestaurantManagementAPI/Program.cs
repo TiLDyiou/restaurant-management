@@ -20,9 +20,13 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Set up Serilog
-builder.Host.UseSerilog((context, loggerConfiguration) => loggerConfiguration
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day));
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    var instanceName = Environment.GetEnvironmentVariable("APP_INSTANCE") ?? "api";
+    loggerConfiguration
+        .WriteTo.Console()
+        .WriteTo.File($"Logs/log-{instanceName}-.txt", rollingInterval: RollingInterval.Day);
+});
 
 // DbContext
 builder.Services.AddDbContext<QLNHDbContext>(options =>

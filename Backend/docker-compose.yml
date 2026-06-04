@@ -43,12 +43,11 @@ services:
   # 3. BACKEND API SERVICE - INSTANCE 1
   # ----------------------------------------------------------------------------
   api1:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: restaurant-api:latest
     container_name: qlnh_api1
     restart: always
     environment:
+      - APP_INSTANCE=api1
       - ConnectionStrings__QLNHDatabase=Server=sqlserver,1433;Database=QLNHDatabase;User Id=sa;Password=${MSSQL_SA_PASSWORD:-YourSecurePassword123!};Encrypt=True;TrustServerCertificate=True;
       - ConnectionStrings__Redis=${ConnectionStrings__Redis:-redis:6379}
       - Jwt__Key=${Jwt__Key}
@@ -79,12 +78,11 @@ services:
   # 4. BACKEND API SERVICE - INSTANCE 2
   # ----------------------------------------------------------------------------
   api2:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: restaurant-api:latest
     container_name: qlnh_api2
     restart: always
     environment:
+      - APP_INSTANCE=api2
       - ConnectionStrings__QLNHDatabase=Server=sqlserver,1433;Database=QLNHDatabase;User Id=sa;Password=${MSSQL_SA_PASSWORD:-YourSecurePassword123!};Encrypt=True;TrustServerCertificate=True;
       - ConnectionStrings__Redis=${ConnectionStrings__Redis:-redis:6379}
       - Jwt__Key=${Jwt__Key}
