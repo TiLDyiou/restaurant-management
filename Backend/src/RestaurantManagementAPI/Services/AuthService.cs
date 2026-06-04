@@ -116,7 +116,7 @@ namespace RestaurantManagementAPI.Services
             }
             else
             {
-                // Verify với hash hợp lệ để giữ thời gian xử lý đồng đều, chống timing attack.
+                // Verify with a valid dummy hash to maintain constant response time and prevent timing attacks
                 BCrypt.Net.BCrypt.Verify(dto.MatKhau, DummyHash);
             }
 
@@ -160,7 +160,7 @@ namespace RestaurantManagementAPI.Services
             if (taiKhoan == null || !taiKhoan.IsActive)
                 return ServiceResult<object>.Fail("Tài khoản không khả dụng.");
 
-            // Token rotation: thu hồi refresh token cũ, cấp mới.
+            // Token rotation: revoke old refresh token, issue a new one
             stored.RevokedAt = DateTime.UtcNow;
 
             var newAccessToken = _jwtGenerator.GenerateAccessToken(taiKhoan);
@@ -197,7 +197,7 @@ namespace RestaurantManagementAPI.Services
 
             user.Online = false;
 
-            // Thu hồi tất cả refresh token còn hiệu lực của user này.
+            // Revoke all active refresh tokens for this user
             var activeTokens = await _context.REFRESHTOKEN
                 .Where(r => r.MaNV == maNV && r.RevokedAt == null && r.ExpiresAt > DateTime.UtcNow)
                 .ToListAsync();
@@ -275,7 +275,7 @@ namespace RestaurantManagementAPI.Services
             user.OTP = null;
             user.OTPExpireTime = null;
 
-            // Thu hồi tất cả refresh token sau khi đổi mật khẩu — buộc đăng nhập lại trên mọi thiết bị.
+            // Revoke all active refresh tokens after password reset to force re-authentication on all devices
             var activeTokens = await _context.REFRESHTOKEN
                 .Where(r => r.MaNV == user.MaNV && r.RevokedAt == null)
                 .ToListAsync();

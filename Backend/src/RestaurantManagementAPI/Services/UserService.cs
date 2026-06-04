@@ -128,7 +128,7 @@ namespace RestaurantManagementAPI.Services
                     }
                     catch (Exception ex)
                     { 
-                        // [SMTP Bypass] In mã OTP ra logs và tiếp tục để hỗ trợ môi trường VPS bị chặn cổng gửi mail
+                        // [SMTP Bypass] Log the OTP to application logs and proceed in case the VPS environment blocks outgoing mail ports
                         Log.Warning("⚠️ [SMTP Bypass] Gửi email OTP Verify thất bại do lỗi kết nối mạng VPS: {Message}. OTP của {Email} là: {Otp}", ex.Message, dto.Email, otp);
                         emailChanged = true; 
                     }
@@ -184,7 +184,7 @@ namespace RestaurantManagementAPI.Services
             }
             catch (Exception ex) 
             { 
-                // [SMTP Bypass] In mã OTP ra logs và tiếp tục để hỗ trợ môi trường VPS bị chặn cổng gửi mail
+                // [SMTP Bypass] Log the OTP to application logs and proceed in case the VPS environment blocks outgoing mail ports
                 Log.Warning("⚠️ [SMTP Bypass] Gửi email Resend OTP thất bại do lỗi kết nối mạng VPS: {Message}. OTP của {Email} là: {Otp}", ex.Message, user.Email, otp);
             }
             return ServiceResult.Ok("Đã gửi lại OTP");
@@ -245,7 +245,7 @@ namespace RestaurantManagementAPI.Services
             if (nv == null) 
                 return ServiceResult.Fail("Không tìm thấy NV");
 
-            // Kiểm tra các ràng buộc dữ liệu quan trọng (chặn xóa cứng nếu đã có dữ liệu giao dịch)
+            // Check reference constraints (block hard delete if employee has transaction history)
             bool hasOrders = await _context.HOADON.AnyAsync(h => h.MaNV == maNV);
             bool hasImports = await _context.PHIEUNHAPKHO.AnyAsync(p => p.MaNV == maNV);
             if (hasOrders || hasImports)
@@ -253,14 +253,14 @@ namespace RestaurantManagementAPI.Services
                 return ServiceResult.Fail("Không thể xóa cứng vì nhân viên này đã có lịch sử tạo hóa đơn hoặc nhập kho. Vui lòng dùng tính năng 'Cho nghỉ việc' để vô hiệu hóa tài khoản.");
             }
 
-            // Xóa các tin nhắn nhận/gửi để tránh lỗi Restrict constraint
+            // Delete associated messages to prevent database referential integrity constraint failures
             var receivedMessages = await _context.MESSAGES.Where(m => m.MaNV_Receiver == maNV).ToListAsync();
             if (receivedMessages.Any())
             {
                 _context.MESSAGES.RemoveRange(receivedMessages);
             }
 
-            // Tài khoản và Token sẽ tự động bị xóa nhờ Cascade Delete, nhưng ta có thể xóa thủ công NhanVien
+            // The Account and Refresh Tokens will be cascade deleted, delete the Employee entity
             _context.NHANVIEN.Remove(nv);
             
             await _context.SaveChangesAsync();

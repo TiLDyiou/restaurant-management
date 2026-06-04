@@ -11,7 +11,7 @@ using System.Text;
 
 namespace RestaurantManagementAPI.Infrastructure.Sockets
 {
-    public class TcpSocketServer : BackgroundService // TcpSocketServer kế thừa từ BackgroundService để chạy ngầm
+    public class TcpSocketServer : BackgroundService // Inherit from BackgroundService for background execution
     {
         public static TcpSocketServer? Instance { get; private set; }
         private TcpListener? _listener;
@@ -48,7 +48,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var client = await _listener.AcceptTcpClientAsync(stoppingToken);
-                    _ = HandleClientAsync(client, stoppingToken); // Fire-and-forget, không chờ client trước xử lý xong mà tiếp tục lắng nghe client khác
+                    _ = HandleClientAsync(client, stoppingToken); // Fire-and-forget: run concurrently without blocking acceptance of other clients
                 }
             }
             catch (Exception ex) 
@@ -60,7 +60,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
         private async Task HandleClientAsync(TcpClient client, CancellationToken token)
         {
             string maNV = "";
-            NetworkStream stream = client.GetStream(); // Lấy luồng dữ liệu từ client
+            NetworkStream stream = client.GetStream(); // Retrieve client data stream
             using var reader = new StreamReader(stream, Encoding.UTF8);
 
             try
@@ -73,7 +73,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
 
                     _logger.LogInformation("Received message: {Message}", message);
 
-                    if (message.StartsWith("LOGIN|")) // Định dạng : LOGIN|MaNV
+                    if (message.StartsWith("LOGIN|")) // Format: LOGIN|MaNV
                     {
                         var parts = message.Split('|');
                         if (parts.Length > 1)
@@ -81,7 +81,7 @@ namespace RestaurantManagementAPI.Infrastructure.Sockets
                             maNV = parts[1].Trim();
                             _clients.AddOrUpdate(maNV, client, (k, v) => client);
                             _logger.LogInformation("User {MaNV} Connected", maNV);
-                            await UpdateUserStatusInDb(maNV, true); // Cập nhật trạng thái online trong DB
+                            await UpdateUserStatusInDb(maNV, true); // Update user online status in database
                             await _notifier.NotifyUserStatusChangedAsync(maNV, true);
                         }
                     }

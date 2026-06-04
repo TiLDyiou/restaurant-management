@@ -24,21 +24,20 @@ namespace RestaurantManagementAPI.Infrastructure.Email
             _senderEmail = emailSettings["SenderEmail"]!;
             _senderName = emailSettings["SenderName"] ?? "Nhà hàng";
             
-            // Tận dụng biến AppPassword trong appsettings.json để lưu API Key của Brevo 
-            // (Bạn đỡ phải sửa lại cấu trúc file config)
+            // Map AppPassword to Brevo API Key to reuse existing configuration structure
             _apiKey = emailSettings["AppPassword"]!; 
 
             _httpClient = new HttpClient();
             _httpClient.Timeout = TimeSpan.FromSeconds(10);
             
-            // Header bắt buộc của Brevo API
+            // Required headers for Brevo API
             _httpClient.DefaultRequestHeaders.Add("api-key", _apiKey);
             _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
         }
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            // Cấu trúc JSON payload theo chuẩn API của Brevo
+            // Construct JSON payload according to Brevo API specification
             var payload = new
             {
                 sender = new { name = _senderName, email = _senderEmail },
@@ -50,7 +49,7 @@ namespace RestaurantManagementAPI.Infrastructure.Email
             var jsonPayload = JsonSerializer.Serialize(payload);
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            // Gửi qua HTTPS (Port 443 - không bao giờ bị khóa trên VPS)
+            // Send via HTTPS (Port 443) which avoids port blocking issues on VPS
             var response = await _httpClient.PostAsync("https://api.brevo.com/v3/smtp/email", content);
 
             if (!response.IsSuccessStatusCode)

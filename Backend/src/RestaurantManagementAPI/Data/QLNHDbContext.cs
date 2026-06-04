@@ -140,35 +140,35 @@ namespace RestaurantManagementAPI.Data
             modelBuilder.Entity<DatBan>()
             .HasKey(db => db.MaDatBan);
 
-            // DatBan -> Ban (n-1) 
+            // DatBan -> Ban (N-1) relation
             modelBuilder.Entity<Ban>()
                 .HasMany<DatBan>() 
                 .WithOne(db => db.Ban)
                 .HasForeignKey(db => db.MaBan)
-                .OnDelete(DeleteBehavior.Restrict); // Không cho xoá Bàn nếu còn lịch sử đặt
+                .OnDelete(DeleteBehavior.Restrict); // Restrict deletion of Tables that have active reservations
 
 
-            // Cấu hình cho bảng MESSAGES
+            // Message entity configuration
             modelBuilder.Entity<Message>(entity => {
                 entity.HasKey(m => m.Id);
                 entity.Property(m => m.Content).IsRequired();
 
-                // Quan hệ với người gửi (Sender)
+                // Relationship with Sender
                 entity.HasOne(m => m.Sender) 
                       .WithMany()
                       .HasForeignKey(m => m.MaNV_Sender)
-                      .OnDelete(DeleteBehavior.Cascade); // Xóa nhân viên thì xóa tin nhắn họ gửi
+                      .OnDelete(DeleteBehavior.Cascade); // Cascade delete messages sent by the deleted employee
 
-                // Quan hệ với người nhận (Receiver) - QUAN TRỌNG CHO CHAT 1-1
+                // Relationship with Receiver (Important for 1-1 Chat)
                 entity.HasOne(m => m.Receiver)
                       .WithMany()
                       .HasForeignKey(m => m.MaNV_Receiver)
-                      .OnDelete(DeleteBehavior.Restrict); // Dùng Restrict để tránh lỗi Multiple Cascade Path
+                      .OnDelete(DeleteBehavior.Restrict); // Use Restrict to prevent Multiple Cascade Paths in SQL Server
 
-                // Chỉ định độ dài cho ConversationId để tối ưu index
+                // Configure ConversationId length to optimize database indexing
                 entity.Property(m => m.ConversationId).HasMaxLength(100);
 
-                // Thêm index cho ConversationId và Timestamp để load lịch sử chat nhanh hơn
+                // Add compound index on ConversationId and Timestamp for faster chat history retrieval
                 entity.HasIndex(m => new { m.ConversationId, m.Timestamp });
             });
 

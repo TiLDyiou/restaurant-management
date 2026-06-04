@@ -170,7 +170,7 @@ PayOSClient payOS = new PayOSClient(new PayOSOptions
 });
 builder.Services.AddSingleton(payOS);
 
-// Dependency Injection (Đăng ký Services)
+// Dependency Injection Service Registrations
 
 // Infrastructure
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -229,7 +229,7 @@ catch (Exception ex)
     app.Logger.LogError(ex, "Seeding Error");
 }
 
-// Luôn bật Swagger (kể cả Production) để phục vụ chấm điểm và chạy thử dự án sinh viên
+// Always enable Swagger (including Production) for student grading and testing purposes
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseStaticFiles();
