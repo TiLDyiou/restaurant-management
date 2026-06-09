@@ -149,3 +149,5 @@ volumes:
 networks:
   qlnh_network:
     name: restaurantmanagementapi_qlnh_network
+
+# Deploy trigger: 2026-06-09T18:41:00Z
