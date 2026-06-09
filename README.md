@@ -59,10 +59,27 @@ restaurant-management/
 
 ## 💻 Cài Đặt và Chạy thử ở Máy Local
 
+### ⚡ Cách Chạy Nhanh Client Bằng File ZIP (Không cần cài đặt/biên dịch)
+Nếu bạn chỉ muốn trải nghiệm nhanh giao diện và tính năng của ứng dụng Client (Windows) mà không muốn cài đặt Visual Studio, cấu hình môi trường hoặc biên dịch mã nguồn từ đầu:
+1. Giải nén tệp tin **`RestaurantManagementApp_Testing.zip`** nằm ngay tại thư mục gốc của dự án này.
+2. Mở thư mục vừa giải nén và chạy trực tiếp file thực thi **`RestaurantManagementGUI.exe`**.
+
+> [!NOTE]
+> * Ứng dụng Client này đã được cấu hình sẵn để kết nối trực tiếp đến hệ thống API đang chạy thực tế trên Cloud VPS tại địa chỉ: `https://qlnhnhom2.me/`.
+> * Bạn **không cần** khởi chạy Database hay API ở máy local vẫn có thể đăng nhập và trải nghiệm toàn bộ nghiệp vụ thời gian thực của hệ thống.
+> * Thông tin đăng nhập mặc định:
+>   * **Tài khoản:** `admin` | **Mật khẩu:** `123456` (Quyền Quản trị viên)
+>   * Hoặc đăng ký tài khoản mới trực tiếp trên giao diện của ứng dụng.
+
+---
+
+### 🛠️ Cấu hình và chạy từ Source Code đầy đủ
+
 ### Yêu cầu hệ thống
 *   [.NET SDK 9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
 *   SQL Server LocalDB (đi kèm khi cài Visual Studio) hoặc Docker SQL Server.
 *   Visual Studio 2022 (phiên bản 17.12 trở lên) hoặc JetBrains Rider.
+
 
 ### 🔑 Thiết lập Môi trường Bảo mật (User Secrets)
 Để tránh lộ các khóa bảo mật trong Git, hãy khởi tạo các secret của bạn trong thư mục API:
